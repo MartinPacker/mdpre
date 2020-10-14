@@ -2,6 +2,11 @@
 
 ### Releases
 
+### v0.4.5 - 14 October, 2020
+
+* **FIXED** Did not run with Python 3. Now it does
+
+### v0.4.4 - 7 January, 2020
 
 ### v0.4.3 - 10 March, 2019
 
