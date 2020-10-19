@@ -16,10 +16,15 @@ import zipfile
 #import StringIO
 import re
 import datetime
+from functools import partial
+
+
 
 mdpre_level = "0.4.5"
 mdpre_date = "14 October, 2020"
 
+
+log = partial(print,file=sys.stderr)                       #| create log to stderr
 
 def writeMarkdown(toFile, text):
     toFile.write(text + "\n")
@@ -294,36 +299,24 @@ def handle_linejoins(input_file):
 
 
 # Returns one item per potential TOC entry. First is level, Second is Text
-def extractTableOfContents(input_file):
-    toc = []
-    minTocLevel = 999
-    maxTocLevel = 0
-    for line in input_file:
-        if line.startswith("######"):
-            toc.append((6, line[6:].lstrip().rstrip()))
-            maxTocLevel = max(maxTocLevel, 6)
-            minTocLevel = min(minTocLevel, 6)
-        if line.startswith("#####"):
-            toc.append((5, line[5:].lstrip().rstrip()))
-            maxTocLevel = max(maxTocLevel, 5)
-            minTocLevel = min(minTocLevel, 5)
-        if line.startswith("####"):
-            toc.append((4, line[4:].lstrip().rstrip()))
-            maxTocLevel = max(maxTocLevel, 4)
-            minTocLevel = min(minTocLevel, 4)
-        elif line.startswith("###"):
-            toc.append((3, line[3:].lstrip().rstrip()))
-            maxTocLevel = max(maxTocLevel, 3)
-            minTocLevel = min(minTocLevel, 3)
-        elif line.startswith("##"):
-            toc.append((2, line[2:].lstrip().rstrip()))
-            maxTocLevel = max(maxTocLevel, 2)
-            minTocLevel = min(minTocLevel, 2)
-        elif line.startswith("#"):
-            toc.append((1, line[1:].lstrip().rstrip()))
-            maxTocLevel = max(maxTocLevel, 1)
-            minTocLevel = min(minTocLevel, 1)
-    return [minTocLevel, maxTocLevel, toc]
+def extractTableOfContents(p_input_file_lines, o_heading_symbol = "#"):
+    r_toc = []                                                      #| init:
+    r_minTocLevel = 999
+    r_maxTocLevel = 0
+    for line in p_input_file_lines:                                 #| for every line:
+           
+        if line.startswith(o_heading_symbol):                       #|   if line starts with heading:
+            title = line.lstrip(o_heading_symbol)                   #|     remoe leading sign
+            level = len(line) - len(title)                          #|     calculate level
+            title = title.lstrip().rstrip()                         #|     flatten heading title
+            r_toc.append((level, title))                            #|     append to list
+                                                                    #| 
+            if level > r_maxTocLevel:                               #|     maybe update levels
+                r_maxTocLevel = level
+            elif level < r_minTocLevel:
+                r_minTocLevel = level
+
+    return [r_minTocLevel, r_maxTocLevel, r_toc]
 
 
 def parseTocStatement(line, minTocLevel, maxTocLevel):
@@ -384,6 +377,7 @@ def makeLink(linkText):
 
 # Print Table Of Contents down to maximum level
 def printTableOfContents(minLevel, maxLevel, heading, toc):
+
     writeMarkdown(toFile, heading + "\n")
     for tocEntryLevel, tocEntryText in toc:
         if (tocEntryLevel >= minLevel) & (tocEntryLevel <= maxLevel):
@@ -623,7 +617,7 @@ if textBundleFilename != "":
         if os.path.isfile(realpath) is True:
             # Regular file of that name exists so quitting
             sys.stderr.write(realpath + " is a regular file. Quitting.\n")
-            exit(0)
+            sys.exit(0)
         else:
             # Directory already exists
             if wantVerbose is True:
@@ -715,6 +709,7 @@ for line in input_file:
         if wantVerbose is True:
             handle_verbose("<!--mdpre-toc:" + line + "-->")
         minLevel, maxLevel, heading = parseTocStatement(line, minTocLevel, maxTocLevel)
+        print(minLevel, maxLevel, heading, file=sys.stderr)
         printTableOfContents(minLevel, maxLevel, "### " + heading, tableOfContents)
     elif (line.startswith("=csv")) & (in_csv is False):
         in_csv = True
@@ -759,4 +754,4 @@ if wantTextPack is True:
 sys.stderr.write("\nProcessing completed.\n\n")
 
 
-exit()
+sys.exit()
