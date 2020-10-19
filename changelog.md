@@ -2,6 +2,10 @@
 
 ### Releases
 
+### v0.4.6 - 19 October, 2020
+
+* **ENHANCED** With -v heading levels can go arbitrarily deep
+
 ### v0.4.5 - 14 October, 2020
 
 * **FIXED** Did not run with Python 3. Now it does

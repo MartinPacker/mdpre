@@ -20,8 +20,8 @@ from functools import partial
 
 
 
-mdpre_level = "0.4.5"
-mdpre_date = "14 October, 2020"
+mdpre_level = "0.4.6"
+mdpre_date = "19 October, 2020"
 
 
 log = partial(print,file=sys.stderr)                       #| create log to stderr
