@@ -17,6 +17,7 @@ import zipfile
 import re
 import datetime
 from functools import partial
+from pathlib import Path
 
 
 
@@ -26,8 +27,61 @@ mdpre_date = "19 October, 2020"
 
 log = partial(print,file=sys.stderr)                       #| create log to stderr
 
-def writeMarkdown(toFile, text):
-    toFile.write(text + "\n")
+g_writer = None 
+
+class Writer(object):
+    NL = '\n'
+    def __init__(self, p_toFile  ):
+        self.toFile = None
+        if hasattr(p_toFile, 'write'):
+            self.toFile = p_toFile
+            log(f'writer opened {p_toFile.name} for writing')
+        else:
+            log(f'ERROR: writer could not find an open file {p_toFile}')
+            sys.exit(-101)
+
+    def close(self):
+        log('file stream closing')
+        self.toFile.close()
+
+    def writeMarkdown(self, p_text):
+        self.toFile.write(f"{p_text}{self.NL}")
+
+def exit_script(p_writer, p_code = 0):
+    p_writer.close()
+    sys.exit(p_code)
+    
+def create_output_file(p_file_path = ""):
+    """
+        param: p_file_path:
+            "" : use sys.stdout
+    """
+    r_writer = None
+
+    if p_file_path == "":
+        r_writer = Writer(sys.stdout) 
+    else:
+        if Path(p_file_path).exists():
+            # TODO: overwrite warning?
+            pass
+        to_file = open(p_file_path, 'w')
+        r_writer = Writer(to_file)
+    
+    return r_writer
+
+
+
+if True: # todo: delete test code
+    writer_stdout = create_output_file()
+    writer_file   = create_output_file('test.txt')
+    writer_stdout.writeMarkdown('| sys.stdout works\n')
+    writer_file.writeMarkdown('| file output works\n')
+    writer_stdout.close()
+    exit_script(writer_file, 0)
+    
+
+def writeMarkdown(toFile, text): #todo: delete old code
+    toFile.write(text+"\n")    
 
 
 def formatCSV(CSV_lines, colalign, colwidth):
