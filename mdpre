@@ -38,7 +38,7 @@ class Writer(object):
             log(f'writer opened {p_toFile.name} for writing')
         else:
             log(f'ERROR: writer could not find an open file {p_toFile}')
-            sys.exit(-101)
+            exit_script(writer, -101)
 
     def close(self):
         log('file stream closing')
@@ -527,6 +527,14 @@ def setupStandardVariables():
 
 def exit_script(p_writer, p_code = 0):
     p_writer.close()
+    if p_code == 0:
+        log("\nProcessing completed.\n\n")
+    elif p_code == 1:
+        # HELP output
+        p_code = 0
+    else:
+        log(f"\nProcessing STOPPED with error {p_code}\n\n")
+
     sys.exit(p_code)
     
 def create_output_file(p_file_path = ""):
@@ -547,22 +555,10 @@ def create_output_file(p_file_path = ""):
     
     return r_writer
 
-def writeMarkdown(toFile, text): #todo: delete old code
-    toFile.write(text+"\n")    
-
-
 ############################################################################################################
 #  Main
 #
-test = False
-if test: # todo: delete test code
-    writer_stdout = create_output_file()
-    writer_file   = create_output_file('test.txt')
-    writer_stdout.writeMarkdown('| sys.stdout works\n')
-    writer_file.writeMarkdown('| file output works\n')
-    writer_stdout.close()
-    exit_script(writer_file, 0)
-    
+
 
 
 END = "\033[0m"
@@ -582,6 +578,8 @@ textBundleFilename = ""
 wrapInCSV = False
 
 parmVars = []
+writer = None
+
 
 arguments = len(sys.argv) - 1
 for arg in range(1, arguments + 1):
@@ -637,7 +635,8 @@ for arg in range(1, arguments + 1):
         )
         sys.stderr.write("mdpre -c < input.csv outputfile\n\n")
 
-        sys.exit()
+        exit_script(writer, 1)
+
     elif argument == "-v":
         # Turn on "verbose mode"
         wantVerbose = True
@@ -711,14 +710,26 @@ if textBundleFilename != "":
     # Remove any prior instance of the markdown file
     if os.path.isfile(markdownFile) is True:
         os.remove(markdownFile)
+                                                #| ## Textbundle:    
+    writer = create_output_file(markdownFile)   #| Open the file where markdown goes for write
 
-    # Open the file where markdown goes for write
-    toFile = open(markdownFile, "w")
+elif markdownFile != "":                        
+
+    if os.path.isfile(markdownFile) is True:
+        os.remove(markdownFile)
+                                                #| ## File:
+    writer = create_output_file(markdownFile)   #| Open the file where markdown goes for write
+
+else:                                           #| ## stdout 
+    writer = create_output_file()               #| NOTE: Write to stdout as not making a textbundle
+
+if input_file == "":
+    input_file = sys.stdin.readlines()
 else:
-    # Write to stdout as not making a textbundle
-    toFile = sys.stdout
+    if os.path.isfile(input_file) is True:
+        with open(input_file, "r') as file_handle:
+            input_file = file_handle.readlines()
 
-input_file = sys.stdin.readlines()
 
 # If -c was specified on the command line wrap the file with =csv / =endcsv bracket
 if wrapInCSV == True:
@@ -752,6 +763,7 @@ minTocLevel, maxTocLevel, tableOfContents = extractTableOfContents(input_file)
 csv_colalign = []
 csv_colwidth = []
 in_csv = False
+    
 
 for line in input_file:
     line = line.rstrip()
@@ -808,7 +820,5 @@ if wantTextPack is True:
     if wantVerbose is True:
         print("Removing temporary files in directory " + realpath)
         shutil.rmtree(realpath)
-sys.stderr.write("\nProcessing completed.\n\n")
 
-
-sys.exit()
+exit_script(writer, 0)
