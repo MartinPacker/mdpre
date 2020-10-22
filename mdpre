@@ -376,7 +376,7 @@ def extractTableOfContents(p_input_file_lines, o_heading_symbol = "#"):
     r_minTocLevel = 999
     r_maxTocLevel = 0
     for line in p_input_file_lines:                                 #| for every line:
-           
+        
         if line.startswith(o_heading_symbol):                       #|   if line starts with heading:
             title = line.lstrip(o_heading_symbol)                   #|     remoe leading sign
             level = len(line) - len(title)                          #|     calculate level
@@ -578,7 +578,10 @@ textBundleFilename = ""
 wrapInCSV = False
 
 parmVars = []
-writer = None
+
+input_file = ""                                 #| TODO: add input file from command line for file output later
+
+writer = None                                   #| global variable for writing output
 
 
 arguments = len(sys.argv) - 1
@@ -727,7 +730,7 @@ if input_file == "":
     input_file = sys.stdin.readlines()
 else:
     if os.path.isfile(input_file) is True:
-        with open(input_file, "r') as file_handle:
+        with open(input_file, "r") as file_handle:
             input_file = file_handle.readlines()
 
 
@@ -773,20 +776,20 @@ for line in input_file:
     elif line.startswith("#"):
         if wantVerbose is True:
             handle_verbose("<!--mdpre-heading:" + line + "-->")
-        writeMarkdown(toFile, line)
+        writer.writeMarkdown(line)
     elif line.startswith("=toc"):
         if wantVerbose is True:
             handle_verbose("<!--mdpre-toc:" + line + "-->")
         minLevel, maxLevel, heading = parseTocStatement(line, minTocLevel, maxTocLevel)
         print(minLevel, maxLevel, heading, file=sys.stderr)
-        printTableOfContents(minLevel, maxLevel, "### " + heading, tableOfContents)
+        writer.printTableOfContents(minLevel, maxLevel, "### " + heading, tableOfContents)
     elif (line.startswith("=csv")) & (in_csv is False):
         in_csv = True
         CSV_lines = []
         if wantVerbose is True:
             handle_verbose("<!--mdpre-csv:" + line + "-->")
     elif (line.startswith("=endcsv")) & (in_csv is True):
-        formatCSV(CSV_lines, csv_colalign, csv_colwidth)
+        writer.formatCSV(CSV_lines, csv_colalign, csv_colwidth)
         in_csv = False
         if wantVerbose is True:
             handle_verbose("<!--mdpre-endcsv:" + line + "-->")
@@ -802,11 +805,12 @@ for line in input_file:
         CSV_lines.append(line)
     elif (line.find("![") > -1) & (wantTextBundle is True):
         # Fix up graphics references and copy graphics to assets folder
-        handle_adjustGraphics(line)
+        writer.handle_adjustGraphics(line)
     else:
-        writeMarkdown(toFile, line)
+        writer.writeMarkdown(line)
 
-toFile.close()
+# NOTE: toFile.close() is handled in the new exits function
+# NOTE: ! this message will self distruct during the pull request
 
 if wantTextPack is True:
     if wantVerbose is True:
@@ -819,6 +823,6 @@ if wantTextPack is True:
 
     if wantVerbose is True:
         print("Removing temporary files in directory " + realpath)
-        shutil.rmtree(realpath)
+    shutil.rmtree(realpath)
 
 exit_script(writer, 0)
