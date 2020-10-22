@@ -44,7 +44,7 @@ class Writer(object):
         log('file stream closing')
         self.toFile.close()
 
-    def writeMarkdown(self, p_text):
+    def to_md_file(self, p_text):
         self.toFile.write(f"{p_text}{self.NL}")
 
     def formatCSV(self, CSV_lines, colalign, colwidth):
@@ -73,7 +73,7 @@ class Writer(object):
             row_text = "|"
             for col in row:
                 row_text = row_text + col + "|"
-            self.writeMarkdown(row_text)
+            self.to_md_file(row_text)
 
             titleUnderline = "|"
             if first_row is True:
@@ -88,17 +88,17 @@ class Writer(object):
                     else:
                         titleUnderline = titleUnderline + dashes + "|"
 
-                self.writeMarkdown(titleUnderline)
+                self.to_md_file(titleUnderline)
                 first_row = False
         return
 
     # Print Table Of Contents down to maximum level
     def printTableOfContents(self, minLevel, maxLevel, heading, toc):
 
-        self.writeMarkdown(heading + "\n")
+        self.to_md_file(heading + "\n")
         for tocEntryLevel, tocEntryText in toc:
             if (tocEntryLevel >= minLevel) & (tocEntryLevel <= maxLevel):
-                self.writeMarkdown(
+                self.to_md_file(
                     ("\t" * (tocEntryLevel - minLevel))
                     + "* ["
                     + tocEntryText
@@ -140,7 +140,7 @@ class Writer(object):
         if wantVerbose is True:
             sys.stderr.write("Adjusting >>" + adjustedLine + "<<<\n")
 
-        self.writeMarkdown(adjustedLine)
+        self.to_md_file(adjustedLine)
 
         return
 
@@ -548,7 +548,8 @@ def create_output_file(p_file_path = ""):
         r_writer = Writer(sys.stdout) 
     else:
         if Path(p_file_path).exists():
-            # TODO: overwrite warning?
+            if wantVerbose:
+                sys.stderr.write("WARNING: overwriting file!")
             pass
         to_file = open(p_file_path, 'w')
         r_writer = Writer(to_file)
@@ -559,8 +560,7 @@ def create_output_file(p_file_path = ""):
 #  Main
 #
 
-
-
+BOLD = "\033[1m"
 END = "\033[0m"
 
 banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
@@ -583,6 +583,8 @@ input_file = ""                                 #| TODO: add input file from com
 
 writer = None                                   #| global variable for writing output
 
+def bold( p_text ):
+    return BOLD + p_text + END
 
 arguments = len(sys.argv) - 1
 for arg in range(1, arguments + 1):
@@ -776,7 +778,7 @@ for line in input_file:
     elif line.startswith("#"):
         if wantVerbose is True:
             handle_verbose("<!--mdpre-heading:" + line + "-->")
-        writer.writeMarkdown(line)
+        writer.to_md_file(line)
     elif line.startswith("=toc"):
         if wantVerbose is True:
             handle_verbose("<!--mdpre-toc:" + line + "-->")
@@ -807,7 +809,7 @@ for line in input_file:
         # Fix up graphics references and copy graphics to assets folder
         writer.handle_adjustGraphics(line)
     else:
-        writer.writeMarkdown(line)
+        writer.to_md_file(line)
 
 # NOTE: toFile.close() is handled in the new exits function
 # NOTE: ! this message will self distruct during the pull request
