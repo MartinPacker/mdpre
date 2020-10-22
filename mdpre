@@ -47,88 +47,106 @@ class Writer(object):
     def writeMarkdown(self, p_text):
         self.toFile.write(f"{p_text}{self.NL}")
 
-def exit_script(p_writer, p_code = 0):
-    p_writer.close()
-    sys.exit(p_code)
-    
-def create_output_file(p_file_path = ""):
-    """
-        param: p_file_path:
-            "" : use sys.stdout
-    """
-    r_writer = None
+    def formatCSV(self, CSV_lines, colalign, colwidth):
+        CSV_reader = csv.reader(CSV_lines)
 
-    if p_file_path == "":
-        r_writer = Writer(sys.stdout) 
-    else:
-        if Path(p_file_path).exists():
-            # TODO: overwrite warning?
-            pass
-        to_file = open(p_file_path, 'w')
-        r_writer = Writer(to_file)
-    
-    return r_writer
+        # Find out how many columns and prime CSV_lines
+        columns = 0
+        CSV_lines = []
+        for row in CSV_reader:
+            columns = max(columns, len(row))
+            CSV_lines.append(row)
 
+        # Extend colalign to cover all columns - now we know how many there are
+        colalign_len = len(colalign)
+        for i in range(colalign_len, columns + 1):
+            colalign.append("l")
 
+        # Extend colwidth to cover all columns - now we know how many there are
+        colwidth_len = len(colwidth)
+        for i in range(colwidth_len, columns + 1):
+            colwidth.append(1)
 
-if True: # todo: delete test code
-    writer_stdout = create_output_file()
-    writer_file   = create_output_file('test.txt')
-    writer_stdout.writeMarkdown('| sys.stdout works\n')
-    writer_file.writeMarkdown('| file output works\n')
-    writer_stdout.close()
-    exit_script(writer_file, 0)
-    
+        # Now print the table
+        first_row = True
+        for row in CSV_lines:
+            row_text = "|"
+            for col in row:
+                row_text = row_text + col + "|"
+            self.writeMarkdown(row_text)
 
-def writeMarkdown(toFile, text): #todo: delete old code
-    toFile.write(text+"\n")    
+            titleUnderline = "|"
+            if first_row is True:
+                for i in range(columns):
+                    dashes = "-" * colwidth[i]
+                    if colalign[i] == "r":
+                        titleUnderline = titleUnderline + dashes + ":|"
+                    elif colalign[i] == "c":
+                        titleUnderline = titleUnderline + ":" + dashes + ":|"
+                    elif colalign[i] == "l":
+                        titleUnderline = titleUnderline + ":" + dashes + "|"
+                    else:
+                        titleUnderline = titleUnderline + dashes + "|"
 
+                self.writeMarkdown(titleUnderline)
+                first_row = False
+        return
 
-def formatCSV(CSV_lines, colalign, colwidth):
-    CSV_reader = csv.reader(CSV_lines)
+    # Print Table Of Contents down to maximum level
+    def printTableOfContents(self, minLevel, maxLevel, heading, toc):
 
-    # Find out how many columns and prime CSV_lines
-    columns = 0
-    CSV_lines = []
-    for row in CSV_reader:
-        columns = max(columns, len(row))
-        CSV_lines.append(row)
+        self.writeMarkdown(heading + "\n")
+        for tocEntryLevel, tocEntryText in toc:
+            if (tocEntryLevel >= minLevel) & (tocEntryLevel <= maxLevel):
+                self.writeMarkdown(
+                    ("\t" * (tocEntryLevel - minLevel))
+                    + "* ["
+                    + tocEntryText
+                    + "](#"
+                    + makeLink(tocEntryText)
+                    + ")",
+                )
 
-    # Extend colalign to cover all columns - now we know how many there are
-    colalign_len = len(colalign)
-    for i in range(colalign_len, columns + 1):
-        colalign.append("l")
+    def handle_adjustGraphics(self, line):
+        adjustedLine = ""
+        splitStart = line.split("![")
+        fragment = 0
+        for s in splitStart:
+            if fragment == 0:
+                # Before first ![
+                adjustedLine = s + "!["
+            else:
+                # At first or subsequent ![
+                endLabelPos = s.find("](")
+                beginGraphicPos = endLabelPos + 2
+                adjustedLine += s[:beginGraphicPos]
+                endGraphicPos = s.find(")")
 
-    # Extend colwidth to cover all columns - now we know how many there are
-    colwidth_len = len(colwidth)
-    for i in range(colwidth_len, columns + 1):
-        colwidth.append(1)
+                # Extract original graphic name, including subdirs
+                graphic = s[beginGraphicPos:endGraphicPos]
 
-    # Now print the table
-    first_row = True
-    for row in CSV_lines:
-        row_text = "|"
-        for col in row:
-            row_text = row_text + col + "|"
-        writeMarkdown(toFile, row_text)
-
-        titleUnderline = "|"
-        if first_row is True:
-            for i in range(columns):
-                dashes = "-" * colwidth[i]
-                if colalign[i] == "r":
-                    titleUnderline = titleUnderline + dashes + ":|"
-                elif colalign[i] == "c":
-                    titleUnderline = titleUnderline + ":" + dashes + ":|"
-                elif colalign[i] == "l":
-                    titleUnderline = titleUnderline + ":" + dashes + "|"
+                # Adjust graphic so it's in the assets subfolder
+                lastSlash = graphic.rfind("/")
+                if lastSlash == -1:
+                    adjustedGraphic = "assets/" + graphic
                 else:
-                    titleUnderline = titleUnderline + dashes + "|"
+                    adjustedGraphic = "assets/" + graphic[lastSlash + 1 :]
 
-            writeMarkdown(toFile, titleUnderline)
-            first_row = False
-    return
+                adjustedLine = adjustedLine + adjustedGraphic + ")" + s[endGraphicPos + 1 :]
 
+                # Copy the file into the text bundle
+                shutil.copy(graphic, realpath + "/" + adjustedGraphic)
+            fragment += 1
+        if wantVerbose is True:
+            sys.stderr.write("Adjusting >>" + adjustedLine + "<<<\n")
+
+        self.writeMarkdown(adjustedLine)
+
+        return
+
+
+#########################################################################################################################
+# Helper Functions
 
 def parse_colalign(colString):
     return colString.rstrip().lstrip().split()
@@ -429,23 +447,6 @@ def makeLink(linkText):
     return re.sub(r"-+", "-", linkURL)
 
 
-# Print Table Of Contents down to maximum level
-def printTableOfContents(minLevel, maxLevel, heading, toc):
-
-    writeMarkdown(toFile, heading + "\n")
-    for tocEntryLevel, tocEntryText in toc:
-        if (tocEntryLevel >= minLevel) & (tocEntryLevel <= maxLevel):
-            writeMarkdown(
-                toFile,
-                ("\t" * (tocEntryLevel - minLevel))
-                + "* ["
-                + tocEntryText
-                + "](#"
-                + makeLink(tocEntryText)
-                + ")",
-            )
-
-
 def handle_verbose(line):
     noPrefixSuffix = line[10:-3]
     verboseArray = noPrefixSuffix.split(":")
@@ -496,43 +497,6 @@ def handle_verbose(line):
     return
 
 
-def handle_adjustGraphics(line):
-    adjustedLine = ""
-    splitStart = line.split("![")
-    fragment = 0
-    for s in splitStart:
-        if fragment == 0:
-            # Before first ![
-            adjustedLine = s + "!["
-        else:
-            # At first or subsequent ![
-            endLabelPos = s.find("](")
-            beginGraphicPos = endLabelPos + 2
-            adjustedLine += s[:beginGraphicPos]
-            endGraphicPos = s.find(")")
-
-            # Extract original graphic name, including subdirs
-            graphic = s[beginGraphicPos:endGraphicPos]
-
-            # Adjust graphic so it's in the assets subfolder
-            lastSlash = graphic.rfind("/")
-            if lastSlash == -1:
-                adjustedGraphic = "assets/" + graphic
-            else:
-                adjustedGraphic = "assets/" + graphic[lastSlash + 1 :]
-
-            adjustedLine = adjustedLine + adjustedGraphic + ")" + s[endGraphicPos + 1 :]
-
-            # Copy the file into the text bundle
-            shutil.copy(graphic, realpath + "/" + adjustedGraphic)
-        fragment += 1
-    if wantVerbose is True:
-        sys.stderr.write("Adjusting >>" + adjustedLine + "<<<\n")
-
-    writeMarkdown(toFile, adjustedLine)
-
-    return
-
 
 # Handle a -d command line parameter
 def handleCommandLineDefine(defString):
@@ -561,7 +525,46 @@ def setupStandardVariables():
     input_file.insert(0, "=def mdpre_date " + mdpre_date + " ")
 
 
-BOLD = "\033[1m"
+def exit_script(p_writer, p_code = 0):
+    p_writer.close()
+    sys.exit(p_code)
+    
+def create_output_file(p_file_path = ""):
+    """
+        param: p_file_path:
+            "" : use sys.stdout
+    """
+    r_writer = None
+
+    if p_file_path == "":
+        r_writer = Writer(sys.stdout) 
+    else:
+        if Path(p_file_path).exists():
+            # TODO: overwrite warning?
+            pass
+        to_file = open(p_file_path, 'w')
+        r_writer = Writer(to_file)
+    
+    return r_writer
+
+def writeMarkdown(toFile, text): #todo: delete old code
+    toFile.write(text+"\n")    
+
+
+############################################################################################################
+#  Main
+#
+test = False
+if test: # todo: delete test code
+    writer_stdout = create_output_file()
+    writer_file   = create_output_file('test.txt')
+    writer_stdout.writeMarkdown('| sys.stdout works\n')
+    writer_file.writeMarkdown('| file output works\n')
+    writer_stdout.close()
+    exit_script(writer_file, 0)
+    
+
+
 END = "\033[0m"
 
 banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
