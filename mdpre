@@ -8,6 +8,10 @@ Reads from stdin
 
 """
 
+# TODO: (later) new log instead of sys.stderr.write + verbose
+# With log( ) we could replace szs.stderr.write
+# With log_verbose( ) we could more the if VERBOSE inside the function
+
 import os
 import sys
 import csv
@@ -18,7 +22,7 @@ import re
 import datetime
 from functools import partial
 from pathlib import Path
-
+from enum import Enum
 
 
 mdpre_level = "0.4.6"
@@ -27,25 +31,36 @@ mdpre_date = "19 October, 2020"
 
 log = partial(print,file=sys.stderr)                       #| create log to stderr
 
-g_writer = None 
+g_output = None 
 
-class Writer(object):
+class Output(Enum):
+    """preparation for later usage. support e.g. other outputs like MMD or ADOC"""
+    MD = 1
+
+class g_output(object):
     NL = '\n'
+    output = Output.MD
+
     def __init__(self, p_toFile  ):
         self.toFile = None
         if hasattr(p_toFile, 'write'):
             self.toFile = p_toFile
-            log(f'writer opened {p_toFile.name} for writing')
+            log(f'g_output opened {p_toFile.name} for writing')
         else:
-            log(f'ERROR: writer could not find an open file {p_toFile}')
-            exit_script(writer, -101)
+            log(f'ERROR: g_output could not find an open file {p_toFile}')
+            exit_script(g_output, -101)
 
     def close(self):
         log('file stream closing')
         self.toFile.close()
 
-    def to_md_file(self, p_text):
-        self.toFile.write(f"{p_text}{self.NL}")
+    def write(self, p_text):
+        if self.output == Output.MD:
+            self.toFile.write(f"{p_text}{self.NL}")
+
+    def write_line(self, p_text):
+        if self.output == Output.MD:
+            self.toFile.write(f"{p_text}{self.NL}")
 
     def formatCSV(self, CSV_lines, colalign, colwidth):
         CSV_reader = csv.reader(CSV_lines)
@@ -73,7 +88,7 @@ class Writer(object):
             row_text = "|"
             for col in row:
                 row_text = row_text + col + "|"
-            self.to_md_file(row_text)
+            self.write(row_text)
 
             titleUnderline = "|"
             if first_row is True:
@@ -88,17 +103,17 @@ class Writer(object):
                     else:
                         titleUnderline = titleUnderline + dashes + "|"
 
-                self.to_md_file(titleUnderline)
+                self.write(titleUnderline)
                 first_row = False
         return
 
     # Print Table Of Contents down to maximum level
     def printTableOfContents(self, minLevel, maxLevel, heading, toc):
 
-        self.to_md_file(heading + "\n")
+        self.write_line(heading)
         for tocEntryLevel, tocEntryText in toc:
             if (tocEntryLevel >= minLevel) & (tocEntryLevel <= maxLevel):
-                self.to_md_file(
+                self.write(
                     ("\t" * (tocEntryLevel - minLevel))
                     + "* ["
                     + tocEntryText
@@ -140,7 +155,7 @@ class Writer(object):
         if wantVerbose is True:
             sys.stderr.write("Adjusting >>" + adjustedLine + "<<<\n")
 
-        self.to_md_file(adjustedLine)
+        self.write(adjustedLine)
 
         return
 
@@ -525,8 +540,8 @@ def setupStandardVariables():
     input_file.insert(0, "=def mdpre_date " + mdpre_date + " ")
 
 
-def exit_script(p_writer, p_code = 0):
-    p_writer.close()
+def exit_script(p_output, p_code = 0):
+    p_output.close()
     if p_code == 0:
         log("\nProcessing completed.\n\n")
     elif p_code == 1:
@@ -542,19 +557,19 @@ def create_output_file(p_file_path = ""):
         param: p_file_path:
             "" : use sys.stdout
     """
-    r_writer = None
+    r_g_output = None
 
     if p_file_path == "":
-        r_writer = Writer(sys.stdout) 
+        r_g_output = g_output(sys.stdout) 
     else:
         if Path(p_file_path).exists():
             if wantVerbose:
                 sys.stderr.write("WARNING: overwriting file!")
             pass
         to_file = open(p_file_path, 'w')
-        r_writer = Writer(to_file)
+        r_g_output = g_output(to_file)
     
-    return r_writer
+    return r_g_output
 
 ############################################################################################################
 #  Main
@@ -579,9 +594,9 @@ wrapInCSV = False
 
 parmVars = []
 
-input_file = ""                                 #| TODO: add input file from command line for file output later
+input_file = ""                                   #| TODO: add input file from command line for file output later
 
-writer = None                                   #| global variable for writing output
+g_output = None                                   #| global variable for writing output
 
 def bold( p_text ):
     return BOLD + p_text + END
@@ -640,7 +655,7 @@ for arg in range(1, arguments + 1):
         )
         sys.stderr.write("mdpre -c < input.csv outputfile\n\n")
 
-        exit_script(writer, 1)
+        exit_script(g_output, 1)
 
     elif argument == "-v":
         # Turn on "verbose mode"
@@ -715,18 +730,18 @@ if textBundleFilename != "":
     # Remove any prior instance of the markdown file
     if os.path.isfile(markdownFile) is True:
         os.remove(markdownFile)
-                                                #| ## Textbundle:    
-    writer = create_output_file(markdownFile)   #| Open the file where markdown goes for write
+                                                  #| ## Textbundle:    
+    g_output = create_output_file(markdownFile)   #| Open the file where markdown goes for write
 
 elif markdownFile != "":                        
 
     if os.path.isfile(markdownFile) is True:
         os.remove(markdownFile)
-                                                #| ## File:
-    writer = create_output_file(markdownFile)   #| Open the file where markdown goes for write
+                                                  #| ## File:
+    g_output = create_output_file(markdownFile)   #| Open the file where markdown goes for write
 
-else:                                           #| ## stdout 
-    writer = create_output_file()               #| NOTE: Write to stdout as not making a textbundle
+else:                                             #| ## stdout 
+    g_output = create_output_file()               #| NOTE: Write to stdout as not making a textbundle
 
 if input_file == "":
     input_file = sys.stdin.readlines()
@@ -778,20 +793,20 @@ for line in input_file:
     elif line.startswith("#"):
         if wantVerbose is True:
             handle_verbose("<!--mdpre-heading:" + line + "-->")
-        writer.to_md_file(line)
+        g_output.write(line)
     elif line.startswith("=toc"):
         if wantVerbose is True:
             handle_verbose("<!--mdpre-toc:" + line + "-->")
         minLevel, maxLevel, heading = parseTocStatement(line, minTocLevel, maxTocLevel)
         print(minLevel, maxLevel, heading, file=sys.stderr)
-        writer.printTableOfContents(minLevel, maxLevel, "### " + heading, tableOfContents)
+        g_output.printTableOfContents(minLevel, maxLevel, "### " + heading, tableOfContents)
     elif (line.startswith("=csv")) & (in_csv is False):
         in_csv = True
         CSV_lines = []
         if wantVerbose is True:
             handle_verbose("<!--mdpre-csv:" + line + "-->")
     elif (line.startswith("=endcsv")) & (in_csv is True):
-        writer.formatCSV(CSV_lines, csv_colalign, csv_colwidth)
+        g_output.formatCSV(CSV_lines, csv_colalign, csv_colwidth)
         in_csv = False
         if wantVerbose is True:
             handle_verbose("<!--mdpre-endcsv:" + line + "-->")
@@ -807,12 +822,12 @@ for line in input_file:
         CSV_lines.append(line)
     elif (line.find("![") > -1) & (wantTextBundle is True):
         # Fix up graphics references and copy graphics to assets folder
-        writer.handle_adjustGraphics(line)
+        g_output.handle_adjustGraphics(line)
     else:
-        writer.to_md_file(line)
+        g_output.write(line)
 
 # NOTE: toFile.close() is handled in the new exits function
-# NOTE: ! this message will self distruct during the pull request
+# NOTE: ! this message will self destruct during the pull request
 
 if wantTextPack is True:
     if wantVerbose is True:
@@ -827,4 +842,4 @@ if wantTextPack is True:
         print("Removing temporary files in directory " + realpath)
     shutil.rmtree(realpath)
 
-exit_script(writer, 0)
+exit_script(g_output, 0)
