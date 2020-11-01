@@ -32,14 +32,21 @@ mdpre_date = "19 October, 2020"
 log = partial(print,file=sys.stderr)                       #| create log to stderr
 
 g_output = None 
+g_wrapInCSV = False
 
-class Output(Enum):
+csv_colalign = []
+csv_colwidth = []
+in_csv = False
+
+
+
+class OutputType(Enum):
     """preparation for later usage. support e.g. other outputs like MMD or ADOC"""
     MD = 1
 
-class g_output(object):
+class Output(object):
     NL = '\n'
-    output = Output.MD
+    output = OutputType.MD
 
     def __init__(self, p_toFile  ):
         self.toFile = None
@@ -55,12 +62,11 @@ class g_output(object):
         self.toFile.close()
 
     def write(self, p_text):
-        if self.output == Output.MD:
+        if self.output == OutputType.MD:
             self.toFile.write(f"{p_text}{self.NL}")
 
     def write_line(self, p_text):
-        if self.output == Output.MD:
-            self.toFile.write(f"{p_text}{self.NL}")
+        self.write(f"{p_text}{self.NL}")
 
     def formatCSV(self, CSV_lines, colalign, colwidth):
         CSV_reader = csv.reader(CSV_lines)
@@ -82,23 +88,29 @@ class g_output(object):
         for i in range(colwidth_len, columns + 1):
             colwidth.append(1)
 
+        log("formatCSV >",colwidth)
+        
         # Now print the table
         first_row = True
         for row in CSV_lines:
             row_text = "|"
-            for col in row:
-                row_text = row_text + col + "|"
+            for col_index, col_text in enumerate(row):
+                spaces = colwidth[col_index] - len(col_text)
+                if spaces < 0:
+                    spaces = 0
+
+                row_text = row_text + col_text + " "*spaces + "|"
             self.write(row_text)
 
             titleUnderline = "|"
             if first_row is True:
-                for i in range(columns):
-                    dashes = "-" * colwidth[i]
-                    if colalign[i] == "r":
+                for col_index in range(columns):
+                    dashes = "-" * (colwidth[col_index]-1)
+                    if colalign[col_index] == "r":
                         titleUnderline = titleUnderline + dashes + ":|"
-                    elif colalign[i] == "c":
+                    elif colalign[col_index] == "c":
                         titleUnderline = titleUnderline + ":" + dashes + ":|"
-                    elif colalign[i] == "l":
+                    elif colalign[col_index] == "l":
                         titleUnderline = titleUnderline + ":" + dashes + "|"
                     else:
                         titleUnderline = titleUnderline + dashes + "|"
@@ -163,12 +175,12 @@ class g_output(object):
 #########################################################################################################################
 # Helper Functions
 
-def parse_colalign(colString):
-    return colString.rstrip().lstrip().split()
+def parse_colalign(colString, p_seperator=' '):
+    return colString.rstrip().lstrip().split(p_seperator)
 
 
-def parse_colwidth(colString):
-    colwidths = colString.rstrip().lstrip().split()
+def parse_colwidth(colString, p_seperator=' '):
+    colwidths = colString.rstrip().lstrip().split(p_seperator)
     colwidthInt = []
     for c in colwidths:
         colwidthInt.append(int(c))
@@ -557,19 +569,19 @@ def create_output_file(p_file_path = ""):
         param: p_file_path:
             "" : use sys.stdout
     """
-    r_g_output = None
+    r_output = None
 
     if p_file_path == "":
-        r_g_output = g_output(sys.stdout) 
+        r_output = Output(sys.stdout) 
     else:
         if Path(p_file_path).exists():
             if wantVerbose:
                 sys.stderr.write("WARNING: overwriting file!")
             pass
         to_file = open(p_file_path, 'w')
-        r_g_output = g_output(to_file)
+        r_output = Output(to_file)
     
-    return r_g_output
+    return r_output
 
 ############################################################################################################
 #  Main
@@ -590,13 +602,13 @@ wantTextPack = False
 awaitingFilename = False
 textBundleFilename = ""
 
-wrapInCSV = False
 
 parmVars = []
 
 input_file = ""                                   #| TODO: add input file from command line for file output later
 
 g_output = None                                   #| global variable for writing output
+markdownFile = "" 
 
 def bold( p_text ):
     return BOLD + p_text + END
@@ -671,7 +683,7 @@ for arg in range(1, arguments + 1):
     elif argument[:2] == "-d":
         handleCommandLineDefine(argument[2:])
     elif argument == "-c":
-        wrapInCSV = True
+        g_wrapInCSV = True
     elif awaitingFilename is True:
         if textBundleFilename == "":
             textBundleFilename = argument
@@ -752,7 +764,7 @@ else:
 
 
 # If -c was specified on the command line wrap the file with =csv / =endcsv bracket
-if wrapInCSV == True:
+if g_wrapInCSV == True:
     input_file.insert(0, "=csv")
     input_file.append("=endcsv")
 
@@ -779,10 +791,10 @@ input_file = handle_linejoins(input_file)
 minTocLevel, maxTocLevel, tableOfContents = extractTableOfContents(input_file)
 
 # Do any other processing, such as CSV to table
-
 csv_colalign = []
 csv_colwidth = []
 in_csv = False
+
     
 
 for line in input_file:

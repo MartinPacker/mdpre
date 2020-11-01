@@ -1,4 +1,3 @@
-=def TOC Table Of Contents
 
 # Markdown Preprocessor User Guide
 
@@ -6,9 +5,31 @@ This document describes the mdpre Markdown preprocessor.
 
 In this document we'll refer to it as "mdpre", pronounced "em dee pree".
 
-This document was converted to HTML at &time; on &date;.
+This document was converted to HTML at 12&colon;20 on 1 November&comma; 2020.
 
-=toc 2 * &TOC;
+### Table Of Contents
+
+* [Why A Preprocessor?](#why-a-preprocessor)
+* [How Do You Use mdpre?](#how-do-you-use-mdpre)
+	* [Help](#help)
+	* [Verbose Mode](#verbose-mode)
+	* [Defining Variables](#defining-variables)
+	* [Filenames](#filenames)
+	* [TextBundle And TextPack Support](#textbundle-and-textpack-support)
+	* [Processing Flow](#processing-flow)
+* [Language Elements](#language-elements)
+	* [Including files with `=include`](#including-files-with-include)
+	* [Defining Variables With `=def`](#defining-variables-with-def)
+	* [Undefining Variables With `=undef`](#undefining-variables-with-undef)
+	* [Conditional Inclusion With `=ifdef`, `=ifndef`, And `=endif`](#conditional-inclusion-with-ifdef-ifndef-and-endif)
+	* [Converting A CSV File To A Markdown Table With `=csv` And `=endcsv`](#converting-a-csv-file-to-a-markdown-table-with-csv-and-endcsv)
+		* [Controlling Table Alignment With `=colalign`](#controlling-table-alignment-with-colalign)
+		* [Controlling Table Column Widths With `=colwidth`](#controlling-table-column-widths-with-colwidth)
+	* [Concatenating Lines With `\`](#concatenating-lines-with)
+	* [Generating A Table Of Contents With `=toc`](#generating-a-table-of-contents-with-toc)
+	* [Terminating Input With `=stop`](#terminating-input-with-stop)
+* [Additional Information](#additional-information)
+	* [Built-In Variables](#builtin-variables)
 
 ## Why A Preprocessor?
 
@@ -22,7 +43,7 @@ Ask yourself the following questions.
 
 1. Have you ever wanted to use variables in Markdown?
 
-1. Have you ever wanted to have a &TOC; automatically generated in Markdown?
+1. Have you ever wanted to have a Table Of Contents automatically generated in Markdown?
 
 If you answer "yes" to any of these you need mdpre.
 
@@ -60,8 +81,7 @@ If you want more diagnostics turn on "verbose mode", using the `-v` parameter:
 
 	mdpre -v < document.mdp > document.md
 
-This documents most of the major events and decisions, such as the embedding of files, conditional inclusion, and the conversion of CSV data to Markdown tables. \
-One early run of this document with `-v` specified resulted in
+This documents most of the major events and decisions, such as the embedding of files, conditional inclusion, and the conversion of CSV data to Markdown tables. One early run of this document with `-v` specified resulted in
 
 	mdpre Markdown Preprocessor v0.1 (17 March, 2018)
 	=================================================
@@ -97,8 +117,7 @@ You can define variables on the command line when you run mdpre. Use the `-d` sw
 
 	mdpre -v -dfred -dbrian < test.mdp > test.md
 
-will set two variables - fred and brian. \
-These can be used with `=ifdef` and `=ifndef` to control processing. See [Conditional Inclusion With `=ifdef`, `=ifndef`, And `=endif`](#conditional-inclusion-with-ifdef-ifndef-and-endif) for more.
+will set two variables - fred and brian. These can be used with `=ifdef` and `=ifndef` to control processing. See [Conditional Inclusion With `=ifdef`, `=ifndef`, And `=endif`](#conditional-inclusion-with-ifdef-ifndef-and-endif) for more.
 
 You can also set their value. For example
 
@@ -133,20 +152,13 @@ If you want textpack format use this form
 
 	mdpre -v -z user-guide.textpack < user-guide.mdp
 
-`z` here stands for "zipped". \
-mdpre will first make a temporary textbundle and then create a textpack from it. \
-Finally it will delete the temporary textbundle (directory structure). \
-In this example `-v` was specified. \
-You probably want this - to observe the creation, zipping, and deletion activity.
+`z` here stands for "zipped". mdpre will first make a temporary textbundle and then create a textpack from it. Finally it will delete the temporary textbundle (directory structure). In this example `-v` was specified. You probably want this - to observe the creation, zipping, and deletion activity.
 
 Using this user guide as a test vehicle, three Mac OS apps were tested with the textpack format:
 
-Good results were obtained with both the Ulysses and MindNode apps. \
-The Bear app produced slightly less good results: \
-While text elements rendered fine, the one graphics reference was improperly rendered as an Internet reference.
+Good results were obtained with both the Ulysses and MindNode apps. The Bear app produced slightly less good results: While text elements rendered fine, the one graphics reference was improperly rendered as an Internet reference.
 
-mdpre can process TextBundle files directly, and you can convert a TextPack file into a TextBundle by unzipping it. \
-mdpre doesn't have special code to read from either of these formats.
+mdpre can process TextBundle files directly, and you can convert a TextPack file into a TextBundle by unzipping it. mdpre doesn't have special code to read from either of these formats.
 
 ### Processing Flow
 
@@ -188,13 +200,12 @@ For example:
 	&greeting; World!
 
 will produce:
-	
+
 	Hello World!
 
 If you don't terminate the use of the variable with a semicolon it won't be substituted. If the variable isn't defined at the point of usage it won't be substituted.
 
-You can also define variables and, optionally, set their value with the `-d` command line parameter. \
-See [Defining Variables](#defining-variables) for more.
+You can also define variables and, optionally, set their value with the `-d` command line parameter. See [Defining Variables](#defining-variables) for more.
 
 ### Undefining Variables With `=undef`
 
@@ -250,10 +261,9 @@ Here is an example:
 
 The table consists of two lines and will render as
 
-=csv
-"A","1",2
-"B","20",30
-=endcsv
+|A|1|2|
+|:|:|:|
+|B|20|30|
 
 (This manual uses this very function.)
 
@@ -277,11 +287,9 @@ You can control the alignment with e.g.
 
 and the result would be
 
-=colalign l r r
-=csv
-"A","1",2
-"B","20",30
-=endcsv
+|A|1|2|
+|:|:|:|
+|B|20|30|
 
 (This manual uses this very function.)
 
@@ -309,25 +317,21 @@ Here the third column is specified as double the width of the others.
 
 **Note:** Many Markdown processors ignore width directives. The developer's other Markdown tool doesn't. :-)
 
-### Concatenating Lines With `\` 
+### Concatenating Lines With `\`
 
-Some Markdown processors treat text on separate lines as requiring a line break between the lines. \
-But you might prefer to write each sentence in a paragraph on a separate line. \
-Indeed this paragraph was written that way.
+Some Markdown processors treat text on separate lines as requiring a line break between the lines. But you might prefer to write each sentence in a paragraph on a separate line. Indeed this paragraph was written that way.
 
 If you terminate a line with a `\` (backslash) character the following line will be concatenated to it. For example:
 
-	Some Markdown processors treat text on separate lines as requiring a line break between the lines. \ 
-	But you might prefer to write each sentence in a paragraph on a separate line. \ 
+	Some Markdown processors treat text on separate lines as requiring a line break between the lines. \
+	But you might prefer to write each sentence in a paragraph on a separate line. \
 	Indeed this paragraph was written that way.
 
-Terminating a line with a `\` does not cause a space to be inserted between the two lines of text. \
-In the above example a space was coded before the `\` each time it was used.
+Terminating a line with a `\` does not cause a space to be inserted between the two lines of text. In the above example a space was coded before the `\` each time it was used.
 
-### Generating A &TOC; With `=toc`
+### Generating A Table Of Contents With `=toc`
 
-You can generate a &TOC; with `=toc`. \
-At its simplest you can simply code
+You can generate a Table Of Contents with `=toc`. At its simplest you can simply code
 
 	=toc
 
@@ -337,7 +341,7 @@ If you want to limit the level of detail you can specify e.g.
 
 	=toc 3
 
-This will limit the &TOC; to levels 1 to 3 and use the default title of "Contents".
+This will limit the Table Of Contents to levels 1 to 3 and use the default title of "Contents".
 
 You can change the title using e.g.
 
@@ -347,25 +351,21 @@ or even
 
 	=toc 3 Topics
 
-The latter specifies both the maximum level of headings included in the &TOC; and the title.
+The latter specifies both the maximum level of headings included in the Table Of Contents and the title.
 
 You can specify the minimum and maximum levels:
 
 	=toc 2 2 Topics
 
-would generate a &TOC; for heading level 2 only. \
-This is particularly useful for a presentation.
+would generate a Table Of Contents for heading level 2 only. This is particularly useful for a presentation.
 
 If you don't want to specify an upper limit and have mdpre create a table of contents for all levels, starting with 2 you could code
 
-	=toc 2 * &TOC;
+	=toc 2 * Table Of Contents
 
 which is what this document uses.
 
-Each &TOC; entry will have an internal document link to the corresponding heading. \
-This is generated by mdpre from the text of the heading, replacing spaces with dashes and deleting certain special characters. \
-While this works most of the time, it might occasionally fail. \
-If it fails for you please let us know and we'll endeavour to patch the link generation code.
+Each Table Of Contents entry will have an internal document link to the corresponding heading. This is generated by mdpre from the text of the heading, replacing spaces with dashes and deleting certain special characters. While this works most of the time, it might occasionally fail. If it fails for you please let us know and we'll endeavour to patch the link generation code.
 
 ### Terminating Input With `=stop`
 
@@ -381,14 +381,11 @@ As you work on your text you can, of course, move the `=stop` line down.
 
 mdpre has the following built-in variables:
 
-=colalign l l l
-=colwidth  20 40 10
-=csv
-Variable,Description,Example Result
-date,Date when mdpre started running,`6 March&comma; 2019`
-time,Time when mdpre startred running,`21&colon;36`
-userid,Userid mdpre was run under,`martinpacker`
-mdpre_level,Level of mdpre,`0.4.4`
-mdpre_date,Date of mdpre,`9 March&colon; 2019`
-=endcsv
+|Variable            |Description                             |Example Result|
+|:-------------------|:---------------------------------------|:---------|
+|date                |Date when mdpre started running         |`6 March&comma; 2019`|
+|time                |Time when mdpre startred running        |`21&colon;36`|
+|userid              |Userid mdpre was run under              |`martinpacker`|
+|mdpre_level         |Level of mdpre                          |`0.4.4`   |
+|mdpre_date          |Date of mdpre                           |`9 March&colon; 2019`|
 
