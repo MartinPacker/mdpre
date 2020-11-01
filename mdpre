@@ -12,6 +12,11 @@ Reads from stdin
 # With log( ) we could replace szs.stderr.write
 # With log_verbose( ) we could more the if VERBOSE inside the function
 
+# TODO: Warning - mdpre>(node:29276) [DEP0005] 
+# DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the 
+# Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+
+
 import os
 import sys
 import csv
@@ -27,10 +32,16 @@ from enum import Enum
 
 mdpre_level = "0.4.6"
 mdpre_date = "19 October, 2020"
-
+banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
+    
 
 log = partial(print,file=sys.stderr)                       #| create log to stderr
 
+def log_status( p_line ):
+    log('-' * len(banner) )
+    log(p_line)
+    log('-' * len(banner) + '\n')
+    
 g_output = None 
 g_wrapInCSV = False
 
@@ -52,13 +63,12 @@ class Output(object):
         self.toFile = None
         if hasattr(p_toFile, 'write'):
             self.toFile = p_toFile
-            log(f'g_output opened {p_toFile.name} for writing')
+            log(f'- opened {p_toFile.name} for writing')
         else:
             log(f'ERROR: g_output could not find an open file {p_toFile}')
             exit_script(g_output, -101)
 
     def close(self):
-        log('file stream closing')
         self.toFile.close()
 
     def write(self, p_text):
@@ -87,8 +97,6 @@ class Output(object):
         colwidth_len = len(colwidth)
         for i in range(colwidth_len, columns + 1):
             colwidth.append(1)
-
-        log("formatCSV >",colwidth)
         
         # Now print the table
         first_row = True
@@ -553,15 +561,18 @@ def setupStandardVariables():
 
 
 def exit_script(p_output, p_code = 0):
-    p_output.close()
-    if p_code == 0:
-        log("\nProcessing completed.\n\n")
-    elif p_code == 1:
-        # HELP output
-        p_code = 0
+    if p_output != None:
+        p_output.close()
+        if p_code == 0:
+            log_status("- Processing completed.")
+        elif p_code == 1:
+            # HELP output
+            p_code = 0
+        else:
+            log_status(f"- Processing STOPPED with error {p_code}")
     else:
-        log(f"\nProcessing STOPPED with error {p_code}\n\n")
-
+        p_code = 0
+    
     sys.exit(p_code)
     
 def create_output_file(p_file_path = ""):
@@ -590,7 +601,6 @@ def create_output_file(p_file_path = ""):
 BOLD = "\033[1m"
 END = "\033[0m"
 
-banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
 bannerUnderline = "=" * len(banner)
 
 sys.stderr.write("\n" + banner + "\n" + bannerUnderline + "\n")
