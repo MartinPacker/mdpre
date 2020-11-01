@@ -8,6 +8,15 @@ Reads from stdin
 
 """
 
+# TODO: (later) new log instead of sys.stderr.write + verbose
+# With log( ) we could replace szs.stderr.write
+# With log_verbose( ) we could more the if VERBOSE inside the function
+
+# TODO: Warning - mdpre>(node:29276) [DEP0005] 
+# DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the 
+# Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+
+
 import os
 import sys
 import csv
@@ -17,71 +26,169 @@ import zipfile
 import re
 import datetime
 from functools import partial
-
+from pathlib import Path
+from enum import Enum
 
 
 mdpre_level = "0.4.6"
 mdpre_date = "19 October, 2020"
-
+banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
+    
 
 log = partial(print,file=sys.stderr)                       #| create log to stderr
 
-def writeMarkdown(toFile, text):
-    toFile.write(text + "\n")
+def log_status( p_line ):
+    log('-' * len(banner) )
+    log(p_line)
+    log('-' * len(banner) + '\n')
+    
+g_output = None 
+g_wrapInCSV = False
+
+csv_colalign = []
+csv_colwidth = []
+in_csv = False
 
 
-def formatCSV(CSV_lines, colalign, colwidth):
-    CSV_reader = csv.reader(CSV_lines)
 
-    # Find out how many columns and prime CSV_lines
-    columns = 0
-    CSV_lines = []
-    for row in CSV_reader:
-        columns = max(columns, len(row))
-        CSV_lines.append(row)
+class OutputType(Enum):
+    """preparation for later usage. support e.g. other outputs like MMD or ADOC"""
+    MD = 1
 
-    # Extend colalign to cover all columns - now we know how many there are
-    colalign_len = len(colalign)
-    for i in range(colalign_len, columns + 1):
-        colalign.append("l")
+class Output(object):
+    NL = '\n'
+    output = OutputType.MD
 
-    # Extend colwidth to cover all columns - now we know how many there are
-    colwidth_len = len(colwidth)
-    for i in range(colwidth_len, columns + 1):
-        colwidth.append(1)
+    def __init__(self, p_toFile  ):
+        self.toFile = None
+        if hasattr(p_toFile, 'write'):
+            self.toFile = p_toFile
+            log(f'- opened {p_toFile.name} for writing')
+        else:
+            log(f'ERROR: g_output could not find an open file {p_toFile}')
+            exit_script(g_output, -101)
 
-    # Now print the table
-    first_row = True
-    for row in CSV_lines:
-        row_text = "|"
-        for col in row:
-            row_text = row_text + col + "|"
-        writeMarkdown(toFile, row_text)
+    def close(self):
+        self.toFile.close()
 
-        titleUnderline = "|"
-        if first_row is True:
-            for i in range(columns):
-                dashes = "-" * colwidth[i]
-                if colalign[i] == "r":
-                    titleUnderline = titleUnderline + dashes + ":|"
-                elif colalign[i] == "c":
-                    titleUnderline = titleUnderline + ":" + dashes + ":|"
-                elif colalign[i] == "l":
-                    titleUnderline = titleUnderline + ":" + dashes + "|"
+    def write(self, p_text):
+        if self.output == OutputType.MD:
+            self.toFile.write(f"{p_text}{self.NL}")
+
+    def write_line(self, p_text):
+        self.write(f"{p_text}{self.NL}")
+
+    def formatCSV(self, CSV_lines, colalign, colwidth):
+        CSV_reader = csv.reader(CSV_lines)
+
+        # Find out how many columns and prime CSV_lines
+        columns = 0
+        CSV_lines = []
+        for row in CSV_reader:
+            columns = max(columns, len(row))
+            CSV_lines.append(row)
+
+        # Extend colalign to cover all columns - now we know how many there are
+        colalign_len = len(colalign)
+        for i in range(colalign_len, columns + 1):
+            colalign.append("l")
+
+        # Extend colwidth to cover all columns - now we know how many there are
+        colwidth_len = len(colwidth)
+        for i in range(colwidth_len, columns + 1):
+            colwidth.append(1)
+        
+        # Now print the table
+        first_row = True
+        for row in CSV_lines:
+            row_text = "|"
+            for col_index, col_text in enumerate(row):
+                spaces = colwidth[col_index] - len(col_text)
+                if spaces < 0:
+                    spaces = 0
+
+                row_text = row_text + col_text + " "*spaces + "|"
+            self.write(row_text)
+
+            titleUnderline = "|"
+            if first_row is True:
+                for col_index in range(columns):
+                    dashes = "-" * (colwidth[col_index]-1)
+                    if colalign[col_index] == "r":
+                        titleUnderline = titleUnderline + dashes + ":|"
+                    elif colalign[col_index] == "c":
+                        titleUnderline = titleUnderline + ":" + dashes + ":|"
+                    elif colalign[col_index] == "l":
+                        titleUnderline = titleUnderline + ":" + dashes + "|"
+                    else:
+                        titleUnderline = titleUnderline + dashes + "|"
+
+                self.write(titleUnderline)
+                first_row = False
+        return
+
+    # Print Table Of Contents down to maximum level
+    def printTableOfContents(self, minLevel, maxLevel, heading, toc):
+
+        self.write_line(heading)
+        for tocEntryLevel, tocEntryText in toc:
+            if (tocEntryLevel >= minLevel) & (tocEntryLevel <= maxLevel):
+                self.write(
+                    ("\t" * (tocEntryLevel - minLevel))
+                    + "* ["
+                    + tocEntryText
+                    + "](#"
+                    + makeLink(tocEntryText)
+                    + ")",
+                )
+
+    def handle_adjustGraphics(self, line):
+        adjustedLine = ""
+        splitStart = line.split("![")
+        fragment = 0
+        for s in splitStart:
+            if fragment == 0:
+                # Before first ![
+                adjustedLine = s + "!["
+            else:
+                # At first or subsequent ![
+                endLabelPos = s.find("](")
+                beginGraphicPos = endLabelPos + 2
+                adjustedLine += s[:beginGraphicPos]
+                endGraphicPos = s.find(")")
+
+                # Extract original graphic name, including subdirs
+                graphic = s[beginGraphicPos:endGraphicPos]
+
+                # Adjust graphic so it's in the assets subfolder
+                lastSlash = graphic.rfind("/")
+                if lastSlash == -1:
+                    adjustedGraphic = "assets/" + graphic
                 else:
-                    titleUnderline = titleUnderline + dashes + "|"
+                    adjustedGraphic = "assets/" + graphic[lastSlash + 1 :]
 
-            writeMarkdown(toFile, titleUnderline)
-            first_row = False
-    return
+                adjustedLine = adjustedLine + adjustedGraphic + ")" + s[endGraphicPos + 1 :]
+
+                # Copy the file into the text bundle
+                shutil.copy(graphic, realpath + "/" + adjustedGraphic)
+            fragment += 1
+        if wantVerbose is True:
+            sys.stderr.write("Adjusting >>" + adjustedLine + "<<<\n")
+
+        self.write(adjustedLine)
+
+        return
 
 
-def parse_colalign(colString):
-    return colString.rstrip().lstrip().split()
+#########################################################################################################################
+# Helper Functions
+
+def parse_colalign(colString, p_seperator=' '):
+    return colString.rstrip().lstrip().split(p_seperator)
 
 
-def parse_colwidth(colString):
-    colwidths = colString.rstrip().lstrip().split()
+def parse_colwidth(colString, p_seperator=' '):
+    colwidths = colString.rstrip().lstrip().split(p_seperator)
     colwidthInt = []
     for c in colwidths:
         colwidthInt.append(int(c))
@@ -304,7 +411,7 @@ def extractTableOfContents(p_input_file_lines, o_heading_symbol = "#"):
     r_minTocLevel = 999
     r_maxTocLevel = 0
     for line in p_input_file_lines:                                 #| for every line:
-           
+        
         if line.startswith(o_heading_symbol):                       #|   if line starts with heading:
             title = line.lstrip(o_heading_symbol)                   #|     remoe leading sign
             level = len(line) - len(title)                          #|     calculate level
@@ -375,23 +482,6 @@ def makeLink(linkText):
     return re.sub(r"-+", "-", linkURL)
 
 
-# Print Table Of Contents down to maximum level
-def printTableOfContents(minLevel, maxLevel, heading, toc):
-
-    writeMarkdown(toFile, heading + "\n")
-    for tocEntryLevel, tocEntryText in toc:
-        if (tocEntryLevel >= minLevel) & (tocEntryLevel <= maxLevel):
-            writeMarkdown(
-                toFile,
-                ("\t" * (tocEntryLevel - minLevel))
-                + "* ["
-                + tocEntryText
-                + "](#"
-                + makeLink(tocEntryText)
-                + ")",
-            )
-
-
 def handle_verbose(line):
     noPrefixSuffix = line[10:-3]
     verboseArray = noPrefixSuffix.split(":")
@@ -442,43 +532,6 @@ def handle_verbose(line):
     return
 
 
-def handle_adjustGraphics(line):
-    adjustedLine = ""
-    splitStart = line.split("![")
-    fragment = 0
-    for s in splitStart:
-        if fragment == 0:
-            # Before first ![
-            adjustedLine = s + "!["
-        else:
-            # At first or subsequent ![
-            endLabelPos = s.find("](")
-            beginGraphicPos = endLabelPos + 2
-            adjustedLine += s[:beginGraphicPos]
-            endGraphicPos = s.find(")")
-
-            # Extract original graphic name, including subdirs
-            graphic = s[beginGraphicPos:endGraphicPos]
-
-            # Adjust graphic so it's in the assets subfolder
-            lastSlash = graphic.rfind("/")
-            if lastSlash == -1:
-                adjustedGraphic = "assets/" + graphic
-            else:
-                adjustedGraphic = "assets/" + graphic[lastSlash + 1 :]
-
-            adjustedLine = adjustedLine + adjustedGraphic + ")" + s[endGraphicPos + 1 :]
-
-            # Copy the file into the text bundle
-            shutil.copy(graphic, realpath + "/" + adjustedGraphic)
-        fragment += 1
-    if wantVerbose is True:
-        sys.stderr.write("Adjusting >>" + adjustedLine + "<<<\n")
-
-    writeMarkdown(toFile, adjustedLine)
-
-    return
-
 
 # Handle a -d command line parameter
 def handleCommandLineDefine(defString):
@@ -507,10 +560,47 @@ def setupStandardVariables():
     input_file.insert(0, "=def mdpre_date " + mdpre_date + " ")
 
 
+def exit_script(p_output, p_code = 0):
+    if p_output != None:
+        p_output.close()
+        if p_code == 0:
+            log_status("- Processing completed.")
+        elif p_code == 1:
+            # HELP output
+            p_code = 0
+        else:
+            log_status(f"- Processing STOPPED with error {p_code}")
+    else:
+        p_code = 0
+    
+    sys.exit(p_code)
+    
+def create_output_file(p_file_path = ""):
+    """
+        param: p_file_path:
+            "" : use sys.stdout
+    """
+    r_output = None
+
+    if p_file_path == "":
+        r_output = Output(sys.stdout) 
+    else:
+        if Path(p_file_path).exists():
+            if wantVerbose:
+                sys.stderr.write("WARNING: overwriting file!")
+            pass
+        to_file = open(p_file_path, 'w')
+        r_output = Output(to_file)
+    
+    return r_output
+
+############################################################################################################
+#  Main
+#
+
 BOLD = "\033[1m"
 END = "\033[0m"
 
-banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
 bannerUnderline = "=" * len(banner)
 
 sys.stderr.write("\n" + banner + "\n" + bannerUnderline + "\n")
@@ -522,9 +612,16 @@ wantTextPack = False
 awaitingFilename = False
 textBundleFilename = ""
 
-wrapInCSV = False
 
 parmVars = []
+
+input_file = ""                                   #| TODO: add input file from command line for file output later
+
+g_output = None                                   #| global variable for writing output
+markdownFile = "" 
+
+def bold( p_text ):
+    return BOLD + p_text + END
 
 arguments = len(sys.argv) - 1
 for arg in range(1, arguments + 1):
@@ -580,7 +677,8 @@ for arg in range(1, arguments + 1):
         )
         sys.stderr.write("mdpre -c < input.csv outputfile\n\n")
 
-        sys.exit()
+        exit_script(g_output, 1)
+
     elif argument == "-v":
         # Turn on "verbose mode"
         wantVerbose = True
@@ -595,7 +693,7 @@ for arg in range(1, arguments + 1):
     elif argument[:2] == "-d":
         handleCommandLineDefine(argument[2:])
     elif argument == "-c":
-        wrapInCSV = True
+        g_wrapInCSV = True
     elif awaitingFilename is True:
         if textBundleFilename == "":
             textBundleFilename = argument
@@ -654,17 +752,29 @@ if textBundleFilename != "":
     # Remove any prior instance of the markdown file
     if os.path.isfile(markdownFile) is True:
         os.remove(markdownFile)
+                                                  #| ## Textbundle:    
+    g_output = create_output_file(markdownFile)   #| Open the file where markdown goes for write
 
-    # Open the file where markdown goes for write
-    toFile = open(markdownFile, "w")
+elif markdownFile != "":                        
+
+    if os.path.isfile(markdownFile) is True:
+        os.remove(markdownFile)
+                                                  #| ## File:
+    g_output = create_output_file(markdownFile)   #| Open the file where markdown goes for write
+
+else:                                             #| ## stdout 
+    g_output = create_output_file()               #| NOTE: Write to stdout as not making a textbundle
+
+if input_file == "":
+    input_file = sys.stdin.readlines()
 else:
-    # Write to stdout as not making a textbundle
-    toFile = sys.stdout
+    if os.path.isfile(input_file) is True:
+        with open(input_file, "r") as file_handle:
+            input_file = file_handle.readlines()
 
-input_file = sys.stdin.readlines()
 
 # If -c was specified on the command line wrap the file with =csv / =endcsv bracket
-if wrapInCSV == True:
+if g_wrapInCSV == True:
     input_file.insert(0, "=csv")
     input_file.append("=endcsv")
 
@@ -691,10 +801,11 @@ input_file = handle_linejoins(input_file)
 minTocLevel, maxTocLevel, tableOfContents = extractTableOfContents(input_file)
 
 # Do any other processing, such as CSV to table
-
 csv_colalign = []
 csv_colwidth = []
 in_csv = False
+
+    
 
 for line in input_file:
     line = line.rstrip()
@@ -704,20 +815,20 @@ for line in input_file:
     elif line.startswith("#"):
         if wantVerbose is True:
             handle_verbose("<!--mdpre-heading:" + line + "-->")
-        writeMarkdown(toFile, line)
+        g_output.write(line)
     elif line.startswith("=toc"):
         if wantVerbose is True:
             handle_verbose("<!--mdpre-toc:" + line + "-->")
         minLevel, maxLevel, heading = parseTocStatement(line, minTocLevel, maxTocLevel)
         print(minLevel, maxLevel, heading, file=sys.stderr)
-        printTableOfContents(minLevel, maxLevel, "### " + heading, tableOfContents)
+        g_output.printTableOfContents(minLevel, maxLevel, "### " + heading, tableOfContents)
     elif (line.startswith("=csv")) & (in_csv is False):
         in_csv = True
         CSV_lines = []
         if wantVerbose is True:
             handle_verbose("<!--mdpre-csv:" + line + "-->")
     elif (line.startswith("=endcsv")) & (in_csv is True):
-        formatCSV(CSV_lines, csv_colalign, csv_colwidth)
+        g_output.formatCSV(CSV_lines, csv_colalign, csv_colwidth)
         in_csv = False
         if wantVerbose is True:
             handle_verbose("<!--mdpre-endcsv:" + line + "-->")
@@ -733,11 +844,12 @@ for line in input_file:
         CSV_lines.append(line)
     elif (line.find("![") > -1) & (wantTextBundle is True):
         # Fix up graphics references and copy graphics to assets folder
-        handle_adjustGraphics(line)
+        g_output.handle_adjustGraphics(line)
     else:
-        writeMarkdown(toFile, line)
+        g_output.write(line)
 
-toFile.close()
+# NOTE: toFile.close() is handled in the new exits function
+# NOTE: ! this message will self destruct during the pull request
 
 if wantTextPack is True:
     if wantVerbose is True:
@@ -750,8 +862,6 @@ if wantTextPack is True:
 
     if wantVerbose is True:
         print("Removing temporary files in directory " + realpath)
-        shutil.rmtree(realpath)
-sys.stderr.write("\nProcessing completed.\n\n")
+    shutil.rmtree(realpath)
 
-
-sys.exit()
+exit_script(g_output, 0)

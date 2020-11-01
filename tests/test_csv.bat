@@ -1,0 +1,1 @@
+python -s ..\mdpre -c 0< .\test_variables.csv 1> .\test_variables.md
