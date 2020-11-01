@@ -1,7 +1,0 @@
-{
-  "python.linting.pylintArgs": [
-    "--init-hook",
-    "import sys; sys.path.extend([\"\"c:\\\\Users\\\\andre\\\\.vscode\\\\extensions\\\\ms-python.devicesimulatorexpress-2020.0.36321\\\\out\"\",\"\"c:\\\\Users\\\\andre\\\\.vscode\\\\extensions\\\\ms-python.devicesimulatorexpress-2020.0.36321\\\\out\\\\micropython\"\",\"\"c:\\\\Users\\\\andre\\\\.vscode\\\\extensions\\\\ms-python.devicesimulatorexpress-2020.0.36321\\\\out\\\\clue\"\",\"\"c:\\\\Users\\\\andre\\\\.vscode\\\\extensions\\\\ms-python.devicesimulatorexpress-2020.0.36321\\\\out\\\\base_circuitpython\"\"])"
-  ],
-  "python.pythonPath": "c:\\_stama\\python-v2020.03.09\\python.exe"
-}
