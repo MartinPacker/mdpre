@@ -382,7 +382,7 @@ As you work on your text you can, of course, move the `=stop` line down.
 mdpre has the following built-in variables:
 
 =colalign l l l
-=colwidth  20 40 10
+=colwidth  2 4 1
 =csv
 Variable,Description,Example Result
 date,Date when mdpre started running,`6 March&comma; 2019`

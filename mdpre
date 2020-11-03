@@ -103,17 +103,14 @@ class Output(object):
         for row in CSV_lines:
             row_text = "|"
             for col_index, col_text in enumerate(row):
-                spaces = colwidth[col_index] - len(col_text)
-                if spaces < 0:
-                    spaces = 0
-
-                row_text = row_text + col_text + " "*spaces + "|"
+                row_text = row_text + col_text + "|"
             self.write(row_text)
 
             titleUnderline = "|"
             if first_row is True:
                 for col_index in range(columns):
-                    dashes = "-" * (colwidth[col_index]-1)
+                    dashes = "-" * (colwidth[col_index]) 
+                    # NOTE: col_width is ratio not characters
                     if colalign[col_index] == "r":
                         titleUnderline = titleUnderline + dashes + ":|"
                     elif colalign[col_index] == "c":
