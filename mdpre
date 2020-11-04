@@ -31,7 +31,7 @@ from enum import Enum
 
 
 mdpre_level = "0.4.6"
-mdpre_date = "19 October, 2020"
+mdpre_date = "4 November, 2020"
 banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
     
 
@@ -45,8 +45,8 @@ def log_status( p_line ):
 g_output = None 
 g_wrapInCSV = False
 
-csv_colalign = []
-csv_colwidth = []
+csv_colaligns = []
+csv_colwidths = []
 in_csv = False
 
 
@@ -177,18 +177,23 @@ class Output(object):
         return
 
 
-#########################################################################################################################
-# Helper Functions
+####################
+# Helper Functions #                                                     
+####################
 
-def parse_colalign(colString, p_seperator=' '):
-    return colString.rstrip().lstrip().split(p_seperator)
+def parse_colalign(colString, p_separator='\s+'):
+    cs = colString.rstrip().lstrip()
+
+    return re.split(p_separator, cs)
 
 
-def parse_colwidth(colString, p_seperator=' '):
-    colwidths = colString.rstrip().lstrip().split(p_seperator)
+def parse_colwidth(colString, p_separator='\s+'):
+    cs = colString.rstrip().lstrip()
+    colwidths = re.split(p_separator, cs)
     colwidthInt = []
     for c in colwidths:
         colwidthInt.append(int(c))
+
     return colwidthInt
 
 
@@ -798,8 +803,8 @@ input_file = handle_linejoins(input_file)
 minTocLevel, maxTocLevel, tableOfContents = extractTableOfContents(input_file)
 
 # Do any other processing, such as CSV to table
-csv_colalign = []
-csv_colwidth = []
+csv_colaligns = []
+csv_colwidths = []
 in_csv = False
 
     
@@ -825,16 +830,17 @@ for line in input_file:
         if wantVerbose is True:
             handle_verbose("<!--mdpre-csv:" + line + "-->")
     elif (line.startswith("=endcsv")) & (in_csv is True):
-        g_output.formatCSV(CSV_lines, csv_colalign, csv_colwidth)
+        g_output.formatCSV(CSV_lines, csv_colaligns, csv_colwidths)
         in_csv = False
         if wantVerbose is True:
             handle_verbose("<!--mdpre-endcsv:" + line + "-->")
     elif line.startswith("=colalign "):
-        csv_colalign = parse_colalign(line[10:])
+        csv_colaligns = parse_colalign(line[10:])
         if wantVerbose is True:
             handle_verbose("<!--mdpre-colalign:" + line + "-->")
     elif line.startswith("=colwidth "):
-        csv_colwidth = parse_colwidth(line[10:])
+        csv_colwidths = parse_colwidth(line[10:])
+        print(csv_colwidths)
         if wantVerbose is True:
             handle_verbose("<!--mdpre-colwidth:" + line + "-->")
     elif in_csv is True:
