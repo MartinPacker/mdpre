@@ -1,6 +1,6 @@
 HyperLink Test
 
-Trying to link to [this](#link-with-space-in)
+Trying to link to [this](#blah)
 
 * One
 * Two
@@ -51,6 +51,5 @@ I have come across a number of mentions of MultiMarkdown's support for internal 
 So, what is the syntax for denoting the named anchor, and what is the syntax for linking to it the same as linking to any other URLs (only using hash foo instead of http://....)?
 
 ### Blah
-<a name="link-with-space-in">
-</a>
+<a name="blah"></a>
 Here is some text after the hyperlink target. Just to see what happens.
