@@ -31,7 +31,7 @@ from enum import Enum
 
 
 mdpre_level = "0.4.6"
-mdpre_date = "4 November, 2020"
+mdpre_date = "26 January, 2021"
 banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
     
 
@@ -840,7 +840,6 @@ for line in input_file:
             handle_verbose("<!--mdpre-colalign:" + line + "-->")
     elif line.startswith("=colwidth "):
         csv_colwidths = parse_colwidth(line[10:])
-        print(csv_colwidths)
         if wantVerbose is True:
             handle_verbose("<!--mdpre-colwidth:" + line + "-->")
     elif in_csv is True:
