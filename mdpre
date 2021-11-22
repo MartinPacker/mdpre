@@ -30,8 +30,8 @@ from pathlib import Path
 from enum import Enum
 
 
-mdpre_level = "0.4.6"
-mdpre_date = "26 January, 2021"
+mdpre_level = "0.4.7"
+mdpre_date = "22 November, 2021"
 banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
     
 
@@ -286,7 +286,19 @@ def parse_include(input_file, vars, ifStack, embedLevel):
 
         if ifStack[-1] is True:
             if line.startswith("=include "):
-                include_name = line[9:].rstrip().lstrip()
+                raw_include_name = line[9:].rstrip().lstrip()
+                
+                # Substitute any symbols into the included filename
+                include_name = ''.join(substitute_variables([raw_include_name], vars))
+  
+                # Check for recursive inclusion                
+                if include_name in includeStack:
+                    sys.stderr.write(f"File '{include_name}' recursively included. Stopping.")
+                    sys.exit()
+
+                # Not recursive so add include file name to stack
+                includeStack.append(include_name)
+                
                 if wantVerbose is True:
                     input_file2.append(
                         "<!--mdpre-embed-start:"
@@ -349,6 +361,9 @@ def parse_include(input_file, vars, ifStack, embedLevel):
             if wantVerbose is True:
                 input_file2.append(verbosity)
 
+    # Pop this file from the stack
+    includeStack.pop()
+    
     return [False, input_file2, vars]
 
 
@@ -768,8 +783,10 @@ else:                                             #| ## stdout
     g_output = create_output_file()               #| NOTE: Write to stdout as not making a textbundle
 
 if input_file == "":
+    input_filename = ""
     input_file = sys.stdin.readlines()
 else:
+    input_filename = input_file
     if os.path.isfile(input_file) is True:
         with open(input_file, "r") as file_handle:
             input_file = file_handle.readlines()
@@ -789,6 +806,9 @@ setupStandardVariables()
 
 
 ifStack = [True]
+
+# Prime list of referenced files
+includeStack = ["top-level-file"]
 
 # Pre-process - to pick up includes
 stopIt, input_file, variables = parse_include(input_file, [], ifStack, 0)

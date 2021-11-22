@@ -118,23 +118,28 @@ body .markdown-body
   padding: 0;
 }
 
-.markdown-body .codehilitetable {
+.markdown-body .codehilitetable,
+.markdown-body .highlighttable {
   border: 0;
   border-spacing: 0;
 }
 
-.markdown-body .codehilitetable tr {
+.markdown-body .codehilitetable tr,
+.markdown-body .highlighttable {
   border: 0;
 }
 
 .markdown-body .codehilitetable pre,
-.markdown-body .codehilitetable div.codehilite {
+.markdown-body .codehilitetable div.codehilite,
+.markdown-body .highlighttable pre,
+.markdown-body .highlighttable div.highlight {
   margin: 0;
 }
 
 .markdown-body .linenos,
 .markdown-body .code,
-.markdown-body .codehilitetable td {
+.markdown-body .codehilitetable td,
+.markdown-body .highlighttable td {
   border: 0;
   padding: 0;
 }
@@ -517,11 +522,13 @@ body .markdown-body
   border: 0;
 }
 
-.markdown-body .codehilite {
+.markdown-body .codehilite,
+.markdown-body .highlight {
   margin-bottom: 16px;
 }
 
 .markdown-body .codehilite pre,
+.markdown-body .highlight pre,
 .markdown-body pre {
   padding: 16px;
   overflow: auto;
@@ -531,7 +538,8 @@ body .markdown-body
   border-radius: 3px;
 }
 
-.markdown-body .codehilite pre {
+.markdown-body .codehilite pre,
+.markdown-body .highlight pre {
   margin-bottom: 0;
   word-break: normal;
 }
@@ -992,10 +1000,73 @@ body .markdown-body
     page-break-after: avoid;
   }
 }
+</style><style>/*GitHub*/
+.highlight {background-color:#fff;color:#333333;}
+.highlight .hll {background-color:#ffffcc;}
+.highlight .c{color:#999988;font-style:italic}
+.highlight .err{color:#a61717;background-color:#e3d2d2}
+.highlight .k{font-weight:bold}
+.highlight .o{font-weight:bold}
+.highlight .cm{color:#999988;font-style:italic}
+.highlight .cp{color:#999999;font-weight:bold}
+.highlight .c1{color:#999988;font-style:italic}
+.highlight .cs{color:#999999;font-weight:bold;font-style:italic}
+.highlight .gd{color:#000000;background-color:#ffdddd}
+.highlight .ge{font-style:italic}
+.highlight .gr{color:#aa0000}
+.highlight .gh{color:#999999}
+.highlight .gi{color:#000000;background-color:#ddffdd}
+.highlight .go{color:#888888}
+.highlight .gp{color:#555555}
+.highlight .gs{font-weight:bold}
+.highlight .gu{color:#800080;font-weight:bold}
+.highlight .gt{color:#aa0000}
+.highlight .kc{font-weight:bold}
+.highlight .kd{font-weight:bold}
+.highlight .kn{font-weight:bold}
+.highlight .kp{font-weight:bold}
+.highlight .kr{font-weight:bold}
+.highlight .kt{color:#445588;font-weight:bold}
+.highlight .m{color:#009999}
+.highlight .s{color:#dd1144}
+.highlight .n{color:#333333}
+.highlight .na{color:teal}
+.highlight .nb{color:#0086b3}
+.highlight .nc{color:#445588;font-weight:bold}
+.highlight .no{color:teal}
+.highlight .ni{color:purple}
+.highlight .ne{color:#990000;font-weight:bold}
+.highlight .nf{color:#990000;font-weight:bold}
+.highlight .nn{color:#555555}
+.highlight .nt{color:navy}
+.highlight .nv{color:teal}
+.highlight .ow{font-weight:bold}
+.highlight .w{color:#bbbbbb}
+.highlight .mf{color:#009999}
+.highlight .mh{color:#009999}
+.highlight .mi{color:#009999}
+.highlight .mo{color:#009999}
+.highlight .sb{color:#dd1144}
+.highlight .sc{color:#dd1144}
+.highlight .sd{color:#dd1144}
+.highlight .s2{color:#dd1144}
+.highlight .se{color:#dd1144}
+.highlight .sh{color:#dd1144}
+.highlight .si{color:#dd1144}
+.highlight .sx{color:#dd1144}
+.highlight .sr{color:#009926}
+.highlight .s1{color:#dd1144}
+.highlight .ss{color:#990073}
+.highlight .bp{color:#999999}
+.highlight .vc{color:teal}
+.highlight .vg{color:teal}
+.highlight .vi{color:teal}
+.highlight .il{color:#009999}
+.highlight .gc{color:#999;background-color:#EAF2F5}
 </style><title>user-guide</title></head><body><article class="markdown-body"><h1 id="markdown-preprocessor-user-guide">Markdown Preprocessor User Guide<a class="headerlink" href="#markdown-preprocessor-user-guide" title="Permanent link"></a></h1>
 <p>This document describes the mdpre Markdown preprocessor.</p>
 <p>In this document we&rsquo;ll refer to it as &ldquo;mdpre&rdquo;, pronounced &ldquo;em dee pree&rdquo;.</p>
-<p>This document was converted to HTML at 14&colon;57 on 8 March&comma; 2019.</p>
+<p>This document was converted to HTML at 16&colon;50 on 22 November&comma; 2021.</p>
 <h3 id="table-of-contents">Table Of Contents<a class="headerlink" href="#table-of-contents" title="Permanent link"></a></h3>
 <ul>
 <li><a href="#why-a-preprocessor">Why A Preprocessor?</a></li>
@@ -1058,31 +1129,25 @@ body .markdown-body
 </ol>
 <p>The following instructions are for Unix-like systems. (It&rsquo;s developed and used by the developer on Mac OS but should also have identical syntax on Linux.) Windows users will need a slightly different form, but the principle is the same.</p>
 <p>Here is a sample invocation:</p>
-<div class="codehilite"><pre>mdpre &lt; document.mdp &gt; document.md
-</pre></div>
-
-
+<pre><code>mdpre &lt; document.mdp &gt; document.md
+</code></pre>
 <p>In this invocation the document.mdp file is the source and the &ldquo;vanilla&rdquo; Markdown produced by mdpre is written to document.md.</p>
 <p>You can, of course, use stdin and stdout in a pipeline. Indeed the developer uses this to pipe into another program.</p>
 <p>Messages are written to stderr.</p>
 <h3 id="help">Help<a class="headerlink" href="#help" title="Permanent link"></a></h3>
 <p>You can get parameter help using the <code>-h</code> parameter:</p>
-<div class="codehilite"><pre>mdpre -h
-</pre></div>
-
-
+<pre><code>mdpre -h
+</code></pre>
 <h3 id="verbose-mode">Verbose Mode<a class="headerlink" href="#verbose-mode" title="Permanent link"></a></h3>
 <p>If you want more diagnostics turn on &ldquo;verbose mode&rdquo;, using the <code>-v</code> parameter:</p>
-<div class="codehilite"><pre>mdpre -v &lt; document.mdp &gt; document.md
-</pre></div>
-
-
+<pre><code>mdpre -v &lt; document.mdp &gt; document.md
+</code></pre>
 <p>This documents most of the major events and decisions, such as the embedding of files, conditional inclusion, and the conversion of CSV data to Markdown tables. One early run of this document with <code>-v</code> specified resulted in</p>
-<div class="codehilite"><pre>mdpre Markdown Preprocessor v0.1 (17 March, 2018)
+<pre><code>mdpre Markdown Preprocessor v0.1 (17 March, 2018)
 =================================================
 Def TOC = Table Of Contents
 Markdown Preprocessor User Guide
-Table Of Contents - spec &#39;2 * Table Of Contents&#39;
+Table Of Contents - spec '2 * Table Of Contents'
 .....  Why A Preprocessor?
 .....  How Do You Use mdpre?
 ..... .....  Help
@@ -1097,7 +1162,7 @@ Table Of Contents - spec &#39;2 * Table Of Contents&#39;
 CSV Start
 CSV Stop
 ..... ..... .....  Controlling Table Alignment With `=colalign`
-Column Alignment - spec &#39;l r r&#39;
+Column Alignment - spec 'l r r'
 CSV Start
 CSV Stop
 ..... ..... .....  Controlling Table Column Widths With `=colwidth`
@@ -1105,21 +1170,15 @@ CSV Stop
 ..... .....  Generating A Table Of Contents With `=toc`
 
 Processing completed.
-</pre></div>
-
-
+</code></pre>
 <h3 id="defining-variables">Defining Variables<a class="headerlink" href="#defining-variables" title="Permanent link"></a></h3>
 <p>You can define variables on the command line when you run mdpre. Use the <code>-d</code> switch. For example</p>
-<div class="codehilite"><pre>mdpre -v -dfred -dbrian &lt; test.mdp &gt; test.md
-</pre></div>
-
-
+<pre><code>mdpre -v -dfred -dbrian &lt; test.mdp &gt; test.md
+</code></pre>
 <p>will set two variables - fred and brian. These can be used with <code>=ifdef</code> and <code>=ifndef</code> to control processing. See <a href="#conditional-inclusion-with-ifdef-ifndef-and-endif">Conditional Inclusion With <code>=ifdef</code>, <code>=ifndef</code>, And <code>=endif</code></a> for more.</p>
 <p>You can also set their value. For example</p>
-<div class="codehilite"><pre>mdpre -v &#39;-djon=bon jovi&#39; &lt; test.mdp &gt; test.md
-</pre></div>
-
-
+<pre><code>mdpre -v '-djon=bon jovi' &lt; test.mdp &gt; test.md
+</code></pre>
 <p>In this case the whole <code>-d</code> parameter string is in quotes to preserve spaces in the value.</p>
 <h3 id="filenames">Filenames<a class="headerlink" href="#filenames" title="Permanent link"></a></h3>
 <p>You can use any names you like but an extension to denote that the input file is a preprocessable one is handy. In the above example .mdp was used. This seems like a sensible convention.</p>
@@ -1132,17 +1191,13 @@ Processing completed.
 </ul>
 <p>These mechanisms allow easy transfer to other tools.</p>
 <p>mdpre can create a TextBundle format file (.textbundle). To create it type something like:</p>
-<div class="codehilite"><pre>mdpre -v -t user-guide.textbundle &lt; user-guide.mdp
-</pre></div>
-
-
+<pre><code>mdpre -v -t user-guide.textbundle &lt; user-guide.mdp
+</code></pre>
 <p>This will result in the Markdown that would normally go to stdout instead going into the textbundle. Graphics will go to the <code>/assets</code> subdirectory.</p>
 <p><strong>NOTE:</strong> mdpre places all graphics <strong>directly</strong> in the <code>/assets</code> subdirectory. If two graphics files were incorporated with the same name one would overwrite the other.</p>
 <p>If you want textpack format use this form</p>
-<div class="codehilite"><pre>mdpre -v -z user-guide.textpack &lt; user-guide.mdp
-</pre></div>
-
-
+<pre><code>mdpre -v -z user-guide.textpack &lt; user-guide.mdp
+</code></pre>
 <p><code>z</code> here stands for &ldquo;zipped&rdquo;. mdpre will first make a temporary textbundle and then create a textpack from it. Finally it will delete the temporary textbundle (directory structure). In this example <code>-v</code> was specified. You probably want this - to observe the creation, zipping, and deletion activity.</p>
 <p>Using this user guide as a test vehicle, three Mac OS apps were tested with the textpack format:</p>
 <p>Good results were obtained with both the Ulysses and MindNode apps. The Bear app produced slightly less good results: While text elements rendered fine, the one graphics reference was improperly rendered as an Internet reference.</p>
@@ -1155,11 +1210,15 @@ Processing completed.
 <p>The spirit of some of these additional statements is similar to that of C compiler preprocessors. However the <code>#</code> character is already taken in Markdown so commands begin with <code>=</code> instead. <strong>All statements begin at the first character on the line.</strong></p>
 <h3 id="including-files-with-include">Including files with <code>=include</code><a class="headerlink" href="#including-files-with-include" title="Permanent link"></a></h3>
 <p>You can include files with the <code>=include</code> statement. Here is a sample invocation:</p>
-<div class="codehilite"><pre>=include HiperDispatch.mdp
-</pre></div>
-
-
+<pre><code>=include HiperDispatch.mdp
+</code></pre>
 <p>You can nest <code>=include</code> statements to any depth.</p>
+<p>mdpre detects recursion in including files. If recursion is detected mdpre will terminate with a message. This is to prevent infinite recursion.</p>
+<p>You can use a variable in a include filename. For example:</p>
+<pre><code>=def includeName b
+=include &amp;includeName;.mdp
+</code></pre>
+<p>In this case the file that will be included is <code>b.mdp</code>.</p>
 <h3 id="defining-variables-with-def">Defining Variables With <code>=def</code><a class="headerlink" href="#defining-variables-with-def" title="Permanent link"></a></h3>
 <p>You can define variables with one of two forms of the <code>=def</code> statement:</p>
 <ol>
@@ -1170,50 +1229,40 @@ Processing completed.
 <p>Defining variables is useful with the <code>=ifdef</code> and <code>=ifndef</code> statements.</p>
 <p>To use a variable you&rsquo;ve defined with a value code the variable name preceded by an ampersand and terminated by a semicolon.
 For example:</p>
-<div class="codehilite"><pre>=def greeting Hello
+<pre><code>=def greeting Hello
 
 &amp;greeting; World!
-</pre></div>
-
-
+</code></pre>
 <p>will produce:</p>
-<div class="codehilite"><pre>Hello World!
-</pre></div>
-
-
+<pre><code>Hello World!
+</code></pre>
 <p>If you don&rsquo;t terminate the use of the variable with a semicolon it won&rsquo;t be substituted. If the variable isn&rsquo;t defined at the point of usage it won&rsquo;t be substituted.</p>
 <p>You can also define variables and, optionally, set their value with the <code>-d</code> command line parameter. See <a href="#defining-variables">Defining Variables</a> for more.</p>
 <h3 id="undefining-variables-with-undef">Undefining Variables With <code>=undef</code><a class="headerlink" href="#undefining-variables-with-undef" title="Permanent link"></a></h3>
 <p>Just as you can use <code>=def</code> to define a variable you can remove it from the variable table using <code>=undef</code>. For example,</p>
-<div class="codehilite"><pre>=undef xyzzy
-</pre></div>
-
-
+<pre><code>=undef xyzzy
+</code></pre>
 <p>will mean the variable <code>xyzzy</code> will no longer be defined.</p>
 <h3 id="conditional-inclusion-with-ifdef-ifndef-and-endif">Conditional Inclusion With <code>=ifdef</code>, <code>=ifndef</code>, And <code>=endif</code><a class="headerlink" href="#conditional-inclusion-with-ifdef-ifndef-and-endif" title="Permanent link"></a></h3>
 <p><code>=ifdef</code> and <code>=ifndef</code> perform very similar functions, but are complementary to each other.</p>
 <p>With <code>=ifdef</code>, if the variable referred to is defined (whatever its value) the following text is processed.</p>
 <p>The conditional bracket is ended with a line with <code>=endif</code> on it.</p>
 <p>Here is an example:</p>
-<div class="codehilite"><pre>=def includeMe
+<pre><code>=def includeMe
 
 =ifdef includeMe
 Here is some text that would be included by the test on the line above.
 =endif
-</pre></div>
-
-
+</code></pre>
 <p>Only one line is included - and only if the variable <code>includeMe</code> has been defined.</p>
 <p>To exclude the line if the variable is set use <code>=ifndef</code> instead.</p>
 <p>Any mdpre statement can be included in the bracket. For example, you could conditionally include another file with <code>=include</code>. For example:</p>
-<div class="codehilite"><pre>=def wantLongVersion
+<pre><code>=def wantLongVersion
 
 =ifdef wantLongVersion
 =include theWorks.mdp
 =endif
-</pre></div>
-
-
+</code></pre>
 <p>You can define variables for use with <code>=ifdef</code> and <code>ifndef</code> in one of two ways:</p>
 <ul>
 <li>With <code>=def</code>, described in <a href="#defining-variables-with-def">Defining Variables With <code>=def</code></a>.</li>
@@ -1222,13 +1271,11 @@ Here is some text that would be included by the test on the line above.
 <h3 id="converting-a-csv-file-to-a-markdown-table-with-csv-and-endcsv">Converting A CSV File To A Markdown Table With <code>=csv</code> And <code>=endcsv</code><a class="headerlink" href="#converting-a-csv-file-to-a-markdown-table-with-csv-and-endcsv" title="Permanent link"></a></h3>
 <p>If you have a Comma-Separated Value (CSV) file you want to render as a table in a Markdown document use the <code>=csv</code> statement.</p>
 <p>Here is an example:</p>
-<div class="codehilite"><pre>=csv
-&quot;A&quot;,&quot;1&quot;,2
-&quot;B&quot;,&quot;20&quot;,30
+<pre><code>=csv
+"A","1",2
+"B","20",30
 =endcsv
-</pre></div>
-
-
+</code></pre>
 <p>The table consists of two lines and will render as</p>
 <table>
 <thead>
@@ -1248,24 +1295,18 @@ Here is some text that would be included by the test on the line above.
 </table>
 <p>(This manual uses this very function.)</p>
 <p>The actual Markdown for the table produced is:</p>
-<div class="codehilite"><pre>|A|1|2|
+<pre><code>|A|1|2|
 |:-|:-|:-|
 |B|20|30|
-</pre></div>
-
-
+</code></pre>
 <p>You&rsquo;ll notice an extra line crept in. By default, mdpre creates tables where the first CSV line is the title and all columns are of equal width and left-aligned.</p>
 <p>If you have a file which is purely CSV you don&rsquo;t actually need to code <code>=csv</code> and <code>=endcsv</code> in the input file just to convert it to a Markdown table - if you are happy with default column widths and alignments. Just use the <code>-c</code> command line parameter:</p>
-<div class="codehilite"><pre>mdpre -c &lt; input.csv &gt; output.md
-</pre></div>
-
-
+<pre><code>mdpre -c &lt; input.csv &gt; output.md
+</code></pre>
 <h4 id="controlling-table-alignment-with-colalign">Controlling Table Alignment With <code>=colalign</code><a class="headerlink" href="#controlling-table-alignment-with-colalign" title="Permanent link"></a></h4>
 <p>You can control the alignment with e.g.</p>
-<div class="codehilite"><pre>=colalign l r r
-</pre></div>
-
-
+<pre><code>=colalign l r r
+</code></pre>
 <p>and the result would be</p>
 <table>
 <thead>
@@ -1285,73 +1326,53 @@ Here is some text that would be included by the test on the line above.
 </table>
 <p>(This manual uses this very function.)</p>
 <p>The actual Markdown for the table produced is:</p>
-<div class="codehilite"><pre>|A|1|2|
+<pre><code>|A|1|2|
 |:-|-:|-:|
 |B|20|30|
-</pre></div>
-
-
+</code></pre>
 <p>You can specify one of three alignments: <code>l</code> (for &ldquo;left&rdquo;), <code>r</code> (for &ldquo;right&rdquo;), or <code>c</code> (for &ldquo;centre&rdquo;). The default for a column is <code>l</code>.</p>
 <h4 id="controlling-table-column-widths-with-colwidth">Controlling Table Column Widths With <code>=colwidth</code><a class="headerlink" href="#controlling-table-column-widths-with-colwidth" title="Permanent link"></a></h4>
 <p>You can control the column widths with statements like</p>
-<div class="codehilite"><pre>=colwidth 1 1 2
-</pre></div>
-
-
+<pre><code>=colwidth 1 1 2
+</code></pre>
 <p>Adding that to the above produces the following Markdown</p>
-<div class="codehilite"><pre>|A|1|2|
+<pre><code>|A|1|2|
 |:-|-:|--:|
 |B|20|30|
-</pre></div>
-
-
+</code></pre>
 <p>Here the third column is specified as double the width of the others.</p>
 <p><strong>Note:</strong> Many Markdown processors ignore width directives. The developer&rsquo;s other Markdown tool doesn&rsquo;t. :-)</p>
 <h3 id="concatenating-lines-with">Concatenating Lines With <code>\</code><a class="headerlink" href="#concatenating-lines-with" title="Permanent link"></a></h3>
 <p>Some Markdown processors treat text on separate lines as requiring a line break between the lines. But you might prefer to write each sentence in a paragraph on a separate line. Indeed this paragraph was written that way.</p>
 <p>If you terminate a line with a <code>\</code> (backslash) character the following line will be concatenated to it. For example:</p>
-<div class="codehilite"><pre>Some Markdown processors treat text on separate lines as requiring a line break between the lines. \
+<pre><code>Some Markdown processors treat text on separate lines as requiring a line break between the lines. \
 But you might prefer to write each sentence in a paragraph on a separate line. \
 Indeed this paragraph was written that way.
-</pre></div>
-
-
+</code></pre>
 <p>Terminating a line with a <code>\</code> does not cause a space to be inserted between the two lines of text. In the above example a space was coded before the <code>\</code> each time it was used.</p>
 <h3 id="generating-a-table-of-contents-with-toc">Generating A Table Of Contents With <code>=toc</code><a class="headerlink" href="#generating-a-table-of-contents-with-toc" title="Permanent link"></a></h3>
 <p>You can generate a Table Of Contents with <code>=toc</code>. At its simplest you can simply code</p>
-<div class="codehilite"><pre>=toc
-</pre></div>
-
-
+<pre><code>=toc
+</code></pre>
 <p>If this is all you specify, it will generate a heading level 3 titled &ldquo;Contents&rdquo; and nested bullets for every heading level - from 1 up to 6.</p>
 <p>If you want to limit the level of detail you can specify e.g.</p>
-<div class="codehilite"><pre>=toc 3
-</pre></div>
-
-
+<pre><code>=toc 3
+</code></pre>
 <p>This will limit the Table Of Contents to levels 1 to 3 and use the default title of &ldquo;Contents&rdquo;.</p>
 <p>You can change the title using e.g.</p>
-<div class="codehilite"><pre>=toc Agenda
-</pre></div>
-
-
+<pre><code>=toc Agenda
+</code></pre>
 <p>or even</p>
-<div class="codehilite"><pre>=toc 3 Topics
-</pre></div>
-
-
+<pre><code>=toc 3 Topics
+</code></pre>
 <p>The latter specifies both the maximum level of headings included in the Table Of Contents and the title.</p>
 <p>You can specify the minimum and maximum levels:</p>
-<div class="codehilite"><pre>=toc 2 2 Topics
-</pre></div>
-
-
+<pre><code>=toc 2 2 Topics
+</code></pre>
 <p>would generate a Table Of Contents for heading level 2 only. This is particularly useful for a presentation.</p>
 <p>If you don&rsquo;t want to specify an upper limit and have mdpre create a table of contents for all levels, starting with 2 you could code</p>
-<div class="codehilite"><pre>=toc 2 * Table Of Contents
-</pre></div>
-
-
+<pre><code>=toc 2 * Table Of Contents
+</code></pre>
 <p>which is what this document uses.</p>
 <p>Each Table Of Contents entry will have an internal document link to the corresponding heading. This is generated by mdpre from the text of the heading, replacing spaces with dashes and deleting certain special characters. While this works most of the time, it might occasionally fail. If it fails for you please let us know and we&rsquo;ll endeavour to patch the link generation code.</p>
 <h3 id="terminating-input-with-stop">Terminating Input With <code>=stop</code><a class="headerlink" href="#terminating-input-with-stop" title="Permanent link"></a></h3>

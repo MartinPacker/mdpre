@@ -1,0 +1,47 @@
+
+mdpre Markdown Preprocessor v0.4.7 (22 November, 2021)
+======================================================
+- opened <stdout> for writing
+Def mdpre_date = 22 November, 2021
+Def mdpre_level = 0.4.7
+Def userid = martinpacker
+Def time = 16&colon;50
+Def date = 22 November&comma; 2021
+Def TOC = Table Of Contents
+Markdown Preprocessor User Guide
+Table Of Contents - spec '2 * Table Of Contents'
+2 4 Table Of Contents
+.....  Why A Preprocessor?
+.....  How Do You Use mdpre?
+..... .....  Help
+..... .....  Verbose Mode
+..... .....  Defining Variables
+..... .....  Filenames
+..... .....  TextBundle And TextPack Support
+..... .....  Processing Flow
+.....  Language Elements
+..... .....  Including files with `=include`
+..... .....  Defining Variables With `=def`
+..... .....  Undefining Variables With `=undef`
+..... .....  Conditional Inclusion With `=ifdef`, `=ifndef`, And `=endif`
+..... .....  Converting A CSV File To A Markdown Table With `=csv` And `=endcsv`
+CSV Start
+CSV Stop
+..... ..... .....  Controlling Table Alignment With `=colalign`
+Column Alignment - spec 'l r r'
+CSV Start
+CSV Stop
+..... ..... .....  Controlling Table Column Widths With `=colwidth`
+..... .....  Concatenating Lines With `\`
+..... .....  Generating A Table Of Contents With `=toc`
+..... .....  Terminating Input With `=stop`
+.....  Additional Information
+..... .....  Built-In Variables
+Column Alignment - spec 'l l l'
+Column Width - spec ' 2 4 1'
+CSV Start
+CSV Stop
+------------------------------------------------------
+- Processing completed.
+------------------------------------------------------
+
