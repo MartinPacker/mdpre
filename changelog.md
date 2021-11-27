@@ -2,6 +2,11 @@
 
 ### Releases
 
+
+### v0.4.7 - 21 November, 2021
+
+* **ENHANCED** Recursion check for embeds
+
 ### v0.4.6 - 19 October, 2020
 
 * **ENHANCED** With -v heading levels can go arbitrarily deep
