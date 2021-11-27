@@ -30,8 +30,8 @@ from pathlib import Path
 from enum import Enum
 
 
-mdpre_level = "0.4.7"
-mdpre_date = "22 November, 2021"
+mdpre_level = "0.5"
+mdpre_date = "27 November, 2021"
 banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
     
 
@@ -49,6 +49,17 @@ csv_colaligns = []
 csv_colwidths = []
 in_csv = False
 
+# Find index of variable in variable list. -1 means "not found"
+def find_variable(targetVar, vars):
+    foundVar = -1
+    cursor = 0
+    for var in vars:
+        if var[0] == targetVar:
+            varRecord = var
+            foundVar = cursor
+            break
+        cursor += 1
+    return foundVar
 
 
 class OutputType(Enum):
@@ -181,6 +192,12 @@ class Output(object):
 # Helper Functions #                                                     
 ####################
 
+def intTryParse(value):
+    try:
+        return int(value), True
+    except ValueError:
+        return value, False
+
 def parse_colalign(colString, p_separator='\s+'):
     cs = colString.rstrip().lstrip()
 
@@ -210,6 +227,41 @@ def parse_def(defString):
         varValue = residue
 
     return [varName, varType, varValue]
+
+def parse_inc(line, vars):
+    targetVar = line[5:-1].lstrip()
+    foundVar = find_variable(targetVar, vars)
+    if foundVar > -1:
+        varRecord = vars[foundVar]
+        if varRecord[1] != "T":
+            sys.stderr.write("Variable " + targetVar + " is a flag. Cannot be incremented.\n")
+        else:
+            intVal, OK = intTryParse(varRecord[2])
+            if OK is False:
+                sys.stderr.write("Variable " + targetVar + " is not an integer. Cannot be incremented.\n")
+            else:
+                vars[foundVar] = [targetVar, "T", str(intVal + 1)]
+            
+    else:
+        sys.stderr.write("Variable " + targetVar + " not found. Cannot be incremented.\n")
+
+
+def parse_dec(line, vars):
+    targetVar = line[5:-1].lstrip()
+    foundVar = find_variable(targetVar, vars)
+    if foundVar > -1:
+        varRecord = vars[foundVar]
+        if varRecord[1] != "T":
+            sys.stderr.write("Variable " + targetVar + " is a flag. Cannot be decremented.\n")
+        else:
+            intVal, OK = intTryParse(varRecord[2])
+            if OK is False:
+                sys.stderr.write("Variable " + targetVar + " is not an integer. Cannot be decremented.\n")
+            else:
+                vars[foundVar] = [targetVar, "T", str(intVal - 1)]
+            
+    else:
+        sys.stderr.write("Variable " + targetVar + " not found. Cannot be decremented.\n")
 
 
 # =ifdef encountered
@@ -284,13 +336,13 @@ def parse_include(input_file, vars, ifStack, embedLevel):
         if line.startswith("=stop") is True:
             return [True, input_file2, vars]
 
+        # Substitute any symbols into the included filename
+        line = substitute_variables(line, vars)
+  
         if ifStack[-1] is True:
             if line.startswith("=include "):
-                raw_include_name = line[9:].rstrip().lstrip()
+                include_name = line[9:].rstrip().lstrip()
                 
-                # Substitute any symbols into the included filename
-                include_name = ''.join(substitute_variables([raw_include_name], vars))
-  
                 # Check for recursive inclusion                
                 if include_name in includeStack:
                     sys.stderr.write(f"File '{include_name}' recursively included. Stopping.")
@@ -323,9 +375,11 @@ def parse_include(input_file, vars, ifStack, embedLevel):
                     )
                 if stopIt is True:
                     return [stopIt, input_file2, vars]
+
             elif line.startswith("=def ") is True:
                 var = parse_def(line[5:-1].lstrip())
                 vars.append(var)
+
                 if wantVerbose is True:
                     varName, varType, varValue = var
                     input_file2.append(
@@ -337,27 +391,39 @@ def parse_include(input_file, vars, ifStack, embedLevel):
                         + varValue
                         + "-->"
                     )
+
+            elif line.startswith("=inc ") is True:
+                parse_inc(line, vars)
+
+            elif line.startswith("=dec ") is True:
+                parse_dec(line, vars)
+
             elif line.startswith("=undef") is True:
                 varName = line[7:-1].lstrip()
                 vars, verbosity = handle_undef(varName, vars)
                 if wantVerbose is True:
                     input_file2.append(verbosity)
+
             elif line.startswith("=ifdef ") is True:
                 ifStack, verbosity = handle_ifdef(
                     ifStack, line[7:].lstrip().rstrip(), vars
                 )
                 if wantVerbose is True:
                     input_file2.append(verbosity)
+
             elif line.startswith("=ifndef ") is True:
                 ifStack, verbosity = handle_ifndef(
                     ifStack, line[8:].lstrip().rstrip(), vars
                 )
                 if wantVerbose is True:
                     input_file2.append(verbosity)
+
             elif line.startswith("=endif") is False:
                 input_file2.append(line)
+
         if line.startswith("=endif") is True:
             ifStack, verbosity = handle_endif(ifStack)
+
             if wantVerbose is True:
                 input_file2.append(verbosity)
 
@@ -375,30 +441,26 @@ def replace_varname(varName, variables):
     return "&" + varName + ";"
 
 
-def substitute_variables(input_file, variables):
-    input_file2 = []
-    for line in input_file:
-        fragments = line.split("&")
-        ampersands = len(fragments) - 1
+def substitute_variables(input_line, variables):
+    fragments = input_line.split("&")
+    ampersands = len(fragments) - 1
 
-        # Output line starts with fragment before the first ampersand
-        output_line = fragments[0]
+    # Output line starts with fragment before the first ampersand
+    output_line = fragments[0]
 
-        # Go through the remaining fragments, extracting their data
-        for f in range(ampersands):
-            fragment = fragments[f + 1]
-            semicolonPos = fragment.find(";")
-            if semicolonPos == -1:
-                # No terminating semicolon
-                output_line += "&" + fragment
-            else:
-                # Terminating semicolon so extract variable name
-                varName = fragment[:semicolonPos]
-                tail = fragment[semicolonPos + 1 :]
-                output_line += replace_varname(varName, variables) + tail
-
-        input_file2.append(output_line)
-    return input_file2
+    # Go through the remaining fragments, extracting their data
+    for f in range(ampersands):
+        fragment = fragments[f + 1]
+        semicolonPos = fragment.find(";")
+        if semicolonPos == -1:
+            # No terminating semicolon
+            output_line += "&" + fragment
+        else:
+            # Terminating semicolon so extract variable name
+            varName = fragment[:semicolonPos]
+            tail = fragment[semicolonPos + 1 :]
+            output_line += replace_varname(varName, variables) + tail
+    return output_line
 
 
 def handle_linejoins(input_file):
@@ -812,9 +874,6 @@ includeStack = ["top-level-file"]
 
 # Pre-process - to pick up includes
 stopIt, input_file, variables = parse_include(input_file, [], ifStack, 0)
-
-# Substitute any variables
-input_file = substitute_variables(input_file, variables)
 
 # Handle line joining
 input_file = handle_linejoins(input_file)

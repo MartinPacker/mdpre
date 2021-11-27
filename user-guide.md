@@ -5,7 +5,7 @@ This document describes the mdpre Markdown preprocessor.
 
 In this document we'll refer to it as "mdpre", pronounced "em dee pree".
 
-This document was converted to HTML at 16&colon;50 on 22 November&comma; 2021.
+This document was converted to HTML at 15&colon;46 on 27 November&comma; 2021.
 
 ### Table Of Contents
 
@@ -21,6 +21,8 @@ This document was converted to HTML at 16&colon;50 on 22 November&comma; 2021.
 	* [Including files with `=include`](#including-files-with-include)
 	* [Defining Variables With `=def`](#defining-variables-with-def)
 	* [Undefining Variables With `=undef`](#undefining-variables-with-undef)
+	* [Incrementing Integer Variables Wth `=inc`](#incrementing-integer-variables-wth-inc)
+	* [Decrementing Integer Variables Wth `=dec`](#decrementing-integer-variables-wth-dec)
 	* [Conditional Inclusion With `=ifdef`, `=ifndef`, And `=endif`](#conditional-inclusion-with-ifdef-ifndef-and-endif)
 	* [Converting A CSV File To A Markdown Table With `=csv` And `=endcsv`](#converting-a-csv-file-to-a-markdown-table-with-csv-and-endcsv)
 		* [Controlling Table Alignment With `=colalign`](#controlling-table-alignment-with-colalign)
@@ -222,6 +224,29 @@ Just as you can use `=def` to define a variable you can remove it from the varia
 	=undef xyzzy
 
 will mean the variable `xyzzy` will no longer be defined.
+
+### Incrementing Integer Variables Wth `=inc`
+
+If a variable has an integer value it can be incremented. For example,
+
+	=def counter1 1
+	=include B&counter1;.md
+	=inc counter1
+	=include B&counter1;.md
+
+In this example B1.md will be included and then B2.md will be included
+
+### Decrementing Integer Variables Wth `=dec`
+
+If a variable has an integer value it can be decremented. For example,
+
+	=def counter1 1
+
+    ⋮
+
+	=dec counter1
+
+In this example counter1 will start with the value 1 and after the `=dec` its value will be 0.
 
 ### Conditional Inclusion With `=ifdef`, `=ifndef`, And `=endif`
 

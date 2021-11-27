@@ -1,12 +1,12 @@
 
-mdpre Markdown Preprocessor v0.4.7 (22 November, 2021)
-======================================================
+mdpre Markdown Preprocessor v0.5 (27 November, 2021)
+====================================================
 - opened <stdout> for writing
-Def mdpre_date = 22 November, 2021
-Def mdpre_level = 0.4.7
+Def mdpre_date = 27 November, 2021
+Def mdpre_level = 0.5
 Def userid = martinpacker
-Def time = 16&colon;50
-Def date = 22 November&comma; 2021
+Def time = 15&colon;46
+Def date = 27 November&comma; 2021
 Def TOC = Table Of Contents
 Markdown Preprocessor User Guide
 Table Of Contents - spec '2 * Table Of Contents'
@@ -23,6 +23,8 @@ Table Of Contents - spec '2 * Table Of Contents'
 ..... .....  Including files with `=include`
 ..... .....  Defining Variables With `=def`
 ..... .....  Undefining Variables With `=undef`
+..... .....  Incrementing Integer Variables Wth `=inc`
+..... .....  Decrementing Integer Variables Wth `=dec`
 ..... .....  Conditional Inclusion With `=ifdef`, `=ifndef`, And `=endif`
 ..... .....  Converting A CSV File To A Markdown Table With `=csv` And `=endcsv`
 CSV Start
@@ -41,7 +43,7 @@ Column Alignment - spec 'l l l'
 Column Width - spec ' 2 4 1'
 CSV Start
 CSV Stop
-------------------------------------------------------
+----------------------------------------------------
 - Processing completed.
-------------------------------------------------------
+----------------------------------------------------
 

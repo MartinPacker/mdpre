@@ -215,6 +215,29 @@ Just as you can use `=def` to define a variable you can remove it from the varia
 
 will mean the variable `xyzzy` will no longer be defined.
 
+### Incrementing Integer Variables Wth `=inc`
+
+If a variable has an integer value it can be incremented. For example,
+
+	=def counter1 1
+	=include B&counter1;.md
+	=inc counter1
+	=include B&counter1;.md
+
+In this example B1.md will be included and then B2.md will be included
+
+### Decrementing Integer Variables Wth `=dec`
+
+If a variable has an integer value it can be decremented. For example,
+
+	=def counter1 1
+
+    ⋮
+
+	=dec counter1
+
+In this example counter1 will start with the value 1 and after the `=dec` its value will be 0.
+
 ### Conditional Inclusion With `=ifdef`, `=ifndef`, And `=endif`
 
 `=ifdef` and `=ifndef` perform very similar functions, but are complementary to each other.

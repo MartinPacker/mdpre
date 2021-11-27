@@ -3,6 +3,11 @@
 ### Releases
 
 
+### v0.5 - 27 November, 2021
+
+* **ENHANCED** Symbol resolution happens inline - which means a symbol can be redefined
+* **ENHANCED** Added `=inc` and `=dec` - to increment and decrement values of **integer** variables
+
 ### v0.4.7 - 21 November, 2021
 
 * **ENHANCED** Recursion check for `=include`
