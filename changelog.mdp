@@ -4,7 +4,8 @@
 
 ### v0.4.7 - 21 November, 2021
 
-* **ENHANCED** Recursion check for embeds
+* **ENHANCED** Recursion check for `=include`
+* **ENHANCED** `=include` resolves symbols in filename
 
 ### v0.4.6 - 19 October, 2020
 
