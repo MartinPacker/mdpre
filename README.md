@@ -17,4 +17,4 @@ It's suggested you use a file extension other than .markdown or .md for the inpu
 
 mdpre uses stdin and stdout so you can use this as part of a pipeline. It also uses stderr for all messages. Verbose mode (`-v`) gives you lots of messages. For syntax help use `-h`.
 
-Latest release (v0.5) is [here](https://github.com/MartinPacker/mdpre)
+Latest release (v0.5) is [here](https://github.com/MartinPacker/mdpre).
