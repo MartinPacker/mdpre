@@ -1,3 +1,114 @@
+<style>
+    .blue {
+        color: #0000FF;
+    }
+
+    .red {
+        color: #FF0000;
+    }
+
+    .green {
+        color: #00DD00;
+    }
+
+    .purple {
+        color: #FF00FF;
+    }
+
+    .yellow {
+        color: #BBBB00;
+    }
+
+    .darkgreen {
+        color: #008000;
+    }
+
+    .orange {
+        color: #FFA500
+    }
+
+    .turquoise {
+        color: #00FFFF
+    }
+
+    .C0000C0 {
+        color: #0000C0;
+    }
+
+    .C00C000 {
+        color: #00C000;
+    }
+
+    .C00C0C0 {
+        color: #00C0C0;
+    }
+
+    .CC00000 {
+        color: #C00000;
+    }
+
+    .CC000C0 {
+        color: #C000C0;
+    }
+
+    .CC0C000 {
+        color: #C0C000;
+    }
+
+    .C0000FF {
+        color: #0000FF;
+    }
+
+    .C00FF00 {
+        color: #00FF00;
+    }
+
+    .C00FFFF {
+        color: #00FFFF;
+    }
+
+    .CFF0000 {
+        color: #FF0000;
+    }
+
+    .CFF00FF {
+        color: #FF00FF;
+    }
+
+    .CFFFF00 {
+        color: #FFFF00;
+    }
+
+    .C000080 {
+        color: #000080;
+    }
+
+    .C008000 {
+        color: #008000;
+    }
+
+    .C008080 {
+        color: #008080;
+    }
+
+    .C800000 {
+        color: #800000;
+    }
+
+    .C800080 {
+        color: #800080;
+    }
+
+    .C808000 {
+        color: #808000;
+    }
+
+    .C000000 {
+        color: #000000;
+    }
+</style>
+
+
 
 # Markdown Preprocessor User Guide
 
@@ -5,7 +116,7 @@ This document describes the mdpre Markdown preprocessor.
 
 In this document we'll refer to it as "mdpre", pronounced "em dee pree".
 
-This document was converted to HTML at 15&colon;46 on 27 November&comma; 2021.
+This document was converted to HTML at 11&colon;39 on 16 March&comma; 2022.
 
 ### Table Of Contents
 
@@ -27,6 +138,10 @@ This document was converted to HTML at 15&colon;46 on 27 November&comma; 2021.
 	* [Converting A CSV File To A Markdown Table With `=csv` And `=endcsv`](#converting-a-csv-file-to-a-markdown-table-with-csv-and-endcsv)
 		* [Controlling Table Alignment With `=colalign`](#controlling-table-alignment-with-colalign)
 		* [Controlling Table Column Widths With `=colwidth`](#controlling-table-column-widths-with-colwidth)
+	* [Creating A Calendar Month Table With `=cal`](#creating-a-calendar-month-table-with-cal)
+		* [Controlling How Day Numbers Are Displayed With `=caldays`](#controlling-how-day-numbers-are-displayed-with-caldays)
+		* [Adding A Key To The Day Numbers' Styling With `=calkey`](#adding-a-key-to-the-day-numbers-styling-with-calkey)
+		* [Adding Information To A Cell With `=calnote`](#adding-information-to-a-cell-with-calnote)
 	* [Concatenating Lines With `\`](#concatenating-lines-with)
 	* [Generating A Table Of Contents With `=toc`](#generating-a-table-of-contents-with-toc)
 	* [Terminating Input With `=stop`](#terminating-input-with-stop)
@@ -349,6 +464,127 @@ Adding that to the above produces the following Markdown
 Here the third column is specified as double the width of the others.
 
 **Note:** Many Markdown processors ignore width directives. The developer's other Markdown tool doesn't. :-)
+
+### Creating A Calendar Month Table With `=cal`
+
+You can generate a Markdown table that shows all the days in a month. For example:
+
+|**Mo**|**Tu**|**We**|**Th**|**Fr**|**Sa**|**Su**|
+|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+|<br/>|<br/>|1<br/>|2<br/>|3<br/>|4<br/>|5<br/>|
+|6<br/>|7<br/>|8<br/>|9<br/>|10<br/>|11<br/>|12<br/>|
+|13<br/>|14<br/>|15<br/>|16<br/>|17<br/>|18<br/>|19<br/>|
+|20<br/>|21<br/>|22<br/>|23<br/>|24<br/>|25<br/>|26<br/>|
+|27<br/>|28<br/>|29<br/>|30<br/>|31<br/>|
+
+This example (from November 2021) is the simplest case. You can enhance such a table in a number of ways.
+
+But here's the syntax to generate the above table:
+
+	=cal 2021 12
+	=endcal
+
+The `=endcal` line is necessary because it enables more commands within the `=cal` / `=endcal` bracket.
+
+You can control the height of the cells - in terms of the number of lines by specifying a third parameter:
+
+	=cal 2021 12 3
+	=endcal
+
+In this example each cell is 3 lines high. The default is for each cell to be 2 lines high.
+
+**Note:** By repeated use of `=cal` and `=endcal` you can add multiple months to a document (for example a md2pptx-processed slide).
+
+Here is an example of a calendar that uses all the capabilities (described below):
+
+    =cal 2021 12 3
+    =caldays blue 14 15 16 17
+    =caldays orange 18
+    =calkey blue We have data for **somehow**
+    =calkey orange Is focus day
+    =calnote 17 A
+    =calnote 18 <span class="green">B</span>
+    =calnote 4 X
+    =endcal
+
+    * An unrelated bullet
+
+It produces something like this:
+
+|**Mo**|**Tu**|**We**|**Th**|**Fr**|**Sa**|**Su**|
+|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+|<br/><br/>|<br/><br/>|1<br/><br/>|2<br/><br/>|3<br/><br/>|4<br/>X<br/>|5<br/><br/>|
+|6<br/><br/>|7<br/><br/>|8<br/><br/>|9<br/><br/>|10<br/><br/>|11<br/><br/>|12<br/><br/>|
+|13<br/><br/>|<span class='blue'>14</span><br/><br/>|<span class='blue'>15</span><br/><br/>|<span class='blue'>16</span><br/><br/>|<span class='blue'>17</span><br/>A<br/>|<span class='orange'>18</span><br/><span class="green">B</span><br/>|19<br/><br/>|
+|20<br/><br/>|21<br/><br/>|22<br/><br/>|23<br/><br/>|24<br/><br/>|25<br/><br/>|26<br/><br/>|
+|27<br/><br/>|28<br/><br/>|29<br/><br/>|30<br/><br/>|31<br/><br/>|
+
+* <span class='blue'>&nbsp;</span>We have data for **somehow**
+* <span class='orange'>&nbsp;</span>Is focus day
+
+
+* An unrelated bullet
+
+although in md2pptx the bullets would be coloured appropriately.
+
+#### Controlling How Day Numbers Are Displayed With `=caldays`
+
+You can style days in the calendar with CSS using the `class` attribute. For example:
+
+```
+=caldays blue 14 15 16 17
+=caldays orange 18
+```
+
+In this case days 14, 15, 16, and 17 are styled with CSS class `blue`, whereas day 18 is styled with CSS class `orange`. You need to code the CSS for classes `blue` and `orange` for these specifications to be effective.
+
+`=caldays` must be specified on its own line between the `=cal` and `=endcal` lines. You can specify as many `=caldays` lines as you like within this bracket.
+
+#### Adding A Key To The Day Numbers' Styling With `=calkey`
+
+You can add bullets below the table to explain what each style means. For example:
+
+```
+=calkey blue We have data for **somehow**
+=calkey orange Is focus day
+```
+
+causes the following Markdown / HTML to be generated:
+
+```
+* <span class='blue'>&nbsp;</span>We have data for **somehow**
+* <span class='orange'>&nbsp;</span>Is focus day
+```
+
+As with `=caldays`, you need to code the CSS for classes `blue` and `orange` for these specifications to be effective.
+
+`=calkey` must be specified on its own line between the `=cal` and `=endcal` lines. You can specify as many `=calkey` lines as you like within this bracket.
+
+**Notes:**
+
+1. You can continue the bulleted list that `=caldays` generates with other bulleted list items; Just code those bulleted list items after `=endcal`.
+1. While you need not use the same class names as `=caldays` the intended use case is for you to do so.
+1. md2pptx will use the `<span>` element to e.g. colour the bullets.
+
+
+#### Adding Information To A Cell With `=calnote`
+
+You can add annotations to individual calendar dates with `=calnote`. For example:
+
+```
+=calnote 17 A
+=calnote 18 <span class="green">B</span>
+```
+
+1. `=calnote 17 A` adds the text "A" to the cell for 17th of the month.
+1. `=calnote 18 <span class="green">B</span>` adds the text "B" in (presumably) green to the cell for the 18th of the month.
+
+`=calnote` must be specified on its own line between the `=cal` and `=endcal` lines. You can specify as many `=calnote` lines as you like within this bracket.
+
+**Notes:**
+
+1. In the examples given the text is short. It probably looks worse if the text is long.
+1. The second example shows use of `<span>`. Equally you can code `<br/>` as needed. This would be a case where coding the third parameter to `=cal` can be used to ensure all the cells have the same height.
 
 ### Concatenating Lines With `\`
 

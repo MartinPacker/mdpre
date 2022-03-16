@@ -1063,10 +1063,120 @@ body .markdown-body
 .highlight .vi{color:teal}
 .highlight .il{color:#009999}
 .highlight .gc{color:#999;background-color:#EAF2F5}
-</style><title>user-guide</title></head><body><article class="markdown-body"><h1 id="markdown-preprocessor-user-guide">Markdown Preprocessor User Guide<a class="headerlink" href="#markdown-preprocessor-user-guide" title="Permanent link"></a></h1>
+</style><title>user-guide</title></head><body><article class="markdown-body"><style>
+    .blue {
+        color: #0000FF;
+    }
+
+    .red {
+        color: #FF0000;
+    }
+
+    .green {
+        color: #00DD00;
+    }
+
+    .purple {
+        color: #FF00FF;
+    }
+
+    .yellow {
+        color: #BBBB00;
+    }
+
+    .darkgreen {
+        color: #008000;
+    }
+
+    .orange {
+        color: #FFA500
+    }
+
+    .turquoise {
+        color: #00FFFF
+    }
+
+    .C0000C0 {
+        color: #0000C0;
+    }
+
+    .C00C000 {
+        color: #00C000;
+    }
+
+    .C00C0C0 {
+        color: #00C0C0;
+    }
+
+    .CC00000 {
+        color: #C00000;
+    }
+
+    .CC000C0 {
+        color: #C000C0;
+    }
+
+    .CC0C000 {
+        color: #C0C000;
+    }
+
+    .C0000FF {
+        color: #0000FF;
+    }
+
+    .C00FF00 {
+        color: #00FF00;
+    }
+
+    .C00FFFF {
+        color: #00FFFF;
+    }
+
+    .CFF0000 {
+        color: #FF0000;
+    }
+
+    .CFF00FF {
+        color: #FF00FF;
+    }
+
+    .CFFFF00 {
+        color: #FFFF00;
+    }
+
+    .C000080 {
+        color: #000080;
+    }
+
+    .C008000 {
+        color: #008000;
+    }
+
+    .C008080 {
+        color: #008080;
+    }
+
+    .C800000 {
+        color: #800000;
+    }
+
+    .C800080 {
+        color: #800080;
+    }
+
+    .C808000 {
+        color: #808000;
+    }
+
+    .C000000 {
+        color: #000000;
+    }
+</style>
+
+<h1 id="markdown-preprocessor-user-guide">Markdown Preprocessor User Guide<a class="headerlink" href="#markdown-preprocessor-user-guide" title="Permanent link"></a></h1>
 <p>This document describes the mdpre Markdown preprocessor.</p>
 <p>In this document we&rsquo;ll refer to it as &ldquo;mdpre&rdquo;, pronounced &ldquo;em dee pree&rdquo;.</p>
-<p>This document was converted to HTML at 15&colon;46 on 27 November&comma; 2021.</p>
+<p>This document was converted to HTML at 11&colon;39 on 16 March&comma; 2022.</p>
 <h3 id="table-of-contents">Table Of Contents<a class="headerlink" href="#table-of-contents" title="Permanent link"></a></h3>
 <ul>
 <li><a href="#why-a-preprocessor">Why A Preprocessor?</a></li>
@@ -1089,6 +1199,12 @@ body .markdown-body
 <li><a href="#converting-a-csv-file-to-a-markdown-table-with-csv-and-endcsv">Converting A CSV File To A Markdown Table With <code>=csv</code> And <code>=endcsv</code></a><ul>
 <li><a href="#controlling-table-alignment-with-colalign">Controlling Table Alignment With <code>=colalign</code></a></li>
 <li><a href="#controlling-table-column-widths-with-colwidth">Controlling Table Column Widths With <code>=colwidth</code></a></li>
+</ul>
+</li>
+<li><a href="#creating-a-calendar-month-table-with-cal">Creating A Calendar Month Table With <code>=cal</code></a><ul>
+<li><a href="#controlling-how-day-numbers-are-displayed-with-caldays">Controlling How Day Numbers Are Displayed With <code>=caldays</code></a></li>
+<li><a href="#adding-a-key-to-the-day-numbers-styling-with-calkey">Adding A Key To The Day Numbers&rsquo; Styling With <code>=calkey</code></a></li>
+<li><a href="#adding-information-to-a-cell-with-calnote">Adding Information To A Cell With <code>=calnote</code></a></li>
 </ul>
 </li>
 <li><a href="#concatenating-lines-with">Concatenating Lines With <code>\</code></a></li>
@@ -1361,6 +1477,207 @@ Here is some text that would be included by the test on the line above.
 </code></pre>
 <p>Here the third column is specified as double the width of the others.</p>
 <p><strong>Note:</strong> Many Markdown processors ignore width directives. The developer&rsquo;s other Markdown tool doesn&rsquo;t. :-)</p>
+<h3 id="creating-a-calendar-month-table-with-cal">Creating A Calendar Month Table With <code>=cal</code><a class="headerlink" href="#creating-a-calendar-month-table-with-cal" title="Permanent link"></a></h3>
+<p>You can generate a Markdown table that shows all the days in a month. For example:</p>
+<table>
+<thead>
+<tr>
+<th align="center"><strong>Mo</strong></th>
+<th align="center"><strong>Tu</strong></th>
+<th align="center"><strong>We</strong></th>
+<th align="center"><strong>Th</strong></th>
+<th align="center"><strong>Fr</strong></th>
+<th align="center"><strong>Sa</strong></th>
+<th align="center"><strong>Su</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><br/></td>
+<td align="center"><br/></td>
+<td align="center">1<br/></td>
+<td align="center">2<br/></td>
+<td align="center">3<br/></td>
+<td align="center">4<br/></td>
+<td align="center">5<br/></td>
+</tr>
+<tr>
+<td align="center">6<br/></td>
+<td align="center">7<br/></td>
+<td align="center">8<br/></td>
+<td align="center">9<br/></td>
+<td align="center">10<br/></td>
+<td align="center">11<br/></td>
+<td align="center">12<br/></td>
+</tr>
+<tr>
+<td align="center">13<br/></td>
+<td align="center">14<br/></td>
+<td align="center">15<br/></td>
+<td align="center">16<br/></td>
+<td align="center">17<br/></td>
+<td align="center">18<br/></td>
+<td align="center">19<br/></td>
+</tr>
+<tr>
+<td align="center">20<br/></td>
+<td align="center">21<br/></td>
+<td align="center">22<br/></td>
+<td align="center">23<br/></td>
+<td align="center">24<br/></td>
+<td align="center">25<br/></td>
+<td align="center">26<br/></td>
+</tr>
+<tr>
+<td align="center">27<br/></td>
+<td align="center">28<br/></td>
+<td align="center">29<br/></td>
+<td align="center">30<br/></td>
+<td align="center">31<br/></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+</tbody>
+</table>
+<p>This example (from November 2021) is the simplest case. You can enhance such a table in a number of ways.</p>
+<p>But here&rsquo;s the syntax to generate the above table:</p>
+<pre><code>=cal 2021 12
+=endcal
+</code></pre>
+<p>The <code>=endcal</code> line is necessary because it enables more commands within the <code>=cal</code> / <code>=endcal</code> bracket.</p>
+<p>You can control the height of the cells - in terms of the number of lines by specifying a third parameter:</p>
+<pre><code>=cal 2021 12 3
+=endcal
+</code></pre>
+<p>In this example each cell is 3 lines high. The default is for each cell to be 2 lines high.</p>
+<p><strong>Note:</strong> By repeated use of <code>=cal</code> and <code>=endcal</code> you can add multiple months to a document (for example a md2pptx-processed slide).</p>
+<p>Here is an example of a calendar that uses all the capabilities (described below):</p>
+<pre><code>=cal 2021 12 3
+=caldays blue 14 15 16 17
+=caldays orange 18
+=calkey blue We have data for **somehow**
+=calkey orange Is focus day
+=calnote 17 A
+=calnote 18 &lt;span class="green"&gt;B&lt;/span&gt;
+=calnote 4 X
+=endcal
+
+* An unrelated bullet
+</code></pre>
+<p>It produces something like this:</p>
+<table>
+<thead>
+<tr>
+<th align="center"><strong>Mo</strong></th>
+<th align="center"><strong>Tu</strong></th>
+<th align="center"><strong>We</strong></th>
+<th align="center"><strong>Th</strong></th>
+<th align="center"><strong>Fr</strong></th>
+<th align="center"><strong>Sa</strong></th>
+<th align="center"><strong>Su</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><br/><br/></td>
+<td align="center"><br/><br/></td>
+<td align="center">1<br/><br/></td>
+<td align="center">2<br/><br/></td>
+<td align="center">3<br/><br/></td>
+<td align="center">4<br/>X<br/></td>
+<td align="center">5<br/><br/></td>
+</tr>
+<tr>
+<td align="center">6<br/><br/></td>
+<td align="center">7<br/><br/></td>
+<td align="center">8<br/><br/></td>
+<td align="center">9<br/><br/></td>
+<td align="center">10<br/><br/></td>
+<td align="center">11<br/><br/></td>
+<td align="center">12<br/><br/></td>
+</tr>
+<tr>
+<td align="center">13<br/><br/></td>
+<td align="center"><span class='blue'>14</span><br/><br/></td>
+<td align="center"><span class='blue'>15</span><br/><br/></td>
+<td align="center"><span class='blue'>16</span><br/><br/></td>
+<td align="center"><span class='blue'>17</span><br/>A<br/></td>
+<td align="center"><span class='orange'>18</span><br/><span class="green">B</span><br/></td>
+<td align="center">19<br/><br/></td>
+</tr>
+<tr>
+<td align="center">20<br/><br/></td>
+<td align="center">21<br/><br/></td>
+<td align="center">22<br/><br/></td>
+<td align="center">23<br/><br/></td>
+<td align="center">24<br/><br/></td>
+<td align="center">25<br/><br/></td>
+<td align="center">26<br/><br/></td>
+</tr>
+<tr>
+<td align="center">27<br/><br/></td>
+<td align="center">28<br/><br/></td>
+<td align="center">29<br/><br/></td>
+<td align="center">30<br/><br/></td>
+<td align="center">31<br/><br/></td>
+<td align="center"></td>
+<td align="center"></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><span class='blue'>&nbsp;</span>We have data for <strong>somehow</strong></li>
+<li>
+<p><span class='orange'>&nbsp;</span>Is focus day</p>
+</li>
+<li>
+<p>An unrelated bullet</p>
+</li>
+</ul>
+<p>although in md2pptx the bullets would be coloured appropriately.</p>
+<h4 id="controlling-how-day-numbers-are-displayed-with-caldays">Controlling How Day Numbers Are Displayed With <code>=caldays</code><a class="headerlink" href="#controlling-how-day-numbers-are-displayed-with-caldays" title="Permanent link"></a></h4>
+<p>You can style days in the calendar with CSS using the <code>class</code> attribute. For example:</p>
+<div class="highlight"><pre>=caldays blue 14 15 16 17
+=caldays orange 18
+</pre></div>
+
+<p>In this case days 14, 15, 16, and 17 are styled with CSS class <code>blue</code>, whereas day 18 is styled with CSS class <code>orange</code>. You need to code the CSS for classes <code>blue</code> and <code>orange</code> for these specifications to be effective.</p>
+<p><code>=caldays</code> must be specified on its own line between the <code>=cal</code> and <code>=endcal</code> lines. You can specify as many <code>=caldays</code> lines as you like within this bracket.</p>
+<h4 id="adding-a-key-to-the-day-numbers-styling-with-calkey">Adding A Key To The Day Numbers&rsquo; Styling With <code>=calkey</code><a class="headerlink" href="#adding-a-key-to-the-day-numbers-styling-with-calkey" title="Permanent link"></a></h4>
+<p>You can add bullets below the table to explain what each style means. For example:</p>
+<div class="highlight"><pre>=calkey blue We have data for **somehow**
+=calkey orange Is focus day
+</pre></div>
+
+<p>causes the following Markdown / HTML to be generated:</p>
+<div class="highlight"><pre>* &lt;span class=&#39;blue&#39;&gt;&amp;nbsp;&lt;/span&gt;We have data for **somehow**
+* &lt;span class=&#39;orange&#39;&gt;&amp;nbsp;&lt;/span&gt;Is focus day
+</pre></div>
+
+<p>As with <code>=caldays</code>, you need to code the CSS for classes <code>blue</code> and <code>orange</code> for these specifications to be effective.</p>
+<p><code>=calkey</code> must be specified on its own line between the <code>=cal</code> and <code>=endcal</code> lines. You can specify as many <code>=calkey</code> lines as you like within this bracket.</p>
+<p><strong>Notes:</strong></p>
+<ol>
+<li>You can continue the bulleted list that <code>=caldays</code> generates with other bulleted list items; Just code those bulleted list items after <code>=endcal</code>.</li>
+<li>While you need not use the same class names as <code>=caldays</code> the intended use case is for you to do so.</li>
+<li>md2pptx will use the <code>&lt;span&gt;</code> element to e.g. colour the bullets.</li>
+</ol>
+<h4 id="adding-information-to-a-cell-with-calnote">Adding Information To A Cell With <code>=calnote</code><a class="headerlink" href="#adding-information-to-a-cell-with-calnote" title="Permanent link"></a></h4>
+<p>You can add annotations to individual calendar dates with <code>=calnote</code>. For example:</p>
+<div class="highlight"><pre>=calnote 17 A
+=calnote 18 &lt;span class=&quot;green&quot;&gt;B&lt;/span&gt;
+</pre></div>
+
+<ol>
+<li><code>=calnote 17 A</code> adds the text &ldquo;A&rdquo; to the cell for 17th of the month.</li>
+<li><code>=calnote 18 &lt;span class="green"&gt;B&lt;/span&gt;</code> adds the text &ldquo;B&rdquo; in (presumably) green to the cell for the 18th of the month.</li>
+</ol>
+<p><code>=calnote</code> must be specified on its own line between the <code>=cal</code> and <code>=endcal</code> lines. You can specify as many <code>=calnote</code> lines as you like within this bracket.</p>
+<p><strong>Notes:</strong></p>
+<ol>
+<li>In the examples given the text is short. It probably looks worse if the text is long.</li>
+<li>The second example shows use of <code>&lt;span&gt;</code>. Equally you can code <code>&lt;br/&gt;</code> as needed. This would be a case where coding the third parameter to <code>=cal</code> can be used to ensure all the cells have the same height.</li>
+</ol>
 <h3 id="concatenating-lines-with">Concatenating Lines With <code>\</code><a class="headerlink" href="#concatenating-lines-with" title="Permanent link"></a></h3>
 <p>Some Markdown processors treat text on separate lines as requiring a line break between the lines. But you might prefer to write each sentence in a paragraph on a separate line. Indeed this paragraph was written that way.</p>
 <p>If you terminate a line with a <code>\</code> (backslash) character the following line will be concatenated to it. For example:</p>

@@ -3,6 +3,10 @@
 ### Releases
 
 
+### v0.6 - 16 March, 2022
+
+* **ENHANCED** Month Calendar generation supported -with `=cal` etc.
+
 ### v0.5 - 27 November, 2021
 
 * **ENHANCED** Symbol resolution happens inline - which means a symbol can be redefined

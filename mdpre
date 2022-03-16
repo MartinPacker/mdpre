@@ -28,10 +28,11 @@ import datetime
 from functools import partial
 from pathlib import Path
 from enum import Enum
+import calendar
 
 
-mdpre_level = "0.5"
-mdpre_date = "27 November, 2021"
+mdpre_level = "0.6"
+mdpre_date = "16 March, 2022"
 banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
     
 
@@ -48,6 +49,9 @@ g_wrapInCSV = False
 csv_colaligns = []
 csv_colwidths = []
 in_csv = False
+
+cal_date = (0, 0, 2)
+in_cal = False
 
 # Find index of variable in variable list. -1 means "not found"
 def find_variable(targetVar, vars):
@@ -135,6 +139,64 @@ class Output(object):
                 first_row = False
         return
 
+    def formatCalendar(self, cal_lines, cal_date, cal_spans, cal_keys, cal_notes):
+        # Get a calendar month in a 2-dimensional array
+        cal_year, cal_month, cal_cellHeight = cal_date
+        c = calendar.TextCalendar(calendar.MONDAY)
+        daysAndNumbers = c.formatmonth(cal_year, cal_month).split("\n")[1:]
+
+        # Process the rows into day names and actual day numbers
+        weeks = []
+        for row in range(len(daysAndNumbers) - 1):
+            rawCells = [daysAndNumbers[row][i : i + 3].lstrip().rstrip() for i in range(0, len(daysAndNumbers[row]), 3)]
+            if row == 0:
+                dayNames = rawCells
+            else:
+                weeks.append(rawCells)
+        
+        # Write the table heading
+        dayLine = "|"
+        for dayName in dayNames:
+            dayLine = dayLine + "**" + dayName + "**|"
+
+        self.write(dayLine)
+
+        self.write(("|:-:") * 7 + "|")
+        
+        # Write the remaining lines
+        for week in weeks:
+            weekLine = "|"
+            for day in week:
+                # Figure out if day has a note
+                if day in cal_notes.keys():
+                    dayNote = "<br/>" + cal_notes[day]
+                    cellLines = len(dayNote.split("<br/>"))
+                else:
+                    dayNote = ""
+                    cellLines = 1
+                
+                
+                # Compose day Markdown / HTML
+                if day in cal_spans.keys():
+                    formattedDay = "<span class='" + cal_spans[day] + "'>" + day + "</span>" + dayNote
+                else:
+                    formattedDay = day + dayNote
+                
+                # Vertically pad
+                formattedDay = formattedDay + "<br/>" * (cal_cellHeight - cellLines)
+                
+                # Add day cell to week line
+                weekLine = weekLine + formattedDay  + "|"
+            
+            # Write week line
+            self.write(weekLine)
+        
+        # Write any descriptions
+        self.write("")
+        for key in cal_keys.keys():
+            self.write("* <span class='" + key + "'>&nbsp;</span>" + cal_keys[key])
+        self.write("")
+ 
     # Print Table Of Contents down to maximum level
     def printTableOfContents(self, minLevel, maxLevel, heading, toc):
 
@@ -213,6 +275,47 @@ def parse_colwidth(colString, p_separator='\s+'):
 
     return colwidthInt
 
+def parse_calstart(calString, p_separator='\s+'):
+    d = calString.rstrip().lstrip()
+    ym = re.split(p_separator, d)
+    
+    if len(ym) < 3:
+        cal_cellHeight = 2
+    else:
+        cal_cellHeight = int(ym[2])
+
+    return(int(ym[0]), int(ym[1]), cal_cellHeight)
+
+def parse_caldays(spanString, cal_spans, p_separator='\s+'):
+    sp = spanString.rstrip().lstrip()
+    words = re.split(p_separator, sp)
+    
+    for w in range(len(words)):
+        if w == 0:
+            spanClass = words[w]
+        else:
+            dayNumber = words[w]
+            cal_spans[dayNumber] = spanClass
+    
+    return cal_spans
+
+def parse_calkeys(keyString, cal_keys):
+    keyString = keyString.rstrip().lstrip()
+    spacePos= keyString.find(" ")
+    keyName =  keyString[:spacePos]
+    keyValue = keyString[spacePos + 1 :]
+    cal_keys[keyName] = keyValue
+    
+    return cal_keys
+
+def parse_calnote(keyString, cal_notes):
+    keyString = keyString.rstrip().lstrip()
+    spacePos= keyString.find(" ")
+    keyName =  keyString[:spacePos]
+    keyValue = keyString[spacePos + 1 :]
+    cal_notes[keyName] = keyValue
+    
+    return cal_notes
 
 def parse_def(defString):
     spacePos = defString.find(" ")
@@ -565,46 +668,75 @@ def handle_verbose(line):
     noPrefixSuffix = line[10:-3]
     verboseArray = noPrefixSuffix.split(":")
     verboseType = verboseArray[0]
+    
     if verboseType == "embed-start":
         embedLevel = int(verboseArray[1])
         sys.stderr.write(("---" * embedLevel) + "> Start of " + verboseArray[2] + "\n")
+
     elif verboseType == "embed-stop":
         embedLevel = int(verboseArray[1])
         sys.stderr.write(("---" * embedLevel) + "> End of " + verboseArray[2] + "\n")
+
     elif verboseType == "heading":
         sys.stderr.write(line[18:-3].replace("#", "..... ")[6:].lstrip() + "\n")
+
     elif verboseType == "toc":
         sys.stderr.write("Table Of Contents - spec '" + noPrefixSuffix[9:] + "'\n")
+
     elif verboseType == "csv":
         sys.stderr.write("CSV Start\n")
+
     elif verboseType == "endcsv":
         sys.stderr.write("CSV Stop\n")
+
+    elif verboseType == "cal":
+        sys.stderr.write("Calendar Start\n")
+
+    elif verboseType == "endcal":
+        sys.stderr.write("Calendar Stop\n")
+
+    elif verboseType == "caldays":
+        sys.stderr.write("Calendar Day Span\n")
+
+    elif verboseType == "calkey":
+        sys.stderr.write("Calendar Class Days\n")
+
+    elif verboseType == "calnote":
+        sys.stderr.write("Calendar Days Note\n")
+
     elif verboseType == "colalign":
         sys.stderr.write("Column Alignment - spec '" + noPrefixSuffix[19:] + "'\n")
+
     elif verboseType == "colwidth":
         sys.stderr.write("Column Width - spec '" + noPrefixSuffix[19:] + "'\n")
+
     elif verboseType == "def":
         if verboseArray[2] == "T":
             sys.stderr.write("Def " + verboseArray[1] + " = " + verboseArray[3] + "\n")
         else:
             sys.stderr.write("Def " + verboseArray[1] + "\n")
+
     elif verboseType == "undef":
         if verboseArray[1] == "found":
             sys.stderr.write("Undef successful " + verboseArray[2] + "\n")
         else:
             sys.stderr.write("Undef failed " + verboseArray[2] + "\n")
+
     elif verboseType == "endif":
         sys.stderr.write("Endif\n")
+
     elif verboseType == "ifdef":
         if verboseArray[1] == "true":
             sys.stderr.write("Ifdef true " + verboseArray[2] + "\n")
         else:
             sys.stderr.write("Ifdef nottrue " + verboseArray[2] + "\n")
+
     elif verboseType == "ifndef":
         if verboseArray[1] == "true":
             sys.stderr.write("Ifndef true " + verboseArray[2] + "\n")
         else:
             sys.stderr.write("Ifndef untrue " + verboseArray[2] + "\n")
+
     else:
         sys.stderr.write("Unknown " + line + "\n")
 
@@ -885,6 +1017,7 @@ minTocLevel, maxTocLevel, tableOfContents = extractTableOfContents(input_file)
 csv_colaligns = []
 csv_colwidths = []
 in_csv = False
+in_cal = False
 
     
 
@@ -893,39 +1026,82 @@ for line in input_file:
     if line.startswith("<!--mdpre-"):
         # For verbose mode writing to stderr
         handle_verbose(line)
+
     elif line.startswith("#"):
         if wantVerbose is True:
             handle_verbose("<!--mdpre-heading:" + line + "-->")
         g_output.write(line)
+
     elif line.startswith("=toc"):
         if wantVerbose is True:
             handle_verbose("<!--mdpre-toc:" + line + "-->")
         minLevel, maxLevel, heading = parseTocStatement(line, minTocLevel, maxTocLevel)
         print(minLevel, maxLevel, heading, file=sys.stderr)
         g_output.printTableOfContents(minLevel, maxLevel, "### " + heading, tableOfContents)
+
     elif (line.startswith("=csv")) & (in_csv is False):
         in_csv = True
         CSV_lines = []
         if wantVerbose is True:
             handle_verbose("<!--mdpre-csv:" + line + "-->")
+
     elif (line.startswith("=endcsv")) & (in_csv is True):
         g_output.formatCSV(CSV_lines, csv_colaligns, csv_colwidths)
         in_csv = False
         if wantVerbose is True:
             handle_verbose("<!--mdpre-endcsv:" + line + "-->")
+
     elif line.startswith("=colalign "):
         csv_colaligns = parse_colalign(line[10:])
         if wantVerbose is True:
             handle_verbose("<!--mdpre-colalign:" + line + "-->")
+
     elif line.startswith("=colwidth "):
         csv_colwidths = parse_colwidth(line[10:])
         if wantVerbose is True:
             handle_verbose("<!--mdpre-colwidth:" + line + "-->")
+
     elif in_csv is True:
         CSV_lines.append(line)
+
+    elif (line.startswith("=cal ")) & (in_cal is False):
+        in_cal = True
+        cal_lines = []
+        cal_spans = {}
+        cal_keys = {}
+        cal_notes = {}
+        cal_date = parse_calstart(line[5:])
+        if wantVerbose is True:
+            handle_verbose("<!--mdpre-cal:" + line + "-->")
+
+    elif (line.startswith("=endcal")) & (in_cal is True):
+        g_output.formatCalendar(cal_lines, cal_date, cal_spans, cal_keys, cal_notes)
+        in_cal = False
+        if wantVerbose is True:
+            handle_verbose("<!--mdpre-endcal:" + line + "-->")
+
+    elif (line.startswith("=caldays")) & (in_cal is True):
+        cal_spans = parse_caldays(line[9:], cal_spans)
+        if wantVerbose is True:
+            handle_verbose("<!--mdpre-caldays:" + line + "-->")
+
+    elif (line.startswith("=calkey")) & (in_cal is True):
+        cal_keys = parse_calkeys(line[8:], cal_keys)
+        if wantVerbose is True:
+            handle_verbose("<!--mdpre-calkey:" + line + "-->")
+
+    elif (line.startswith("=calnote")) & (in_cal is True):
+        cal_notes = parse_calnote(line[9:], cal_notes)
+        if wantVerbose is True:
+            handle_verbose("<!--mdpre-calnote:" + line + "-->")
+
+    elif in_cal is True:
+        cal_lines.append(line)
+
     elif (line.find("![") > -1) & (wantTextBundle is True):
         # Fix up graphics references and copy graphics to assets folder
         g_output.handle_adjustGraphics(line)
+
     else:
         g_output.write(line)
 
