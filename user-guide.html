@@ -1176,7 +1176,7 @@ body .markdown-body
 <h1 id="markdown-preprocessor-user-guide">Markdown Preprocessor User Guide<a class="headerlink" href="#markdown-preprocessor-user-guide" title="Permanent link"></a></h1>
 <p>This document describes the mdpre Markdown preprocessor.</p>
 <p>In this document we&rsquo;ll refer to it as &ldquo;mdpre&rdquo;, pronounced &ldquo;em dee pree&rdquo;.</p>
-<p>This document was converted to HTML at 11&colon;39 on 16 March&comma; 2022.</p>
+<p>This document was converted to HTML at 20&colon;05 on 17 March&comma; 2022.</p>
 <h3 id="table-of-contents">Table Of Contents<a class="headerlink" href="#table-of-contents" title="Permanent link"></a></h3>
 <ul>
 <li><a href="#why-a-preprocessor">Why A Preprocessor?</a></li>
@@ -1553,7 +1553,7 @@ Here is some text that would be included by the test on the line above.
 <p><strong>Note:</strong> By repeated use of <code>=cal</code> and <code>=endcal</code> you can add multiple months to a document (for example a md2pptx-processed slide).</p>
 <p>Here is an example of a calendar that uses all the capabilities (described below):</p>
 <pre><code>=cal 2021 12 3
-=caldays blue 14 15 16 17
+=caldays blue 14-17
 =caldays orange 18
 =calkey blue We have data for **somehow**
 =calkey orange Is focus day
@@ -1643,6 +1643,15 @@ Here is some text that would be included by the test on the line above.
 
 <p>In this case days 14, 15, 16, and 17 are styled with CSS class <code>blue</code>, whereas day 18 is styled with CSS class <code>orange</code>. You need to code the CSS for classes <code>blue</code> and <code>orange</code> for these specifications to be effective.</p>
 <p><code>=caldays</code> must be specified on its own line between the <code>=cal</code> and <code>=endcal</code> lines. You can specify as many <code>=caldays</code> lines as you like within this bracket.</p>
+<p>You can specify a range of days in the following manner:</p>
+<div class="highlight"><pre>=caldays blue 14-17 22-24 27
+</pre></div>
+
+<p><strong>Notes:</strong></p>
+<ol>
+<li>In a range specification there mustn&rsquo;t be spaces between the <code>-</code> and the numbers either side.</li>
+<li>A later <code>=caldays</code> line overrides a prior one in the sequence - within a <code>=cal</code> / <code>=endcal</code> bracket.</li>
+</ol>
 <h4 id="adding-a-key-to-the-day-numbers-styling-with-calkey">Adding A Key To The Day Numbers&rsquo; Styling With <code>=calkey</code><a class="headerlink" href="#adding-a-key-to-the-day-numbers-styling-with-calkey" title="Permanent link"></a></h4>
 <p>You can add bullets below the table to explain what each style means. For example:</p>
 <div class="highlight"><pre>=calkey blue We have data for **somehow**
@@ -1661,6 +1670,7 @@ Here is some text that would be included by the test on the line above.
 <li>You can continue the bulleted list that <code>=caldays</code> generates with other bulleted list items; Just code those bulleted list items after <code>=endcal</code>.</li>
 <li>While you need not use the same class names as <code>=caldays</code> the intended use case is for you to do so.</li>
 <li>md2pptx will use the <code>&lt;span&gt;</code> element to e.g. colour the bullets.</li>
+<li>A later <code>=calkey</code> line overrides a prior one in the sequence - within a <code>=cal</code> / <code>=endcal</code> bracket.</li>
 </ol>
 <h4 id="adding-information-to-a-cell-with-calnote">Adding Information To A Cell With <code>=calnote</code><a class="headerlink" href="#adding-information-to-a-cell-with-calnote" title="Permanent link"></a></h4>
 <p>You can add annotations to individual calendar dates with <code>=calnote</code>. For example:</p>
@@ -1673,10 +1683,16 @@ Here is some text that would be included by the test on the line above.
 <li><code>=calnote 18 &lt;span class="green"&gt;B&lt;/span&gt;</code> adds the text &ldquo;B&rdquo; in (presumably) green to the cell for the 18th of the month.</li>
 </ol>
 <p><code>=calnote</code> must be specified on its own line between the <code>=cal</code> and <code>=endcal</code> lines. You can specify as many <code>=calnote</code> lines as you like within this bracket.</p>
+<p>You can specify a range of days in the following manner:</p>
+<div class="highlight"><pre>=calnote 14-17 RMF
+</pre></div>
+
 <p><strong>Notes:</strong></p>
 <ol>
 <li>In the examples given the text is short. It probably looks worse if the text is long.</li>
 <li>The second example shows use of <code>&lt;span&gt;</code>. Equally you can code <code>&lt;br/&gt;</code> as needed. This would be a case where coding the third parameter to <code>=cal</code> can be used to ensure all the cells have the same height.</li>
+<li>A later <code>=calnote</code> line overrides a prior one in the sequence - within a <code>=cal</code> / <code>=endcal</code> bracket.</li>
+<li>In a range specification there mustn&rsquo;t be spaces between the <code>-</code> and the numbers either side.</li>
 </ol>
 <h3 id="concatenating-lines-with">Concatenating Lines With <code>\</code><a class="headerlink" href="#concatenating-lines-with" title="Permanent link"></a></h3>
 <p>Some Markdown processors treat text on separate lines as requiring a line break between the lines. But you might prefer to write each sentence in a paragraph on a separate line. Indeed this paragraph was written that way.</p>

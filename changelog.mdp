@@ -2,6 +2,10 @@
 
 =toc 2 2 Releases
 
+### v0.6.1 - 17 March, 2022
+
+* **ENHANCED** `=caldays` and `=calnote` support a range of day numbers.
+
 ### v0.6 - 16 March, 2022
 
 * **ENHANCED** Month Calendar generation supported -with `=cal` etc.

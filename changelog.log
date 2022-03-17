@@ -1,15 +1,16 @@
 
-mdpre Markdown Preprocessor v0.6 (16 March, 2022)
-=================================================
+mdpre Markdown Preprocessor v0.6+ (17 March, 2022)
+==================================================
 - opened <stdout> for writing
-Def mdpre_date = 16 March, 2022
-Def mdpre_level = 0.6
+Def mdpre_date = 17 March, 2022
+Def mdpre_level = 0.6+
 Def userid = martinpacker
-Def time = 11&colon;44
-Def date = 16 March&comma; 2022
+Def time = 20&colon;06
+Def date = 17 March&comma; 2022
 This Is The Change Log For mdpre Markdown Preprocessor
 Table Of Contents - spec '2 2 Releases'
 2 2 Releases
+..... .....  v0.6.1 - 17 March, 2022
 ..... .....  v0.6 - 16 March, 2022
 ..... .....  v0.5 - 27 November, 2021
 ..... .....  v0.4.7 - 21 November, 2021
@@ -24,7 +25,7 @@ Table Of Contents - spec '2 2 Releases'
 ..... .....  v0.2 - 26 March, 2018
 ..... .....  v0.1 - 17 March, 2018
 ..... .....  v0.0 - 12 March, 2018
--------------------------------------------------
+--------------------------------------------------
 - Processing completed.
--------------------------------------------------
+--------------------------------------------------
 

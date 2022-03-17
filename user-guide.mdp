@@ -489,7 +489,7 @@ The default is for each cell to be 2 lines high.
 Here is an example of a calendar that uses all the capabilities (described below):
 
     =cal 2021 12 3
-    =caldays blue 14 15 16 17
+    =caldays blue 14-17
     =caldays orange 18
     =calkey blue We have data for **somehow**
     =calkey orange Is focus day
@@ -503,7 +503,7 @@ Here is an example of a calendar that uses all the capabilities (described below
 It produces something like this:
 
 =cal 2021 12 3
-=caldays blue 14 15 16 17
+=caldays blue 14-17
 =caldays orange 18
 =calkey blue We have data for **somehow**
 =calkey orange Is focus day
@@ -531,6 +531,17 @@ You need to code the CSS for classes `blue` and `orange` for these specification
 
 `=caldays` must be specified on its own line between the `=cal` and `=endcal` lines. You can specify as many `=caldays` lines as you like within this bracket.
 
+You can specify a range of days in the following manner:
+
+```
+=caldays blue 14-17 22-24 27
+```
+
+**Notes:**
+
+1. In a range specification there mustn't be spaces between the `-` and the numbers either side.
+1. A later `=caldays` line overrides a prior one in the sequence - within a `=cal` / `=endcal` bracket.
+
 #### Adding A Key To The Day Numbers' Styling With `=calkey`
 
 You can add bullets below the table to explain what each style means. \
@@ -557,6 +568,7 @@ As with `=caldays`, you need to code the CSS for classes `blue` and `orange` for
 1. You can continue the bulleted list that `=caldays` generates with other bulleted list items; Just code those bulleted list items after `=endcal`.
 1. While you need not use the same class names as `=caldays` the intended use case is for you to do so.
 1. md2pptx will use the `<span>` element to e.g. colour the bullets.
+1. A later `=calkey` line overrides a prior one in the sequence - within a `=cal` / `=endcal` bracket.
 
 
 #### Adding Information To A Cell With `=calnote`
@@ -574,10 +586,19 @@ For example:
 
 `=calnote` must be specified on its own line between the `=cal` and `=endcal` lines. You can specify as many `=calnote` lines as you like within this bracket.
 
+You can specify a range of days in the following manner:
+
+```
+=calnote 14-17 RMF
+```
+
 **Notes:**
 
 1. In the examples given the text is short. It probably looks worse if the text is long.
 1. The second example shows use of `<span>`. Equally you can code `<br/>` as needed. This would be a case where coding the third parameter to `=cal` can be used to ensure all the cells have the same height.
+1. A later `=calnote` line overrides a prior one in the sequence - within a `=cal` / `=endcal` bracket.
+1. In a range specification there mustn't be spaces between the `-` and the numbers either side.
+
 
 ### Concatenating Lines With `\`
 
