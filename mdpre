@@ -32,12 +32,28 @@ from enum import Enum
 import calendar
 
 
-mdpre_level = "0.6.1"
-mdpre_date = "17 March, 2022"
+mdpre_level = "0.6.2"
+mdpre_date = "19 March, 2022"
 banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
 
 
 log = partial(print, file=sys.stderr)  # | create log to stderr
+
+
+monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+]
 
 
 def log_status(p_line):
@@ -162,14 +178,16 @@ class Output(object):
             else:
                 weeks.append(rawCells)
 
+        # Write month line
+        self.write("|" + monthNames[cal_month - 1] + " " + str(cal_year) + "|||||||")
         # Write the table heading
+        self.write(("|:-:") * 7 + "|")
+
         dayLine = "|"
         for dayName in dayNames:
             dayLine = dayLine + "**" + dayName + "**|"
 
         self.write(dayLine)
-
-        self.write(("|:-:") * 7 + "|")
 
         # Write the remaining lines
         for week in weeks:
