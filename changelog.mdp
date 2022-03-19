@@ -2,6 +2,10 @@
 
 =toc 2 2 Releases
 
+### v0.6.2 - 19 March, 2022
+
+* **ENHANCED* Calendar has month in a heading row.
+
 ### v0.6.1 - 17 March, 2022
 
 * **ENHANCED** `=caldays` and `=calnote` support a range of day numbers.
