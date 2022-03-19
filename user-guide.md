@@ -116,7 +116,7 @@ This document describes the mdpre Markdown preprocessor.
 
 In this document we'll refer to it as "mdpre", pronounced "em dee pree".
 
-This document was converted to HTML at 20&colon;05 on 17 March&comma; 2022.
+This document was converted to HTML at 17&colon;02 on 19 March&comma; 2022.
 
 ### Table Of Contents
 
@@ -469,31 +469,35 @@ Here the third column is specified as double the width of the others.
 
 You can generate a Markdown table that shows all the days in a month. For example:
 
-|**Mo**|**Tu**|**We**|**Th**|**Fr**|**Sa**|**Su**|
+||||November 2021||||
 |:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+|**Mo**|**Tu**|**We**|**Th**|**Fr**|**Sa**|**Su**|
 |<br/>|<br/>|1<br/>|2<br/>|3<br/>|4<br/>|5<br/>|
 |6<br/>|7<br/>|8<br/>|9<br/>|10<br/>|11<br/>|12<br/>|
 |13<br/>|14<br/>|15<br/>|16<br/>|17<br/>|18<br/>|19<br/>|
 |20<br/>|21<br/>|22<br/>|23<br/>|24<br/>|25<br/>|26<br/>|
 |27<br/>|28<br/>|29<br/>|30<br/>|31<br/>|
 
-This example (from November 2021) is the simplest case. You can enhance such a table in a number of ways.
+This example is the simplest case. You can enhance such a table in a number of ways.
 
 But here's the syntax to generate the above table:
 
-	=cal 2021 12
+	=cal 2021 11
 	=endcal
 
 The `=endcal` line is necessary because it enables more commands within the `=cal` / `=endcal` bracket.
 
 You can control the height of the cells - in terms of the number of lines by specifying a third parameter:
 
-	=cal 2021 12 3
+	=cal 2021 11 3
 	=endcal
 
 In this example each cell is 3 lines high. The default is for each cell to be 2 lines high.
 
-**Note:** By repeated use of `=cal` and `=endcal` you can add multiple months to a document (for example a md2pptx-processed slide).
+**Notes:**
+
+1. By repeated use of `=cal` and `=endcal` you can add multiple months to a document (for example a md2pptx-processed slide).
+2. The rendering above isn't faithful because mdpre (at least in combination with md2pptx) creates a table where the month name spans the entire width of the table and the columns are evenly sized.
 
 Here is an example of a calendar that uses all the capabilities (described below):
 
@@ -511,8 +515,9 @@ Here is an example of a calendar that uses all the capabilities (described below
 
 It produces something like this:
 
-|**Mo**|**Tu**|**We**|**Th**|**Fr**|**Sa**|**Su**|
+|December 2021|||||||
 |:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+|**Mo**|**Tu**|**We**|**Th**|**Fr**|**Sa**|**Su**|
 |<br/><br/>|<br/><br/>|1<br/><br/>|2<br/><br/>|3<br/><br/>|4<br/>X<br/>|5<br/><br/>|
 |6<br/><br/>|7<br/><br/>|8<br/><br/>|9<br/><br/>|10<br/><br/>|11<br/><br/>|12<br/><br/>|
 |13<br/><br/>|<span class='blue'>14</span><br/><br/>|<span class='blue'>15</span><br/><br/>|<span class='blue'>16</span><br/><br/>|<span class='blue'>17</span><br/>A<br/>|<span class='orange'>18</span><br/><span class="green">B</span><br/>|19<br/><br/>|
@@ -525,7 +530,7 @@ It produces something like this:
 
 * An unrelated bullet
 
-although in md2pptx the bullets would be coloured appropriately.
+although in md2pptx the bullets would be coloured appropriately - and mdpre actually centres the month.
 
 #### Controlling How Day Numbers Are Displayed With `=caldays`
 

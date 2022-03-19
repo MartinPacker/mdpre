@@ -1176,7 +1176,7 @@ body .markdown-body
 <h1 id="markdown-preprocessor-user-guide">Markdown Preprocessor User Guide<a class="headerlink" href="#markdown-preprocessor-user-guide" title="Permanent link"></a></h1>
 <p>This document describes the mdpre Markdown preprocessor.</p>
 <p>In this document we&rsquo;ll refer to it as &ldquo;mdpre&rdquo;, pronounced &ldquo;em dee pree&rdquo;.</p>
-<p>This document was converted to HTML at 20&colon;05 on 17 March&comma; 2022.</p>
+<p>This document was converted to HTML at 17&colon;02 on 19 March&comma; 2022.</p>
 <h3 id="table-of-contents">Table Of Contents<a class="headerlink" href="#table-of-contents" title="Permanent link"></a></h3>
 <ul>
 <li><a href="#why-a-preprocessor">Why A Preprocessor?</a></li>
@@ -1482,16 +1482,25 @@ Here is some text that would be included by the test on the line above.
 <table>
 <thead>
 <tr>
-<th align="center"><strong>Mo</strong></th>
-<th align="center"><strong>Tu</strong></th>
-<th align="center"><strong>We</strong></th>
-<th align="center"><strong>Th</strong></th>
-<th align="center"><strong>Fr</strong></th>
-<th align="center"><strong>Sa</strong></th>
-<th align="center"><strong>Su</strong></th>
+<th align="center"></th>
+<th align="center"></th>
+<th align="center"></th>
+<th align="center">November 2021</th>
+<th align="center"></th>
+<th align="center"></th>
+<th align="center"></th>
 </tr>
 </thead>
 <tbody>
+<tr>
+<td align="center"><strong>Mo</strong></td>
+<td align="center"><strong>Tu</strong></td>
+<td align="center"><strong>We</strong></td>
+<td align="center"><strong>Th</strong></td>
+<td align="center"><strong>Fr</strong></td>
+<td align="center"><strong>Sa</strong></td>
+<td align="center"><strong>Su</strong></td>
+</tr>
 <tr>
 <td align="center"><br/></td>
 <td align="center"><br/></td>
@@ -1539,18 +1548,22 @@ Here is some text that would be included by the test on the line above.
 </tr>
 </tbody>
 </table>
-<p>This example (from November 2021) is the simplest case. You can enhance such a table in a number of ways.</p>
+<p>This example is the simplest case. You can enhance such a table in a number of ways.</p>
 <p>But here&rsquo;s the syntax to generate the above table:</p>
-<pre><code>=cal 2021 12
+<pre><code>=cal 2021 11
 =endcal
 </code></pre>
 <p>The <code>=endcal</code> line is necessary because it enables more commands within the <code>=cal</code> / <code>=endcal</code> bracket.</p>
 <p>You can control the height of the cells - in terms of the number of lines by specifying a third parameter:</p>
-<pre><code>=cal 2021 12 3
+<pre><code>=cal 2021 11 3
 =endcal
 </code></pre>
 <p>In this example each cell is 3 lines high. The default is for each cell to be 2 lines high.</p>
-<p><strong>Note:</strong> By repeated use of <code>=cal</code> and <code>=endcal</code> you can add multiple months to a document (for example a md2pptx-processed slide).</p>
+<p><strong>Notes:</strong></p>
+<ol>
+<li>By repeated use of <code>=cal</code> and <code>=endcal</code> you can add multiple months to a document (for example a md2pptx-processed slide).</li>
+<li>The rendering above isn&rsquo;t faithful because mdpre (at least in combination with md2pptx) creates a table where the month name spans the entire width of the table and the columns are evenly sized.</li>
+</ol>
 <p>Here is an example of a calendar that uses all the capabilities (described below):</p>
 <pre><code>=cal 2021 12 3
 =caldays blue 14-17
@@ -1568,16 +1581,25 @@ Here is some text that would be included by the test on the line above.
 <table>
 <thead>
 <tr>
-<th align="center"><strong>Mo</strong></th>
-<th align="center"><strong>Tu</strong></th>
-<th align="center"><strong>We</strong></th>
-<th align="center"><strong>Th</strong></th>
-<th align="center"><strong>Fr</strong></th>
-<th align="center"><strong>Sa</strong></th>
-<th align="center"><strong>Su</strong></th>
+<th align="center">December 2021</th>
+<th align="center"></th>
+<th align="center"></th>
+<th align="center"></th>
+<th align="center"></th>
+<th align="center"></th>
+<th align="center"></th>
 </tr>
 </thead>
 <tbody>
+<tr>
+<td align="center"><strong>Mo</strong></td>
+<td align="center"><strong>Tu</strong></td>
+<td align="center"><strong>We</strong></td>
+<td align="center"><strong>Th</strong></td>
+<td align="center"><strong>Fr</strong></td>
+<td align="center"><strong>Sa</strong></td>
+<td align="center"><strong>Su</strong></td>
+</tr>
 <tr>
 <td align="center"><br/><br/></td>
 <td align="center"><br/><br/></td>
@@ -1634,7 +1656,7 @@ Here is some text that would be included by the test on the line above.
 <p>An unrelated bullet</p>
 </li>
 </ul>
-<p>although in md2pptx the bullets would be coloured appropriately.</p>
+<p>although in md2pptx the bullets would be coloured appropriately - and mdpre actually centres the month.</p>
 <h4 id="controlling-how-day-numbers-are-displayed-with-caldays">Controlling How Day Numbers Are Displayed With <code>=caldays</code><a class="headerlink" href="#controlling-how-day-numbers-are-displayed-with-caldays" title="Permanent link"></a></h4>
 <p>You can style days in the calendar with CSS using the <code>class</code> attribute. For example:</p>
 <div class="highlight"><pre>=caldays blue 14 15 16 17
