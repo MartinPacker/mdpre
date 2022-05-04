@@ -32,8 +32,8 @@ from enum import Enum
 import calendar
 
 
-mdpre_level = "0.6.2"
-mdpre_date = "19 March, 2022"
+mdpre_level = "0.6.2+"
+mdpre_date = "4 May, 2022"
 banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
 
 
@@ -138,8 +138,17 @@ class Output(object):
         first_row = True
         for row in CSV_lines:
             row_text = "|"
+            cell_prefix = ""
+            cell_suffix = ""
             for col_index, col_text in enumerate(row):
-                row_text = row_text + col_text + "|"
+                if (col_index == 0) & (col_text.startswith("=rowspan ")):
+                    rowspan2 = col_text.split("!!XYZZY!!")
+                    spanClass = rowspan2[0][9:]
+                    col_text = rowspan2[1][1:-1]
+                    cell_prefix = "<span class=\"" + spanClass +"\">"
+                    cell_suffix = "</span>"
+                      
+                row_text = row_text + cell_prefix + col_text + cell_suffix + "|"
             self.write(row_text)
 
             titleUnderline = "|"
@@ -792,6 +801,9 @@ def handle_verbose(line):
 
     elif verboseType == "colwidth":
         sys.stderr.write("Column Width - spec '" + noPrefixSuffix[19:] + "'\n")
+    
+    elif verboseType == "rowspan":
+        sys.stderr.write("Row span - spec '" + noPrefixSuffix[17:] + "'\n")
 
     elif verboseType == "def":
         if verboseArray[2] == "T":
@@ -1134,6 +1146,7 @@ for line in input_file:
 
     elif (line.startswith("=csv")) & (in_csv is False):
         in_csv = True
+        in_rowspan = False
         CSV_lines = []
         if wantVerbose is True:
             handle_verbose("<!--mdpre-csv:" + line + "-->")
@@ -1153,9 +1166,20 @@ for line in input_file:
         csv_colwidths = parse_colwidth(line[10:])
         if wantVerbose is True:
             handle_verbose("<!--mdpre-colwidth:" + line + "-->")
+    elif line.startswith("=rowspan"):
+        in_rowspan = True
+        if wantVerbose is True:
+            handle_verbose("<!--mdpre-rowspan:" + line + "-->")
+            rowspan = line.rstrip()
 
     elif in_csv is True:
-        CSV_lines.append(line)
+        if in_rowspan:
+            # Prepend line with rowspan
+            CSV_lines.append(rowspan + "!!XYZZY!!" + line)
+            in_rowspan = False
+        else:
+            # Don't prepend line with rowspan
+            CSV_lines.append(line)
 
     elif (line.startswith("=cal ")) & (in_cal is False):
         in_cal = True
