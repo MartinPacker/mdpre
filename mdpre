@@ -36,7 +36,6 @@ mdpre_level = "0.6.3"
 mdpre_date = "5 May, 2022"
 banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
 
-
 log = partial(print, file=sys.stderr)  # | create log to stderr
 
 
