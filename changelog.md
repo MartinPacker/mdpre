@@ -3,9 +3,13 @@
 ### Releases
 
 
+### v0.6.3 - 5 May, 2022
+
+* **ENHANCED** Added `=rowspan` - to allow easy colouring of text of table rows in a `=csv` / `=endcsv` bracket.
+
 ### v0.6.2 - 19 March, 2022
 
-* **ENHANCED* Calendar has month in a heading row.
+* **ENHANCED** Calendar has month in a heading row.
 
 ### v0.6.1 - 17 March, 2022
 

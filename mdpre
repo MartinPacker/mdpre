@@ -32,8 +32,8 @@ from enum import Enum
 import calendar
 
 
-mdpre_level = "0.6.2+"
-mdpre_date = "4 May, 2022"
+mdpre_level = "0.6.3"
+mdpre_date = "5 May, 2022"
 banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
 
 

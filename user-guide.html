@@ -1176,7 +1176,7 @@ body .markdown-body
 <h1 id="markdown-preprocessor-user-guide">Markdown Preprocessor User Guide<a class="headerlink" href="#markdown-preprocessor-user-guide" title="Permanent link"></a></h1>
 <p>This document describes the mdpre Markdown preprocessor.</p>
 <p>In this document we&rsquo;ll refer to it as &ldquo;mdpre&rdquo;, pronounced &ldquo;em dee pree&rdquo;.</p>
-<p>This document was converted to HTML at 17&colon;02 on 19 March&comma; 2022.</p>
+<p>This document was converted to HTML at 19&colon;54 on 5 May&comma; 2022.</p>
 <h3 id="table-of-contents">Table Of Contents<a class="headerlink" href="#table-of-contents" title="Permanent link"></a></h3>
 <ul>
 <li><a href="#why-a-preprocessor">Why A Preprocessor?</a></li>
@@ -1199,6 +1199,7 @@ body .markdown-body
 <li><a href="#converting-a-csv-file-to-a-markdown-table-with-csv-and-endcsv">Converting A CSV File To A Markdown Table With <code>=csv</code> And <code>=endcsv</code></a><ul>
 <li><a href="#controlling-table-alignment-with-colalign">Controlling Table Alignment With <code>=colalign</code></a></li>
 <li><a href="#controlling-table-column-widths-with-colwidth">Controlling Table Column Widths With <code>=colwidth</code></a></li>
+<li><a href="#colouring-whole-rows-text-with-rowspan">Colouring Whole Rows&rsquo; Text With <code>=rowspan</code></a></li>
 </ul>
 </li>
 <li><a href="#creating-a-calendar-month-table-with-cal">Creating A Calendar Month Table With <code>=cal</code></a><ul>
@@ -1235,6 +1236,9 @@ body .markdown-body
 <li>
 <p>Have you ever wanted to have a Table Of Contents automatically generated in Markdown?</p>
 </li>
+<li>
+<p>Have you wanted to use version control - such as git?</p>
+</li>
 </ol>
 <p>If you answer &ldquo;yes&rdquo; to any of these you need mdpre.</p>
 <h2 id="how-do-you-use-mdpre">How Do You Use mdpre?<a class="headerlink" href="#how-do-you-use-mdpre" title="Permanent link"></a></h2>
@@ -1245,7 +1249,7 @@ body .markdown-body
 <li>Have Python 3 installed - at a reasonably high level.</li>
 <li>Invoke it.</li>
 </ol>
-<p>The following instructions are for Unix-like systems. (It&rsquo;s developed and used by the developer on Mac OS but should also have identical syntax on Linux.) Windows users will need a slightly different form, but the principle is the same.</p>
+<p>The following instructions are for Unix-like systems. (It&rsquo;s developed and used by the developer on MacOS and Raspbian.) Windows users will need a slightly different form, but the principle is the same.</p>
 <p>Here is a sample invocation:</p>
 <pre><code>mdpre &lt; document.mdp &gt; document.md
 </code></pre>
@@ -1477,6 +1481,13 @@ Here is some text that would be included by the test on the line above.
 </code></pre>
 <p>Here the third column is specified as double the width of the others.</p>
 <p><strong>Note:</strong> Many Markdown processors ignore width directives. The developer&rsquo;s other Markdown tool doesn&rsquo;t. :-)</p>
+<h4 id="colouring-whole-rows-text-with-rowspan">Colouring Whole Rows&rsquo; Text With <code>=rowspan</code><a class="headerlink" href="#colouring-whole-rows-text-with-rowspan" title="Permanent link"></a></h4>
+<p>You can set the <code>&lt;span&gt;</code> element&rsquo;s <code>class</code> attribute for each cell in the immediately following row using <code>=rowspan</code>. For example</p>
+<pre><code>=rowspan bad
+</code></pre>
+<p>wraps each table cell in the following row with <code>&lt;span class="bad"&gt;</code> and <code>&lt;/span&gt;</code>.</p>
+<p>Of course this class can apply any styling - through CSS - you like. But typically it would be used for colouring the text.</p>
+<p><strong>Note:</strong> This styling only applies to the immediately following row.</p>
 <h3 id="creating-a-calendar-month-table-with-cal">Creating A Calendar Month Table With <code>=cal</code><a class="headerlink" href="#creating-a-calendar-month-table-with-cal" title="Permanent link"></a></h3>
 <p>You can generate a Markdown table that shows all the days in a month. For example:</p>
 <table>

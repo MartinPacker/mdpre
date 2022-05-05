@@ -1,12 +1,12 @@
 
-mdpre Markdown Preprocessor v0.6.2 (19 March, 2022)
-===================================================
+mdpre Markdown Preprocessor v0.6.3 (5 May, 2022)
+================================================
 - opened <stdout> for writing
-Def mdpre_date = 19 March, 2022
-Def mdpre_level = 0.6.2
+Def mdpre_date = 5 May, 2022
+Def mdpre_level = 0.6.3
 Def userid = martinpacker
-Def time = 17&colon;02
-Def date = 19 March&comma; 2022
+Def time = 19&colon;54
+Def date = 5 May&comma; 2022
 Def TOC = Table Of Contents
 Markdown Preprocessor User Guide
 Table Of Contents - spec '2 * Table Of Contents'
@@ -34,6 +34,7 @@ Column Alignment - spec 'l r r'
 CSV Start
 CSV Stop
 ..... ..... .....  Controlling Table Column Widths With `=colwidth`
+..... ..... .....  Colouring Whole Rows' Text With `=rowspan`
 ..... .....  Creating A Calendar Month Table With `=cal`
 Calendar Start
 Calendar Day Span
@@ -56,7 +57,7 @@ Column Alignment - spec 'l l l'
 Column Width - spec ' 2 4 1'
 CSV Start
 CSV Stop
----------------------------------------------------
+------------------------------------------------
 - Processing completed.
----------------------------------------------------
+------------------------------------------------
 

@@ -116,7 +116,7 @@ This document describes the mdpre Markdown preprocessor.
 
 In this document we'll refer to it as "mdpre", pronounced "em dee pree".
 
-This document was converted to HTML at 17&colon;02 on 19 March&comma; 2022.
+This document was converted to HTML at 19&colon;54 on 5 May&comma; 2022.
 
 ### Table Of Contents
 
@@ -138,6 +138,7 @@ This document was converted to HTML at 17&colon;02 on 19 March&comma; 2022.
 	* [Converting A CSV File To A Markdown Table With `=csv` And `=endcsv`](#converting-a-csv-file-to-a-markdown-table-with-csv-and-endcsv)
 		* [Controlling Table Alignment With `=colalign`](#controlling-table-alignment-with-colalign)
 		* [Controlling Table Column Widths With `=colwidth`](#controlling-table-column-widths-with-colwidth)
+		* [Colouring Whole Rows' Text With `=rowspan`](#colouring-whole-rows-text-with-rowspan)
 	* [Creating A Calendar Month Table With `=cal`](#creating-a-calendar-month-table-with-cal)
 		* [Controlling How Day Numbers Are Displayed With `=caldays`](#controlling-how-day-numbers-are-displayed-with-caldays)
 		* [Adding A Key To The Day Numbers' Styling With `=calkey`](#adding-a-key-to-the-day-numbers-styling-with-calkey)
@@ -162,6 +163,8 @@ Ask yourself the following questions.
 
 1. Have you ever wanted to have a Table Of Contents automatically generated in Markdown?
 
+1. Have you wanted to use version control - such as git?
+
 If you answer "yes" to any of these you need mdpre.
 
 ## How Do You Use mdpre?
@@ -174,7 +177,7 @@ To use mdpre you need to
 1. Have Python 3 installed - at a reasonably high level.
 1. Invoke it.
 
-The following instructions are for Unix-like systems. (It's developed and used by the developer on Mac OS but should also have identical syntax on Linux.) Windows users will need a slightly different form, but the principle is the same.
+The following instructions are for Unix-like systems. (It's developed and used by the developer on MacOS and Raspbian.) Windows users will need a slightly different form, but the principle is the same.
 
 Here is a sample invocation:
 
@@ -464,6 +467,18 @@ Adding that to the above produces the following Markdown
 Here the third column is specified as double the width of the others.
 
 **Note:** Many Markdown processors ignore width directives. The developer's other Markdown tool doesn't. :-)
+
+#### Colouring Whole Rows' Text With `=rowspan`
+
+You can set the `<span>` element's `class` attribute for each cell in the immediately following row using `=rowspan`. For example
+
+    =rowspan bad
+
+wraps each table cell in the following row with `<span class="bad">` and `</span>`.
+
+Of course this class can apply any styling - through CSS - you like. But typically it would be used for colouring the text.
+
+**Note:** This styling only applies to the immediately following row.
 
 ### Creating A Calendar Month Table With `=cal`
 
