@@ -2,6 +2,10 @@
 
 =toc 2 2 Releases
 
+### v0.6.4 - 16 May, 2022
+
+* **FIXED** `=cal` needed 7 cells for all rows.
+
 ### v0.6.3 - 5 May, 2022
 
 * **ENHANCED** Added `=rowspan` - to allow easy colouring of text of table rows in a `=csv` / `=endcsv` bracket.

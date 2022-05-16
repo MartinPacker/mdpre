@@ -32,8 +32,8 @@ from enum import Enum
 import calendar
 
 
-mdpre_level = "0.6.3"
-mdpre_date = "5 May, 2022"
+mdpre_level = "0.6.4"
+mdpre_date = "16 May, 2022"
 banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
 
 log = partial(print, file=sys.stderr)  # | create log to stderr
@@ -172,22 +172,26 @@ class Output(object):
         # Get a calendar month in a 2-dimensional array
         cal_year, cal_month, cal_cellHeight = cal_date
         c = calendar.TextCalendar(calendar.MONDAY)
-        daysAndNumbers = c.formatmonth(cal_year, cal_month).split("\n")[1:]
+        daysAndNumbers = c.formatmonth(cal_year, cal_month).split("\n")[1: -1]
+        
 
         # Process the rows into day names and actual day numbers
         weeks = []
-        for row in range(len(daysAndNumbers) - 1):
-            rawCells = [
-                daysAndNumbers[row][i : i + 3].lstrip().rstrip()
-                for i in range(0, len(daysAndNumbers[row]), 3)
-            ]
-            if row == 0:
+
+        for rowNumber, row in enumerate(daysAndNumbers):
+            rawCells = []
+            row = row.ljust(21)
+            for d in range(7):
+                rawCells.append(str(row[d * 3 : d * 3 +3]).lstrip().rstrip())
+
+            if rowNumber == 0:
                 dayNames = rawCells
             else:
                 weeks.append(rawCells)
 
         # Write month line
         self.write("|" + monthNames[cal_month - 1] + " " + str(cal_year) + "|||||||")
+        
         # Write the table heading
         self.write(("|:-:") * 7 + "|")
 
