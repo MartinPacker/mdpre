@@ -32,8 +32,8 @@ from enum import Enum
 import calendar
 
 
-mdpre_level = "0.6.4"
-mdpre_date = "16 May, 2022"
+mdpre_level = "0.6.4+"
+mdpre_date = "24 May, 2022"
 banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
 
 log = partial(print, file=sys.stderr)  # | create log to stderr
@@ -576,10 +576,22 @@ def parse_include(input_file, vars, ifStack, embedLevel):
 
             elif line.startswith("=def ") is True:
                 var = parse_def(line[5:-1].lstrip())
-                vars.append(var)
+                var_index = find_variable(var[0], vars)
+                if var_index > -1:
+                    # Replace the variable with its new definition
+                    vars[var_index] = var
+                else:
+                    # Add the variable as it's new
+                    vars.append(var)
 
                 if wantVerbose is True:
                     varName, varType, varValue = var
+                    
+                    if var_index > -1:
+                        redefined =" (redefined)"
+                    else:
+                        redefined =""
+                        
                     input_file2.append(
                         "<!--mdpre-def:"
                         + varName
@@ -587,6 +599,7 @@ def parse_include(input_file, vars, ifStack, embedLevel):
                         + varType
                         + ":"
                         + varValue
+                        + redefined
                         + "-->"
                     )
 
