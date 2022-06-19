@@ -22,6 +22,7 @@ import sys
 import csv
 import shutil
 import zipfile
+import io
 
 # import StringIO
 import re
@@ -33,7 +34,7 @@ import calendar
 
 
 mdpre_level = "0.6.4+"
-mdpre_date = "24 May, 2022"
+mdpre_date = "19 June, 2022"
 banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
 
 log = partial(print, file=sys.stderr)  # | create log to stderr
@@ -72,7 +73,8 @@ cal_date = (0, 0, 2)
 in_cal = False
 
 # Find index of variable in variable list. -1 means "not found"
-def find_variable(targetVar, vars):
+def find_variable(targetVar):
+    global vars
     foundVar = -1
     cursor = 0
     for var in vars:
@@ -83,6 +85,17 @@ def find_variable(targetVar, vars):
         cursor += 1
     return foundVar
 
+# Set a variable for the first time - or update it if it already exists
+def setOrUpdateVariable(varName, varValue):
+    global vars
+    var = parse_def(varName + " " + varValue)
+    var_index = find_variable(var[0])
+    if var_index > -1:
+        # Replace the variable with its new definition
+        vars[var_index] = var
+    else:
+         # Add the variable as it's new
+        vars.append(var)
 
 class OutputType(Enum):
     """preparation for later usage. support e.g. other outputs like MMD or ADOC"""
@@ -296,10 +309,27 @@ class Output(object):
         return
 
 
+##########################
+# Class to control loops #
+##########################
+
+class LoopController:
+
+    def __init__(self, loopType, parent, loopVarName, loopVarValues, loopValue = "", children = []):
+        self.loopType = loopType
+        self.parent = parent
+        self.loopVarName = loopVarName
+        self.loopVarValues = loopVarValues
+        self.children = children
+        self.lineValue = loopValue
+        self.endForEncountered = False
+        self.currentIndex = -1
+        self.valueCount = len(loopVarValues)
+
+
 ####################
 # Helper Functions #
 ####################
-
 
 def intTryParse(value):
     try:
@@ -408,9 +438,10 @@ def parse_def(defString):
     return [varName, varType, varValue]
 
 
-def parse_inc(line, vars):
+def parse_inc(line):
+    global vars
     targetVar = line[5:-1].lstrip()
-    foundVar = find_variable(targetVar, vars)
+    foundVar = find_variable(targetVar)
     if foundVar > -1:
         varRecord = vars[foundVar]
         if varRecord[1] != "T":
@@ -434,9 +465,10 @@ def parse_inc(line, vars):
         )
 
 
-def parse_dec(line, vars):
+def parse_dec(line):
+    global vars
     targetVar = line[5:-1].lstrip()
-    foundVar = find_variable(targetVar, vars)
+    foundVar = find_variable(targetVar)
     if foundVar > -1:
         varRecord = vars[foundVar]
         if varRecord[1] != "T":
@@ -461,7 +493,8 @@ def parse_dec(line, vars):
 
 
 # =ifdef encountered
-def handle_ifdef(ifStack, ifdefString, vars):
+def handle_ifdef(ifdefString):
+    global ifStack, vars
     verbosity = ""
 
     for varName, varType, varValue in vars:
@@ -472,7 +505,7 @@ def handle_ifdef(ifStack, ifdefString, vars):
 
             ifStack.append(True)
 
-            return [ifStack, verbosity]
+            return verbosity
 
     # Variable is undefined
     ifStack.append(False)
@@ -484,7 +517,8 @@ def handle_ifdef(ifStack, ifdefString, vars):
 
 
 # =ifndef encountered
-def handle_ifndef(ifStack, ifndefString, vars):
+def handle_ifndef(ifndefString):
+    global ifStack, vars
     verbosity = ""
 
     for varName, varType, varValue in vars:
@@ -495,18 +529,19 @@ def handle_ifndef(ifStack, ifndefString, vars):
 
             ifStack.append(False)
 
-            return [ifStack, verbosity]
+            return verbosity
 
     # Variable is undefined
     ifStack.append(True)
     if wantVerbose is True:
         verbosity = "<!--mdpre-ifndef:true:" + ifndefString + "-->"
 
-    return [ifStack, verbosity]
+    return verbosity
 
 
 # =endif encountered
-def handle_endif(ifStack):
+def handle_endif():
+    global ifStack
     if wantVerbose is True:
         verbosity = "<!--mdpre-endif:-->"
     else:
@@ -514,30 +549,251 @@ def handle_endif(ifStack):
 
     ifStack.pop()
 
-    return [ifStack, verbosity]
+    return verbosity
 
 
-def handle_undef(name, vars):
+def handle_undef(name):
+    global vars
     for var in vars:
         if var[0] == name:
             vars.remove(var)
-            return [vars, "<!--mdpre-undef:found:" + name + "-->"]
+            return ["<!--mdpre-undef:found:" + name + "-->"]
 
-    return [vars, "<!--mdpre-undef:notfound:" + name + "-->"]
+    return ["<!--mdpre-undef:notfound:" + name + "-->"]
 
+def handle_for(forArguments):
+    global rootLoopController, currentLoopController
+    global vars
 
-def parse_include(input_file, vars, ifStack, embedLevel):
+    ####################
+    # Handle arguments #
+    ####################
+    forArgs=forArguments.split(" ")
+    
+    # Remove empty members because of multiple spaces
+    forArgs = [i for i in forArgs if i]
+    
+    # Remove optional "="
+    forArgs = [i for i in forArgs if i != "="]
+    
+    loopIsIn = False
+    
+    # Parse arguments
+    argCount = len(forArgs)
+
+    if argCount < 3:
+        sys.stderr.write(f"Syntax error: {forArguments}\n")
+        sys.stderr.write("Stopping.")
+        sys.exit()
+
+    elif forArgs[1].lower() == "in":
+        # for / in variant
+        loopVarname = forArgs[0]
+        
+        # Get remainder of statement after the variable and "in"
+        afterIn = forArguments.find(" in ") + 4
+        rest = forArguments[afterIn:]
+
+        # ~Use CSV reader to parse the line
+        loopValues = csv.reader(io.StringIO(rest), escapechar = "\\", skipinitialspace = True).__next__()
+
+        loopIsIn = True
+
+    elif argCount == 4:
+        # for / to - without by
+        loopVarname = forArgs[0]
+
+        loopFirst = int(forArgs[1])
+
+        if forArgs[2].lower() != "to":
+            sys.stderr.write(f"Syntax error: {forArguments}\n")
+            sys.stderr.write("Stopping.")
+            sys.exit()
+        
+        loopLast = int(forArgs[3])
+
+        loopBy = 1
+    else:
+        # for / to / by
+        loopVarname = forArgs[0]
+
+        loopFirst = int(forArgs[1])
+
+        if forArgs[2].lower() != "to":
+            sys.stderr.write(f"Syntax error: {forArguments}\n")
+            sys.stderr.write("Stopping.")
+            sys.exit()
+        
+        loopLast = int(forArgs[3])
+
+        if forArgs[4].lower() != "by":
+            sys.stderr.write(f"Syntax error: {forArguments}\n")
+            sys.stderr.write("Stopping.")
+            sys.exit()
+        
+
+        loopBy = int(forArgs[5])
+
+    # Only use range to make list if not "in" form
+    if loopIsIn is False:
+    # Make values into a list
+        loopLast = loopLast + loopBy
+        loopValues = [*range(loopFirst, loopLast, loopBy)]
+
+    ##############################
+    # Set up the loop controller #
+    ##############################
+
+    # Register this for loop
+    loopController = LoopController("for", None, loopVarname, loopValues,"", [])
+    if rootLoopController == None:
+        # Start the tree of loops
+        rootLoopController = loopController
+        currentLoopController = loopController
+    else:
+        if currentLoopController != None:
+            # Add loop controller to tree as a child at parent's position
+            currentLoopController.children.append(loopController)
+            loopController.parent = currentLoopController
+            currentLoopController = loopController
+    
+    # Set the loop variable to its initial value
+    setOrUpdateVariable(loopVarname, str(loopValues[0]))
+
+    return "<!--mdpre-for:" + forArguments + "-->"
+
+def _printLoopControllers(loopController, level):
+    print("    " * level + "--------------------")
+    print("    " * level + "Type: " + loopController.loopType)
+    print("    " * level + "Self: " + str(loopController))
+    print("    " * level + "Parent: " + str(loopController.parent))
+    print("    " * level + "End For: " + str(loopController.endForEncountered))
+    print("    " * level + "Variable: " + loopController.loopVarName)
+    for value in loopController.loopVarValues:
+        print("    " * level + str(value))
+    if loopController.loopType == "line":
+        print("    " * level + "Line value: " +loopController.lineValue)
+    elif loopController.loopType == "include":
+        print("    " * level + "Filename: " +loopController.lineValue[9:])
+    else:
+        print("    " * level + "Children:")
+        for child in loopController.children:
+            print("    " * level + str(child))
+    
+    print("    " * level + "--------------------")
+    print("\n")
+
+    for child in loopController.children:
+        _printLoopControllers(child, level + 1)
+    print("\n\n")
+    
+def printLoopControllers():
+    if rootLoopController is not None:
+        _printLoopControllers(rootLoopController, 0)
+    else:
+        print("No loop controllers")
+
+def interpretLoops(input_file2, loopController):
+    global vars
+    global rootLoopController, currentLoopController
+    #printLoopControllers()
+
+    # Loop over the loop variable's values
+    for loopVarValue in loopController.loopVarValues:
+        # Set the loop variable's current value
+        setOrUpdateVariable(loopController.loopVarName, str(loopVarValue))
+
+        # Add the children of this loop controller
+        for child in loopController.children:
+            if child.loopType == "line":
+                line = substitute_variables(child.lineValue)
+                input_file2.append(line)
+            elif child.loopType == "include":
+                line = substitute_variables(child.lineValue)
+                include_name = substitute_variables(line[9:].rstrip().lstrip())
+
+                # Check for recursive inclusion
+                if include_name in includeStack:
+                    sys.stderr.write(
+                        f"File '{include_name}' recursively included. Stopping."
+                    )
+                    sys.exit()
+
+                if wantVerbose is True:
+                    input_file2.append(
+                        "<!--mdpre-embed-start:"
+                        + str(embedLevel)
+                        + ":"
+                        + include_name
+                        + "-->"
+                    )
+
+                # Not recursive so add include file name to stack
+                includeStack.append(include_name)
+
+                with open(include_name, "r") as f:
+                    stopIt, include_lines = parse_include(f.readlines())
+
+                for line2 in include_lines:
+                    input_file2.append(line2)
+
+                if wantVerbose is True:
+                    input_file2.append(
+                        "<!--mdpre-embed-stop:"
+                        + str(embedLevel)
+                        + ":"
+                        + include_name
+                        + "-->"
+                    )
+
+                if stopIt is True:
+                    return [stopIt, input_file2, vars]
+            else:
+                input_file2 = interpretLoops(input_file2, child)
+    if loopController == rootLoopController:
+        rootLoopController = None
+        currentLoopController = None
+    return input_file2
+
+def handle_endfor(endforArguments, input_file2):
+    global rootLoopController, currentLoopController
+    global vars
+
+    loopController = currentLoopController
+
+    # Flag "end for" encountered
+    currentLoopController.endForEncountered = True
+
+    # Back to processing parent
+    currentLoopController = currentLoopController.parent
+    # printLoopControllers()
+    
+    # If all the way up to root loop controller has met "end for" interpret the loop set
+    if rootLoopController.endForEncountered:
+        input_file2 = interpretLoops(input_file2, rootLoopController)
+
+    return ["<!--mdpre-endfor:" + endforArguments + "-->", input_file2]
+    
+
+def parse_include(input_file):
+    global rootLoopController, currentLoopController
+    global embedLevel
+    global ifStack
+    global vars
+    
+    embedLevel += 1
     input_file2 = []
     for line in input_file:
         if line.startswith("=stop") is True:
-            return [True, input_file2, vars]
+            return [True, input_file2]
 
         # Substitute any symbols into the included filename
-        line = substitute_variables(line, vars)
+        unsubstitutedLine = line
+        line = substitute_variables(line)
 
         if ifStack[-1] is True:
-            if line.startswith("=include "):
-                include_name = line[9:].rstrip().lstrip()
+            if (line.startswith("=include ")) & (rootLoopController == None):
+                include_name = substitute_variables(line[9:].rstrip().lstrip())
 
                 # Check for recursive inclusion
                 if include_name in includeStack:
@@ -558,9 +814,7 @@ def parse_include(input_file, vars, ifStack, embedLevel):
                         + "-->"
                     )
                 with open(include_name, "r") as f:
-                    stopIt, include_lines, vars = parse_include(
-                        f.readlines(), vars, ifStack, embedLevel + 1
-                    )
+                    stopIt, include_lines = parse_include(f.readlines())
                 for line2 in include_lines:
                     input_file2.append(line2)
                 if wantVerbose is True:
@@ -576,7 +830,7 @@ def parse_include(input_file, vars, ifStack, embedLevel):
 
             elif line.startswith("=def ") is True:
                 var = parse_def(line[5:-1].lstrip())
-                var_index = find_variable(var[0], vars)
+                var_index = find_variable(var[0])
                 if var_index > -1:
                     # Replace the variable with its new definition
                     vars[var_index] = var
@@ -603,29 +857,49 @@ def parse_include(input_file, vars, ifStack, embedLevel):
                         + "-->"
                     )
 
+            elif line.startswith("=for ") is True:
+                verbosity = handle_for(line[5:-1].lstrip())
+                if wantVerbose is True:
+                    input_file2.append(verbosity)
+
+            elif line.startswith("=endfor") is True:
+                verbosity, input_file2 = handle_endfor(line[8:-1].lstrip(), input_file2)
+                if wantVerbose is True:
+                    input_file2.append(verbosity)
+
+            elif currentLoopController != None:
+                # There is an active loop
+                if line.startswith("=include "):
+                    # Add current line to loop lines - as an include
+                    lineController = LoopController("include", None, "", [], unsubstitutedLine, [])
+                    currentLoopController.children.append(lineController)
+                else:
+                    # Add current line to loop lines - as an ordinary line
+                    lineController = LoopController("line", None, "", [], unsubstitutedLine, [])
+                    currentLoopController.children.append(lineController)
+
             elif line.startswith("=inc ") is True:
-                parse_inc(line, vars)
+                parse_inc(line)
 
             elif line.startswith("=dec ") is True:
-                parse_dec(line, vars)
+                parse_dec(line)
 
             elif line.startswith("=undef") is True:
                 varName = line[7:-1].lstrip()
-                vars, verbosity = handle_undef(varName, vars)
+                verbosity = handle_undef(varName)
+
                 if wantVerbose is True:
                     input_file2.append(verbosity)
 
             elif line.startswith("=ifdef ") is True:
-                ifStack, verbosity = handle_ifdef(
-                    ifStack, line[7:].lstrip().rstrip(), vars
-                )
+                verbosity = handle_ifdef(line[7:].lstrip().rstrip())
+
                 if wantVerbose is True:
                     input_file2.append(verbosity)
 
             elif line.startswith("=ifndef ") is True:
-                ifStack, verbosity = handle_ifndef(
-                    ifStack, line[8:].lstrip().rstrip(), vars
-                )
+                verbosity = handle_ifndef(line[8:].lstrip().rstrip())
+
                 if wantVerbose is True:
                     input_file2.append(verbosity)
 
@@ -633,7 +907,7 @@ def parse_include(input_file, vars, ifStack, embedLevel):
                 input_file2.append(line)
 
         if line.startswith("=endif") is True:
-            ifStack, verbosity = handle_endif(ifStack)
+            verbosity = handle_endif()
 
             if wantVerbose is True:
                 input_file2.append(verbosity)
@@ -641,18 +915,21 @@ def parse_include(input_file, vars, ifStack, embedLevel):
     # Pop this file from the stack
     includeStack.pop()
 
-    return [False, input_file2, vars]
+    embedLevel -= 1
+    
+    return [False, input_file2]
 
 
-def replace_varname(varName, variables):
-    for var in variables:
+def replace_varname(varName):
+    global vars
+    for var in vars:
         if (var[0] == varName) & (var[1] == "T"):
             # A match so return the value
             return var[2]
     return "&" + varName + ";"
 
 
-def substitute_variables(input_line, variables):
+def substitute_variables(input_line):
     fragments = input_line.split("&")
     ampersands = len(fragments) - 1
 
@@ -670,7 +947,7 @@ def substitute_variables(input_line, variables):
             # Terminating semicolon so extract variable name
             varName = fragment[:semicolonPos]
             tail = fragment[semicolonPos + 1 :]
-            output_line += replace_varname(varName, variables) + tail
+            output_line += replace_varname(varName) + tail
     return output_line
 
 
@@ -779,11 +1056,11 @@ def handle_verbose(line):
 
     if verboseType == "embed-start":
         embedLevel = int(verboseArray[1])
-        sys.stderr.write(("---" * embedLevel) + "> Start of " + verboseArray[2] + "\n")
+        sys.stderr.write(("---" * embedLevel) + "> Start of " + verboseArray[2] + " (@" + str(embedLevel) + ")\n")
 
     elif verboseType == "embed-stop":
         embedLevel = int(verboseArray[1])
-        sys.stderr.write(("---" * embedLevel) + "> End of " + verboseArray[2] + "\n")
+        sys.stderr.write(("---" * embedLevel) + "> End of " + verboseArray[2] + " (@" + str(embedLevel) + ")\n")
 
     elif verboseType == "heading":
         sys.stderr.write(line[18:-3].replace("#", "..... ")[6:].lstrip() + "\n")
@@ -847,6 +1124,12 @@ def handle_verbose(line):
             sys.stderr.write("Ifndef true " + verboseArray[2] + "\n")
         else:
             sys.stderr.write("Ifndef untrue " + verboseArray[2] + "\n")
+
+    elif verboseType == "for":
+        sys.stderr.write("For " + verboseArray[1] + "\n")
+
+    elif verboseType == "endfor":
+        sys.stderr.write("Endfor " + "\n")
 
     else:
         sys.stderr.write("Unknown " + line + "\n")
@@ -935,6 +1218,8 @@ wantTextPack = False
 awaitingFilename = False
 textBundleFilename = ""
 
+rootLoopController = None
+currentLoopController = None
 
 parmVars = []
 
@@ -1124,8 +1409,11 @@ ifStack = [True]
 # Prime list of referenced files
 includeStack = ["top-level-file"]
 
+embedLevel = 0
+
+vars = []
 # Pre-process - to pick up includes
-stopIt, input_file, variables = parse_include(input_file, [], ifStack, 0)
+stopIt, input_file = parse_include(input_file)
 
 # Handle line joining
 input_file = handle_linejoins(input_file)
