@@ -34,7 +34,7 @@ import calendar
 
 
 mdpre_level = "0.6.4+"
-mdpre_date = "19 June, 2022"
+mdpre_date = "20 June, 2022"
 banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
 
 log = partial(print, file=sys.stderr)  # | create log to stderr
@@ -731,8 +731,12 @@ def interpretLoops(input_file2, loopController):
                 # Not recursive so add include file name to stack
                 includeStack.append(include_name)
 
-                with open(include_name, "r") as f:
-                    stopIt, include_lines = parse_include(f.readlines())
+                try:
+                    with open(include_name, "r") as f:
+                        stopIt, include_lines = parse_include(f.readlines())
+                except:
+                    sys.stderr.write(f"File {include_name} missing. Terminating.\n")
+                    exit()
 
                 for line2 in include_lines:
                     input_file2.append(line2)
@@ -813,8 +817,14 @@ def parse_include(input_file):
                         + include_name
                         + "-->"
                     )
-                with open(include_name, "r") as f:
-                    stopIt, include_lines = parse_include(f.readlines())
+
+                try:
+                    with open(include_name, "r") as f:
+                        stopIt, include_lines = parse_include(f.readlines())
+                except:
+                    sys.stderr.write(f"File {include_name} missing. Terminating.\n")
+                    exit()
+                
                 for line2 in include_lines:
                     input_file2.append(line2)
                 if wantVerbose is True:
