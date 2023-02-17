@@ -2,6 +2,11 @@
 
 =toc 2 2 Releases
 
+### v0.6.5 - 17 February, 2023
+
+* **FIXED** Crash with `=ifdef` where the variable **isn't** defined.
+* **ENHANCED** Added message if there are too few `=endif`s at the end of the run.
+
 ### v0.6.4 - 16 May, 2022
 
 * **FIXED** `=cal` needed 7 cells for all rows.
