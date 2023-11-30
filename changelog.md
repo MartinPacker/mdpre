@@ -3,6 +3,11 @@
 ### Releases
 
 
+
+### v0.6.6 - 30 November, 2023
+
+* **FIXED** `=cal` was not rendering empty calendar cells properly. Now uses `&nbsp;`.
+
 ### v0.6.5 - 17 February, 2023
 
 * **FIXED** Crash with `=ifdef` where the variable **isn't** defined.

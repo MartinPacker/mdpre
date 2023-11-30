@@ -116,7 +116,7 @@ This document describes the mdpre Markdown preprocessor.
 
 In this document we'll refer to it as "mdpre", pronounced "em dee pree".
 
-This document was converted to HTML at 19&colon;54 on 5 May&comma; 2022.
+This document was converted to HTML at 16&colon;33 on 30 November&comma; 2023.
 
 ### Table Of Contents
 
@@ -533,11 +533,11 @@ It produces something like this:
 |December 2021|||||||
 |:-:|:-:|:-:|:-:|:-:|:-:|:-:|
 |**Mo**|**Tu**|**We**|**Th**|**Fr**|**Sa**|**Su**|
-|<br/><br/>|<br/><br/>|1<br/><br/>|2<br/><br/>|3<br/><br/>|4<br/>X<br/>|5<br/><br/>|
+|&nbsp;<br/><br/>|&nbsp;<br/><br/>|1<br/><br/>|2<br/><br/>|3<br/><br/>|4<br/>X<br/>|5<br/><br/>|
 |6<br/><br/>|7<br/><br/>|8<br/><br/>|9<br/><br/>|10<br/><br/>|11<br/><br/>|12<br/><br/>|
 |13<br/><br/>|<span class='blue'>14</span><br/><br/>|<span class='blue'>15</span><br/><br/>|<span class='blue'>16</span><br/><br/>|<span class='blue'>17</span><br/>A<br/>|<span class='orange'>18</span><br/><span class="green">B</span><br/>|19<br/><br/>|
 |20<br/><br/>|21<br/><br/>|22<br/><br/>|23<br/><br/>|24<br/><br/>|25<br/><br/>|26<br/><br/>|
-|27<br/><br/>|28<br/><br/>|29<br/><br/>|30<br/><br/>|31<br/><br/>|
+|27<br/><br/>|28<br/><br/>|29<br/><br/>|30<br/><br/>|31<br/><br/>|&nbsp;<br/><br/>|&nbsp;<br/><br/>|
 
 * <span class='blue'>&nbsp;</span>We have data for **somehow**
 * <span class='orange'>&nbsp;</span>Is focus day

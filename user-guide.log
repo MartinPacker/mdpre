@@ -1,12 +1,12 @@
 
-mdpre Markdown Preprocessor v0.6.3 (5 May, 2022)
-================================================
+mdpre Markdown Preprocessor v0.6.6 (30 November, 2023)
+======================================================
 - opened <stdout> for writing
-Def mdpre_date = 5 May, 2022
-Def mdpre_level = 0.6.3
+Def mdpre_date = 30 November, 2023
+Def mdpre_level = 0.6.6
 Def userid = martinpacker
-Def time = 19&colon;54
-Def date = 5 May&comma; 2022
+Def time = 16&colon;33
+Def date = 30 November&comma; 2023
 Def TOC = Table Of Contents
 Markdown Preprocessor User Guide
 Table Of Contents - spec '2 * Table Of Contents'
@@ -57,7 +57,7 @@ Column Alignment - spec 'l l l'
 Column Width - spec ' 2 4 1'
 CSV Start
 CSV Stop
-------------------------------------------------
+------------------------------------------------------
 - Processing completed.
-------------------------------------------------
+------------------------------------------------------
 
