@@ -1189,7 +1189,7 @@ body .markdown-body
 <h1 id="markdown-preprocessor-user-guide">Markdown Preprocessor User Guide<a class="headerlink" href="#markdown-preprocessor-user-guide" title="Permanent link"></a></h1>
 <p>This document describes the mdpre Markdown preprocessor.</p>
 <p>In this document we&rsquo;ll refer to it as &ldquo;mdpre&rdquo;, pronounced &ldquo;em dee pree&rdquo;.</p>
-<p>This document was converted to HTML at 16&colon;33 on 30 November&comma; 2023.</p>
+<p>This document was converted to HTML at 14&colon;26 on 17 December&comma; 2023.</p>
 <h3 id="table-of-contents">Table Of Contents<a class="headerlink" href="#table-of-contents" title="Permanent link"></a></h3>
 <ul>
 <li><a href="#why-a-preprocessor">Why A Preprocessor?</a></li>
@@ -1748,6 +1748,7 @@ But you might prefer to write each sentence in a paragraph on a separate line. \
 Indeed this paragraph was written that way.
 </code></pre>
 <p>Terminating a line with a <code>\</code> does not cause a space to be inserted between the two lines of text. In the above example a space was coded before the <code>\</code> each time it was used.</p>
+<p>You might want to cause vertical spacing with <code>&lt;br/&gt;</code>. Just above it might be a bulleted list, say. If you are adding items to the list you probably don&rsquo;t want to add a <code>\</code> to the last item in the list - because you might add other items after it. If you code a line starting with <code>&lt;br/&gt;</code> it will be concatenated to the previous line, whether that previous line ended with a <code>\</code> or not. You can, of course, code multiple <code>&lt;br/&gt;</code>s on the same line.</p>
 <h3 id="generating-a-table-of-contents-with-toc">Generating A Table Of Contents With <code>=toc</code><a class="headerlink" href="#generating-a-table-of-contents-with-toc" title="Permanent link"></a></h3>
 <p>You can generate a Table Of Contents with <code>=toc</code>. At its simplest you can simply code</p>
 <pre><code>=toc

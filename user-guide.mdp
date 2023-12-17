@@ -633,6 +633,11 @@ If you terminate a line with a `\` (backslash) character the following line will
 Terminating a line with a `\` does not cause a space to be inserted between the two lines of text. \
 In the above example a space was coded before the `\` each time it was used.
 
+You might want to cause vertical spacing with `<br/>`. Just above it might be a bulleted list, say. \
+If you are adding items to the list you probably don't want to add a `\` to the last item in the list - because you might add other items after it. \
+If you code a line starting with `<br/>` it will be concatenated to the previous line, whether that previous line ended with a `\` or not. \
+You can, of course, code multiple `<br/>`s on the same line.
+
 ### Generating A &TOC; With `=toc`
 
 You can generate a &TOC; with `=toc`. \

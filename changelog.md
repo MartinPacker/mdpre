@@ -1,8 +1,11 @@
 # This Is The Change Log For mdpre Markdown Preprocessor
 
-### Releases
+=toc 2 2 Releases
 
 
+### v0.6.7 - 17  December, 2023
+
+* **ENHANCED** Any line beginning with `<br/>` is concatenated to the previous line.
 
 ### v0.6.6 - 30 November, 2023
 

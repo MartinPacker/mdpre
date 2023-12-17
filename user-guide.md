@@ -116,7 +116,7 @@ This document describes the mdpre Markdown preprocessor.
 
 In this document we'll refer to it as "mdpre", pronounced "em dee pree".
 
-This document was converted to HTML at 16&colon;33 on 30 November&comma; 2023.
+This document was converted to HTML at 14&colon;26 on 17 December&comma; 2023.
 
 ### Table Of Contents
 
@@ -638,6 +638,8 @@ If you terminate a line with a `\` (backslash) character the following line will
 	Indeed this paragraph was written that way.
 
 Terminating a line with a `\` does not cause a space to be inserted between the two lines of text. In the above example a space was coded before the `\` each time it was used.
+
+You might want to cause vertical spacing with `<br/>`. Just above it might be a bulleted list, say. If you are adding items to the list you probably don't want to add a `\` to the last item in the list - because you might add other items after it. If you code a line starting with `<br/>` it will be concatenated to the previous line, whether that previous line ended with a `\` or not. You can, of course, code multiple `<br/>`s on the same line.
 
 ### Generating A Table Of Contents With `=toc`
 
