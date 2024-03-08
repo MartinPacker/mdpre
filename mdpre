@@ -33,8 +33,8 @@ from enum import Enum
 import calendar
 
 
-mdpre_level = "0.6.7"
-mdpre_date = "17 December, 2023"
+mdpre_level = "0.6.8"
+mdpre_date = "8 March, 2024"
 banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
 
 log = partial(print, file=sys.stderr)  # | create log to stderr
@@ -1457,7 +1457,7 @@ in_cal = False
 
 
 for line in input_file:
-    line = line.rstrip()
+    line = line.rstrip("\n")
     if line.startswith("<!--mdpre-"):
         # For verbose mode writing to stderr
         handle_verbose(line)

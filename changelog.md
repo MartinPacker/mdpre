@@ -1,7 +1,13 @@
 # This Is The Change Log For mdpre Markdown Preprocessor
 
-=toc 2 2 Releases
+### Releases
 
+
+
+
+### v0.6.8 - 8  March, 2024
+
+* **FIXED** The only thing that should be stripped off a line in the main loop is the newline
 
 ### v0.6.7 - 17  December, 2023
 

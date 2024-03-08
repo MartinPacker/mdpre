@@ -3,6 +3,11 @@
 =toc 2 2 Releases
 
 
+
+### v0.6.8 - 8  March, 2024
+
+* **FIXED** The only thing that should be stripped off a line in the main loop is the newline
+
 ### v0.6.7 - 17  December, 2023
 
 * **ENHANCED** Any line beginning with `<br/>` is concatenated to the previous line.
