@@ -4,6 +4,10 @@
 
 
 
+### v0.6.9 - 17  September, 2024
+
+* **FIXED** Used a test for `userid` variable that shouldn't break on Ubuntu - [Issue 26](https://github.com/MartinPacker/mdpre/issues/26)
+* **FIXED** Used raw strings for parsing CSV-related control lines - [Issue 27](https://github.com/MartinPacker/mdpre/issues/27)
 
 ### v0.6.8 - 8  March, 2024
 
