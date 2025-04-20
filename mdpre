@@ -33,7 +33,7 @@ from enum import Enum
 import calendar
 
 
-mdpre_level = "0.7"
+mdpre_level = "0.7+"
 mdpre_date = "20 April, 2025"
 banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
 
@@ -1637,7 +1637,7 @@ for dnum, d in enumerate(dependencies):
     else:
         makefile += " \n\n"
 
-makefile += "\tmdpre -v < $(target).mdp > $(target).md 2>$(target).log"
+makefile += "\tmdpre -v < $(target).mdp > $(target).md 2>$(target).log $(makefragment)"
 
 # Try to write the make file insert to File Descriptor 3
 try:
