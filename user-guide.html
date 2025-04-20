@@ -1189,13 +1189,14 @@ body .markdown-body
 <h1 id="markdown-preprocessor-user-guide">Markdown Preprocessor User Guide<a class="headerlink" href="#markdown-preprocessor-user-guide" title="Permanent link"></a></h1>
 <p>This document describes the mdpre Markdown preprocessor.</p>
 <p>In this document we&rsquo;ll refer to it as &ldquo;mdpre&rdquo;, pronounced &ldquo;em dee pree&rdquo;.</p>
-<p>This document was converted to HTML at 14&colon;26 on 17 December&comma; 2023.</p>
+<p>This document was converted to HTML at 14&colon;33 on 20 April&comma; 2025.</p>
 <h3 id="table-of-contents">Table Of Contents<a class="headerlink" href="#table-of-contents" title="Permanent link"></a></h3>
 <ul>
 <li><a href="#why-a-preprocessor">Why A Preprocessor?</a></li>
 <li><a href="#how-do-you-use-mdpre">How Do You Use mdpre?</a><ul>
 <li><a href="#help">Help</a></li>
 <li><a href="#verbose-mode">Verbose Mode</a></li>
+<li><a href="#creating-a-make-file-fragment">Creating A Make File Fragment</a></li>
 <li><a href="#defining-variables">Defining Variables</a></li>
 <li><a href="#filenames">Filenames</a></li>
 <li><a href="#textbundle-and-textpack-support">TextBundle And TextPack Support</a></li>
@@ -1232,25 +1233,28 @@ body .markdown-body
 </li>
 </ul>
 <h2 id="why-a-preprocessor">Why A Preprocessor?<a class="headerlink" href="#why-a-preprocessor" title="Permanent link"></a></h2>
-<p>Ask yourself the following questions.</p>
+<p>Ask yourself the following questions. Have you ever wanted to</p>
 <ol>
 <li>
-<p>Have you ever wanted to create a Markdown document from more than one piece of text?</p>
+<p>create a Markdown document from more than one piece of text?</p>
 </li>
 <li>
-<p>Have you ever wanted to make a Markdown table from a CSV file?</p>
+<p>make a Markdown table from a CSV file?</p>
 </li>
 <li>
-<p>Have you ever wanted to control whether text was included or not?</p>
+<p>control whether text was included or not?</p>
 </li>
 <li>
-<p>Have you ever wanted to use variables in Markdown?</p>
+<p>use variables in Markdown?</p>
 </li>
 <li>
-<p>Have you ever wanted to have a Table Of Contents automatically generated in Markdown?</p>
+<p>have a Table Of Contents automatically generated in Markdown?</p>
 </li>
 <li>
-<p>Have you wanted to use version control - such as git?</p>
+<p>use version control - such as git?</p>
+</li>
+<li>
+<p>automatically create a make file that gets updated as you add parts to a markdown document?</p>
 </li>
 </ol>
 <p>If you answer &ldquo;yes&rdquo; to any of these you need mdpre.</p>
@@ -1306,6 +1310,31 @@ CSV Stop
 
 Processing completed.
 </code></pre>
+<h3 id="creating-a-make-file-fragment">Creating A Make File Fragment<a class="headerlink" href="#creating-a-make-file-fragment" title="Permanent link"></a></h3>
+<p>If you define a destination for file descriptor 3 mdpre will emit a make file fragment that lists the files used by the document.
+For example, coding</p>
+<pre><code>mdpre &lt; document.mdp &gt; document.md 2&gt; document.log 3&gt; fragment.mak
+</code></pre>
+<p>will write all messages to document.log and a make file fragment to fragment.mak.</p>
+<p>Here is an example of such a fragment:</p>
+<pre><code>$(target).md: 
+    $(target).mdp \ 
+    included.mdp \ 
+    processing-Flow.png \ 
+    processing-Flow\ 2.png
+
+    mdpre -v &lt; $(target).mdp &gt; $(target).md 2&gt;$(target).log
+</code></pre>
+<p>You could, for example, include the following lines in your main make file (possibly called &ldquo;makefile&rdquo;):</p>
+<div class="highlight"><pre>target=user-guide
+
+include fragment.mak
+</pre></div>
+
+<p>This would set the make variable <code>target</code> to the value &ldquo;user-guide&rdquo;.
+The result of this is that running make invokes mdpre against user-guide.mdp, creating as output user-guide.md and sending messages to user-guide.log.
+Verbose Mode is turned on - which is probably what you want with a log file as a destination for messages.</p>
+<p>In this use case make includes the list of files the build depends on.</p>
 <h3 id="defining-variables">Defining Variables<a class="headerlink" href="#defining-variables" title="Permanent link"></a></h3>
 <p>You can define variables on the command line when you run mdpre. Use the <code>-d</code> switch. For example</p>
 <pre><code>mdpre -v -dfred -dbrian &lt; test.mdp &gt; test.md
@@ -1583,7 +1612,7 @@ Here is some text that would be included by the test on the line above.
 =endcal
 </code></pre>
 <p>In this example each cell is 3 lines high. The default is for each cell to be 2 lines high.</p>
-<p><strong>Notes:</strong></p>
+<p><strong>Notes:</strong> </p>
 <ol>
 <li>By repeated use of <code>=cal</code> and <code>=endcal</code> you can add multiple months to a document (for example a md2pptx-processed slide).</li>
 <li>The rendering above isn&rsquo;t faithful because mdpre (at least in combination with md2pptx) creates a table where the month name spans the entire width of the table and the columns are evenly sized.</li>
@@ -1711,7 +1740,7 @@ Here is some text that would be included by the test on the line above.
 
 <p>As with <code>=caldays</code>, you need to code the CSS for classes <code>blue</code> and <code>orange</code> for these specifications to be effective.</p>
 <p><code>=calkey</code> must be specified on its own line between the <code>=cal</code> and <code>=endcal</code> lines. You can specify as many <code>=calkey</code> lines as you like within this bracket.</p>
-<p><strong>Notes:</strong></p>
+<p><strong>Notes:</strong> </p>
 <ol>
 <li>You can continue the bulleted list that <code>=caldays</code> generates with other bulleted list items; Just code those bulleted list items after <code>=endcal</code>.</li>
 <li>While you need not use the same class names as <code>=caldays</code> the intended use case is for you to do so.</li>
@@ -1743,8 +1772,8 @@ Here is some text that would be included by the test on the line above.
 <h3 id="concatenating-lines-with">Concatenating Lines With <code>\</code><a class="headerlink" href="#concatenating-lines-with" title="Permanent link"></a></h3>
 <p>Some Markdown processors treat text on separate lines as requiring a line break between the lines. But you might prefer to write each sentence in a paragraph on a separate line. Indeed this paragraph was written that way.</p>
 <p>If you terminate a line with a <code>\</code> (backslash) character the following line will be concatenated to it. For example:</p>
-<pre><code>Some Markdown processors treat text on separate lines as requiring a line break between the lines. \
-But you might prefer to write each sentence in a paragraph on a separate line. \
+<pre><code>Some Markdown processors treat text on separate lines as requiring a line break between the lines. \ 
+But you might prefer to write each sentence in a paragraph on a separate line. \ 
 Indeed this paragraph was written that way.
 </code></pre>
 <p>Terminating a line with a <code>\</code> does not cause a space to be inserted between the two lines of text. In the above example a space was coded before the <code>\</code> each time it was used.</p>

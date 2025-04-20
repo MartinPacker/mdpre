@@ -116,7 +116,7 @@ This document describes the mdpre Markdown preprocessor.
 
 In this document we'll refer to it as "mdpre", pronounced "em dee pree".
 
-This document was converted to HTML at 14&colon;26 on 17 December&comma; 2023.
+This document was converted to HTML at 14&colon;33 on 20 April&comma; 2025.
 
 ### Table Of Contents
 
@@ -124,6 +124,7 @@ This document was converted to HTML at 14&colon;26 on 17 December&comma; 2023.
 * [How Do You Use mdpre?](#how-do-you-use-mdpre)
 	* [Help](#help)
 	* [Verbose Mode](#verbose-mode)
+	* [Creating A Make File Fragment](#creating-a-make-file-fragment)
 	* [Defining Variables](#defining-variables)
 	* [Filenames](#filenames)
 	* [TextBundle And TextPack Support](#textbundle-and-textpack-support)
@@ -151,19 +152,21 @@ This document was converted to HTML at 14&colon;26 on 17 December&comma; 2023.
 
 ## Why A Preprocessor?
 
-Ask yourself the following questions.
+Ask yourself the following questions. Have you ever wanted to
 
-1. Have you ever wanted to create a Markdown document from more than one piece of text?
+1. create a Markdown document from more than one piece of text?
 
-1. Have you ever wanted to make a Markdown table from a CSV file?
+1. make a Markdown table from a CSV file?
 
-1. Have you ever wanted to control whether text was included or not?
+1. control whether text was included or not?
 
-1. Have you ever wanted to use variables in Markdown?
+1. use variables in Markdown?
 
-1. Have you ever wanted to have a Table Of Contents automatically generated in Markdown?
+1. have a Table Of Contents automatically generated in Markdown?
 
-1. Have you wanted to use version control - such as git?
+1. use version control - such as git?
+
+1. automatically create a make file that gets updated as you add parts to a markdown document?
 
 If you answer "yes" to any of these you need mdpre.
 
@@ -230,6 +233,40 @@ This documents most of the major events and decisions, such as the embedding of 
 	..... .....  Generating A Table Of Contents With `=toc`
 
 	Processing completed.
+
+
+### Creating A Make File Fragment
+
+If you define a destination for file descriptor 3 mdpre will emit a make file fragment that lists the files used by the document.
+For example, coding
+
+	mdpre < document.mdp > document.md 2> document.log 3> fragment.mak
+
+will write all messages to document.log and a make file fragment to fragment.mak.
+
+Here is an example of such a fragment:
+
+	$(target).md: 
+		$(target).mdp \ 
+		included.mdp \ 
+		processing-Flow.png \ 
+		processing-Flow\ 2.png 
+	
+		mdpre -v < $(target).mdp > $(target).md 2>$(target).log
+
+You could, for example, include the following lines in your main make file (possibly called "makefile"):
+
+```
+target=user-guide
+
+include fragment.mak
+```
+
+This would set the make variable `target` to the value "user-guide".
+The result of this is that running make invokes mdpre against user-guide.mdp, creating as output user-guide.md and sending messages to user-guide.log.
+Verbose Mode is turned on - which is probably what you want with a log file as a destination for messages.
+
+In this use case make includes the list of files the build depends on.
 
 ### Defining Variables
 
@@ -304,7 +341,7 @@ mdpre detects recursion in including files. If recursion is detected mdpre will 
 
 You can use a variable in a include filename. For example:
 
-    =def includeName b
+	=def includeName b
     =include &includeName;.mdp
 
 In this case the file that will be included is `b.mdp`.
@@ -328,7 +365,7 @@ For example:
 	&greeting; World!
 
 will produce:
-
+	
 	Hello World!
 
 If you don't terminate the use of the variable with a semicolon it won't be substituted. If the variable isn't defined at the point of usage it won't be substituted.
@@ -509,7 +546,7 @@ You can control the height of the cells - in terms of the number of lines by spe
 
 In this example each cell is 3 lines high. The default is for each cell to be 2 lines high.
 
-**Notes:**
+**Notes:** 
 
 1. By repeated use of `=cal` and `=endcal` you can add multiple months to a document (for example a md2pptx-processed slide).
 2. The rendering above isn't faithful because mdpre (at least in combination with md2pptx) creates a table where the month name spans the entire width of the table and the columns are evenly sized.
@@ -591,7 +628,7 @@ As with `=caldays`, you need to code the CSS for classes `blue` and `orange` for
 
 `=calkey` must be specified on its own line between the `=cal` and `=endcal` lines. You can specify as many `=calkey` lines as you like within this bracket.
 
-**Notes:**
+**Notes:** 
 
 1. You can continue the bulleted list that `=caldays` generates with other bulleted list items; Just code those bulleted list items after `=endcal`.
 1. While you need not use the same class names as `=caldays` the intended use case is for you to do so.
@@ -633,8 +670,8 @@ Some Markdown processors treat text on separate lines as requiring a line break 
 
 If you terminate a line with a `\` (backslash) character the following line will be concatenated to it. For example:
 
-	Some Markdown processors treat text on separate lines as requiring a line break between the lines. \
-	But you might prefer to write each sentence in a paragraph on a separate line. \
+	Some Markdown processors treat text on separate lines as requiring a line break between the lines. \ 
+	But you might prefer to write each sentence in a paragraph on a separate line. \ 
 	Indeed this paragraph was written that way.
 
 Terminating a line with a `\` does not cause a space to be inserted between the two lines of text. In the above example a space was coded before the `\` each time it was used.

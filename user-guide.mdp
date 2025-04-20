@@ -123,19 +123,21 @@ This document was converted to HTML at &time; on &date;.
 
 ## Why A Preprocessor?
 
-Ask yourself the following questions.
+Ask yourself the following questions. Have you ever wanted to
 
-1. Have you ever wanted to create a Markdown document from more than one piece of text?
+1. create a Markdown document from more than one piece of text?
 
-1. Have you ever wanted to make a Markdown table from a CSV file?
+1. make a Markdown table from a CSV file?
 
-1. Have you ever wanted to control whether text was included or not?
+1. control whether text was included or not?
 
-1. Have you ever wanted to use variables in Markdown?
+1. use variables in Markdown?
 
-1. Have you ever wanted to have a &TOC; automatically generated in Markdown?
+1. have a &TOC; automatically generated in Markdown?
 
-1. Have you wanted to use version control - such as git?
+1. use version control - such as git?
+
+1. automatically create a make file that gets updated as you add parts to a markdown document?
 
 If you answer "yes" to any of these you need mdpre.
 
@@ -203,6 +205,41 @@ One early run of this document with `-v` specified resulted in
 	..... .....  Generating A Table Of Contents With `=toc`
 
 	Processing completed.
+
+
+### Creating A Make File Fragment
+
+If you define a destination for file descriptor 3 mdpre will emit a make file fragment that lists the files \
+used by the document.
+For example, coding
+
+	mdpre < document.mdp > document.md 2> document.log 3> fragment.mak
+
+will write all messages to document.log and a make file fragment to fragment.mak.
+
+Here is an example of such a fragment:
+
+	$(target).md: 
+		$(target).mdp \ 
+		included.mdp \ 
+		processing-Flow.png \ 
+		processing-Flow\ 2.png 
+	
+		mdpre -v < $(target).mdp > $(target).md 2>$(target).log
+
+You could, for example, include the following lines in your main make file (possibly called "makefile"):
+
+```
+target=user-guide
+
+include fragment.mak
+```
+
+This would set the make variable `target` to the value "user-guide".
+The result of this is that running make invokes mdpre against user-guide.mdp, creating as output user-guide.md and sending messages to user-guide.log.
+Verbose Mode is turned on - which is probably what you want with a log file as a destination for messages.
+
+In this use case make includes the list of files the build depends on.
 
 ### Defining Variables
 
@@ -288,7 +325,7 @@ This is to prevent infinite recursion.
 You can use a variable in a include filename. \
 For example:
 
-    =def includeName b
+	=def includeName b
     =include &includeName;.mdp
 
 In this case the file that will be included is `b.mdp`.

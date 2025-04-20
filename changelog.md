@@ -3,6 +3,9 @@
 ### Releases
 
 
+### v0.7 - 20  April, 2025
+
+* **ENHANCED** mdpre writes a make file fragment to file descriptor 3 - if present.
 
 ### v0.6.9 - 17  September, 2024
 
