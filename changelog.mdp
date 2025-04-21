@@ -2,6 +2,10 @@
 
 =toc 2 2 Releases
 
+### v0.7.1 - 21  April, 2025
+
+* **ENHANCED** mdpre's make file fragment supports a variable `makefragment`.
+
 ### v0.7 - 20  April, 2025
 
 * **ENHANCED** mdpre writes a make file fragment to file descriptor 3 - if present.

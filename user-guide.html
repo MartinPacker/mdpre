@@ -1189,7 +1189,7 @@ body .markdown-body
 <h1 id="markdown-preprocessor-user-guide">Markdown Preprocessor User Guide<a class="headerlink" href="#markdown-preprocessor-user-guide" title="Permanent link"></a></h1>
 <p>This document describes the mdpre Markdown preprocessor.</p>
 <p>In this document we&rsquo;ll refer to it as &ldquo;mdpre&rdquo;, pronounced &ldquo;em dee pree&rdquo;.</p>
-<p>This document was converted to HTML at 14&colon;33 on 20 April&comma; 2025.</p>
+<p>This document was converted to HTML at 13&colon;10 on 21 April&comma; 2025.</p>
 <h3 id="table-of-contents">Table Of Contents<a class="headerlink" href="#table-of-contents" title="Permanent link"></a></h3>
 <ul>
 <li><a href="#why-a-preprocessor">Why A Preprocessor?</a></li>
@@ -1317,13 +1317,14 @@ For example, coding</p>
 </code></pre>
 <p>will write all messages to document.log and a make file fragment to fragment.mak.</p>
 <p>Here is an example of such a fragment:</p>
-<pre><code>$(target).md: 
+<pre><code>makefragment=
+$(target).md: 
     $(target).mdp \ 
     included.mdp \ 
     processing-Flow.png \ 
     processing-Flow\ 2.png
 
-    mdpre -v &lt; $(target).mdp &gt; $(target).md 2&gt;$(target).log
+    mdpre -v &lt; $(target).mdp &gt; $(target).md 2&gt;$(target).log $(makefragment)
 </code></pre>
 <p>You could, for example, include the following lines in your main make file (possibly called &ldquo;makefile&rdquo;):</p>
 <div class="highlight"><pre>target=user-guide
@@ -1335,6 +1336,13 @@ include fragment.mak
 The result of this is that running make invokes mdpre against user-guide.mdp, creating as output user-guide.md and sending messages to user-guide.log.
 Verbose Mode is turned on - which is probably what you want with a log file as a destination for messages.</p>
 <p>In this use case make includes the list of files the build depends on.</p>
+<p>The variable <code>makefragment</code> is defined to be the empty string.
+You can override this on the command line.
+Here is an example:</p>
+<pre><code>make makefragment='3&gt;insert.mak'
+</code></pre>
+<p>The idea here is to allow you to specify a make file fragment is generated.
+The default is not to - as it is more likely you won&rsquo;t want to regenerate the make file fragment every time you run mdpre.</p>
 <h3 id="defining-variables">Defining Variables<a class="headerlink" href="#defining-variables" title="Permanent link"></a></h3>
 <p>You can define variables on the command line when you run mdpre. Use the <code>-d</code> switch. For example</p>
 <pre><code>mdpre -v -dfred -dbrian &lt; test.mdp &gt; test.md

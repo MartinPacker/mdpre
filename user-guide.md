@@ -116,7 +116,7 @@ This document describes the mdpre Markdown preprocessor.
 
 In this document we'll refer to it as "mdpre", pronounced "em dee pree".
 
-This document was converted to HTML at 14&colon;33 on 20 April&comma; 2025.
+This document was converted to HTML at 13&colon;10 on 21 April&comma; 2025.
 
 ### Table Of Contents
 
@@ -246,13 +246,14 @@ will write all messages to document.log and a make file fragment to fragment.mak
 
 Here is an example of such a fragment:
 
+	makefragment=
 	$(target).md: 
 		$(target).mdp \ 
 		included.mdp \ 
 		processing-Flow.png \ 
 		processing-Flow\ 2.png 
 	
-		mdpre -v < $(target).mdp > $(target).md 2>$(target).log
+		mdpre -v < $(target).mdp > $(target).md 2>$(target).log $(makefragment)
 
 You could, for example, include the following lines in your main make file (possibly called "makefile"):
 
@@ -267,6 +268,15 @@ The result of this is that running make invokes mdpre against user-guide.mdp, cr
 Verbose Mode is turned on - which is probably what you want with a log file as a destination for messages.
 
 In this use case make includes the list of files the build depends on.
+
+The variable `makefragment` is defined to be the empty string.
+You can override this on the command line.
+Here is an example:
+
+	make makefragment='3>insert.mak'
+
+The idea here is to allow you to specify a make file fragment is generated.
+The default is not to - as it is more likely you won't want to regenerate the make file fragment every time you run mdpre.
 
 ### Defining Variables
 
