@@ -23,6 +23,7 @@ import csv
 import shutil
 import zipfile
 import io
+import subprocess
 
 # import StringIO
 import re
@@ -33,8 +34,8 @@ from enum import Enum
 import calendar
 
 
-mdpre_level = "0.7.1"
-mdpre_date = "21 April, 2025"
+mdpre_level = "0.7.1+"
+mdpre_date = "3 May, 2025"
 banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
 
 log = partial(print, file=sys.stderr)  # | create log to stderr
@@ -455,7 +456,10 @@ def parse_def(defString):
         varName = defString
     else:
         varType = "T"
-        varValue = residue
+        if (residue[0] == "`") & (residue[-1] == "`"):
+            varValue = handle_exec(residue[1:-1])
+        else:
+            varValue = residue
 
     return [varName, varType, varValue]
 
@@ -513,6 +517,9 @@ def parse_dec(line):
             "Variable " + targetVar + " not found. Cannot be decremented.\n"
         )
 
+def handle_exec(command):
+    commandOutput = subprocess.check_output(command, shell=True)
+    return commandOutput.decode('utf-8').rstrip('\n')
 
 # =ifdef encountered
 def handle_ifdef(ifdefString):
@@ -1177,6 +1184,9 @@ def handle_verbose(line):
 
     elif verboseType == "endfor":
         sys.stderr.write("Endfor " + "\n")
+
+    elif verboseType == "exec":
+        sys.stderr.write("Exec " + verboseArray[1][6:] + "\n")
 
     else:
         sys.stderr.write("Unknown " + line + "\n")
