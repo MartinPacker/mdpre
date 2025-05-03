@@ -342,10 +342,11 @@ In this case the file that will be included is `b.mdp`.
 
 ### Defining Variables With `=def`
 
-You can define variables with one of two forms of the `=def` statement:
+You can define variables with one of three forms of the `=def` statement:
 
 1. `=def varName`
 1. `=def varName varValue`
+1. `=def varName command-string`
 
 The variable name cannot contain spaces. If you try the parser will interpret anything after the first space as a value. Other than that there are no restrictions on variable names.
 
@@ -366,6 +367,20 @@ If you don't terminate the use of the variable with a semicolon it won't be subs
 
 You can also define variables and, optionally, set their value with the `-d` command line parameter. \
 See [Defining Variables](#defining-variables) for more.
+
+For the third form, the command string needs to be enclosed in backticks.
+The command is platform dependent.
+So, for example, on Mac OS the following works. It might not work on Windows.
+
+	=def listing `ls -l | sed -e 's/^/* /'`
+
+In this form the stdout from the command will be what the variable is set to.
+It can be multiline.
+
+The example contains a final stage `sed -e 's/^/* /'` which prepends an asterisk onto every line.
+This can be useful for creating a bulleted list.
+Note also the `|` character, allowing complex pipelines of commands.
+Again, applicability is platform specific.
 
 ### Undefining Variables With `=undef`
 
@@ -751,5 +766,8 @@ time,Time when mdpre startred running,`21&colon;36`
 userid,Userid mdpre was run under,`martinpacker`
 mdpre_level,Level of mdpre,`0.4.4`
 mdpre_date,Date of mdpre,`9 March&colon; 2019`
+day,Day of month when mdpre started running,`3`
+month,Month when mdpre started running,`May`
+year,Year when mdpre started running,`2025`
 =endcsv
 

@@ -34,7 +34,7 @@ from enum import Enum
 import calendar
 
 
-mdpre_level = "0.7.1+"
+mdpre_level = "0.8"
 mdpre_date = "3 May, 2025"
 banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
 
@@ -1213,9 +1213,16 @@ def setupStandardVariables():
     now = datetime.datetime.now()
     runTime = now.strftime("%H&colon;%M").lstrip()
     runDate = now.strftime("%e %B&comma; %G").lstrip()
+    runYear = now.strftime("%G").lstrip()
+    runMonth = now.strftime("%B").lstrip()
+    runDay = now.strftime("%e").lstrip()
 
     input_file.insert(0, "=def date " + runDate + " ")
     input_file.insert(0, "=def time " + runTime + " ")
+
+    input_file.insert(0, "=def year " + runYear + " ")
+    input_file.insert(0, "=def month " + runMonth + " ")
+    input_file.insert(0, "=def day " + runDay + " ")
     
     username = os.getenv('USER') or os.getenv('LOGNAME') or os.getenv('USERNAME')
     input_file.insert(0, "=def userid " + username + " ")

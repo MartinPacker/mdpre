@@ -1189,7 +1189,7 @@ body .markdown-body
 <h1 id="markdown-preprocessor-user-guide">Markdown Preprocessor User Guide<a class="headerlink" href="#markdown-preprocessor-user-guide" title="Permanent link"></a></h1>
 <p>This document describes the mdpre Markdown preprocessor.</p>
 <p>In this document we&rsquo;ll refer to it as &ldquo;mdpre&rdquo;, pronounced &ldquo;em dee pree&rdquo;.</p>
-<p>This document was converted to HTML at 13&colon;10 on 21 April&comma; 2025.</p>
+<p>This document was converted to HTML at 13&colon;27 on 3 May&comma; 2025.</p>
 <h3 id="table-of-contents">Table Of Contents<a class="headerlink" href="#table-of-contents" title="Permanent link"></a></h3>
 <ul>
 <li><a href="#why-a-preprocessor">Why A Preprocessor?</a></li>
@@ -1392,10 +1392,11 @@ The default is not to - as it is more likely you won&rsquo;t want to regenerate 
 </code></pre>
 <p>In this case the file that will be included is <code>b.mdp</code>.</p>
 <h3 id="defining-variables-with-def">Defining Variables With <code>=def</code><a class="headerlink" href="#defining-variables-with-def" title="Permanent link"></a></h3>
-<p>You can define variables with one of two forms of the <code>=def</code> statement:</p>
+<p>You can define variables with one of three forms of the <code>=def</code> statement:</p>
 <ol>
 <li><code>=def varName</code></li>
 <li><code>=def varName varValue</code></li>
+<li><code>=def varName command-string</code></li>
 </ol>
 <p>The variable name cannot contain spaces. If you try the parser will interpret anything after the first space as a value. Other than that there are no restrictions on variable names.</p>
 <p>Defining variables is useful with the <code>=ifdef</code> and <code>=ifndef</code> statements.</p>
@@ -1410,6 +1411,17 @@ For example:</p>
 </code></pre>
 <p>If you don&rsquo;t terminate the use of the variable with a semicolon it won&rsquo;t be substituted. If the variable isn&rsquo;t defined at the point of usage it won&rsquo;t be substituted.</p>
 <p>You can also define variables and, optionally, set their value with the <code>-d</code> command line parameter. See <a href="#defining-variables">Defining Variables</a> for more.</p>
+<p>For the third form, the command string needs to be enclosed in backticks.
+The command is platform dependent.
+So, for example, on Mac OS the following works. It might not work on Windows.</p>
+<pre><code>=def listing `ls -l | sed -e 's/^/* /'`
+</code></pre>
+<p>In this form the stdout from the command will be what the variable is set to.
+It can be multiline.</p>
+<p>The example contains a final stage <code>sed -e 's/^/* /'</code> which prepends an asterisk onto every line.
+This can be useful for creating a bulleted list.
+Note also the <code>|</code> character, allowing complex pipelines of commands.
+Again, applicability is platform specific.</p>
 <h3 id="undefining-variables-with-undef">Undefining Variables With <code>=undef</code><a class="headerlink" href="#undefining-variables-with-undef" title="Permanent link"></a></h3>
 <p>Just as you can use <code>=def</code> to define a variable you can remove it from the variable table using <code>=undef</code>. For example,</p>
 <pre><code>=undef xyzzy
@@ -1851,6 +1863,21 @@ Indeed this paragraph was written that way.
 <td align="left">mdpre_date</td>
 <td align="left">Date of mdpre</td>
 <td align="left"><code>9 March&amp;colon; 2019</code></td>
+</tr>
+<tr>
+<td align="left">day</td>
+<td align="left">Day of month when mdpre started running</td>
+<td align="left"><code>3</code></td>
+</tr>
+<tr>
+<td align="left">month</td>
+<td align="left">Month when mdpre started running</td>
+<td align="left"><code>May</code></td>
+</tr>
+<tr>
+<td align="left">year</td>
+<td align="left">Year when mdpre started running</td>
+<td align="left"><code>2025</code></td>
 </tr>
 </tbody>
 </table></article></body></html>
