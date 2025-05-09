@@ -116,7 +116,7 @@ This document describes the mdpre Markdown preprocessor.
 
 In this document we'll refer to it as "mdpre", pronounced "em dee pree".
 
-This document was converted to HTML at 13&colon;27 on 3 May&comma; 2025.
+This document was converted to HTML at 17&colon;04 on 9 May&comma; 2025.
 
 ### Table Of Contents
 
@@ -135,7 +135,7 @@ This document was converted to HTML at 13&colon;27 on 3 May&comma; 2025.
 	* [Undefining Variables With `=undef`](#undefining-variables-with-undef)
 	* [Incrementing Integer Variables Wth `=inc`](#incrementing-integer-variables-wth-inc)
 	* [Decrementing Integer Variables Wth `=dec`](#decrementing-integer-variables-wth-dec)
-	* [Conditional Inclusion With `=ifdef`, `=ifndef`, And `=endif`](#conditional-inclusion-with-ifdef-ifndef-and-endif)
+	* [Conditional Inclusion With `=ifdef`, `=ifndef`, `=ifempty`, `=ifnotempty`, And `=endif`](#conditional-inclusion-with-ifdef-ifndef-ifempty-ifnotempty-and-endif)
 	* [Converting A CSV File To A Markdown Table With `=csv` And `=endcsv`](#converting-a-csv-file-to-a-markdown-table-with-csv-and-endcsv)
 		* [Controlling Table Alignment With `=colalign`](#controlling-table-alignment-with-colalign)
 		* [Controlling Table Column Widths With `=colwidth`](#controlling-table-column-widths-with-colwidth)
@@ -358,11 +358,12 @@ In this case the file that will be included is `b.mdp`.
 
 ### Defining Variables With `=def`
 
-You can define variables with one of three forms of the `=def` statement:
+You can define variables with one of four forms of the `=def` statement:
 
 1. `=def varName`
 1. `=def varName varValue`
 1. `=def varName command-string`
+1. `=def varName1,varname2 command-string`
 
 The variable name cannot contain spaces. If you try the parser will interpret anything after the first space as a value. Other than that there are no restrictions on variable names.
 
@@ -383,7 +384,7 @@ If you don't terminate the use of the variable with a semicolon it won't be subs
 
 You can also define variables and, optionally, set their value with the `-d` command line parameter. See [Defining Variables](#defining-variables) for more.
 
-For the third form, the command string needs to be enclosed in backticks.
+For the third and fourth forms, the command string needs to be enclosed in backticks.
 The command is platform dependent.
 So, for example, on Mac OS the following works. It might not work on Windows.
 
@@ -396,6 +397,11 @@ The example contains a final stage `sed -e 's/^/* /'` which prepends an asterisk
 This can be useful for creating a bulleted list.
 Note also the `|` character, allowing complex pipelines of commands.
 Again, applicability is platform specific.
+
+The fourth form allows you to capture the stderr from the command string:
+
+* The first variable name captures the stdout
+* The second variable name captures the stderr
 
 ### Undefining Variables With `=undef`
 
@@ -428,7 +434,7 @@ If a variable has an integer value it can be decremented. For example,
 
 In this example counter1 will start with the value 1 and after the `=dec` its value will be 0.
 
-### Conditional Inclusion With `=ifdef`, `=ifndef`, And `=endif`
+### Conditional Inclusion With `=ifdef`, `=ifndef`, `=ifempty`, `=ifnotempty`, And `=endif`
 
 `=ifdef` and `=ifndef` perform very similar functions, but are complementary to each other.
 
@@ -456,10 +462,17 @@ Any mdpre statement can be included in the bracket. For example, you could condi
 	=include theWorks.mdp
 	=endif
 
-You can define variables for use with `=ifdef` and `ifndef` in one of two ways:
+You can define variables for use with `=ifdef`, `=ifndef`, `=ifempty`, and `=ifnotempty` in one of two ways:
 
 * With `=def`, described in [Defining Variables With `=def`](#defining-variables-with-def).
 * With the `-d` command line switch, described in [Defining Variables](#defining-variables).
+
+`=ifempty` and `=ifnotempty` test for whether a variable is defined with an empty string or not.
+This might happen, for example, if the variable was defined as the stderr from a command.
+
+If the variable is not defined it fails both the `=ifempty` and `=ifenotempty` tests.
+
+An alternative form of `=ifnotempty` is `=ifnempty`.
 
 ### Converting A CSV File To A Markdown Table With `=csv` And `=endcsv`
 

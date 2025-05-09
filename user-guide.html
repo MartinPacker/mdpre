@@ -1189,7 +1189,7 @@ body .markdown-body
 <h1 id="markdown-preprocessor-user-guide">Markdown Preprocessor User Guide<a class="headerlink" href="#markdown-preprocessor-user-guide" title="Permanent link"></a></h1>
 <p>This document describes the mdpre Markdown preprocessor.</p>
 <p>In this document we&rsquo;ll refer to it as &ldquo;mdpre&rdquo;, pronounced &ldquo;em dee pree&rdquo;.</p>
-<p>This document was converted to HTML at 13&colon;27 on 3 May&comma; 2025.</p>
+<p>This document was converted to HTML at 17&colon;04 on 9 May&comma; 2025.</p>
 <h3 id="table-of-contents">Table Of Contents<a class="headerlink" href="#table-of-contents" title="Permanent link"></a></h3>
 <ul>
 <li><a href="#why-a-preprocessor">Why A Preprocessor?</a></li>
@@ -1209,7 +1209,7 @@ body .markdown-body
 <li><a href="#undefining-variables-with-undef">Undefining Variables With <code>=undef</code></a></li>
 <li><a href="#incrementing-integer-variables-wth-inc">Incrementing Integer Variables Wth <code>=inc</code></a></li>
 <li><a href="#decrementing-integer-variables-wth-dec">Decrementing Integer Variables Wth <code>=dec</code></a></li>
-<li><a href="#conditional-inclusion-with-ifdef-ifndef-and-endif">Conditional Inclusion With <code>=ifdef</code>, <code>=ifndef</code>, And <code>=endif</code></a></li>
+<li><a href="#conditional-inclusion-with-ifdef-ifndef-ifempty-ifnotempty-and-endif">Conditional Inclusion With <code>=ifdef</code>, <code>=ifndef</code>, <code>=ifempty</code>, <code>=ifnotempty</code>, And <code>=endif</code></a></li>
 <li><a href="#converting-a-csv-file-to-a-markdown-table-with-csv-and-endcsv">Converting A CSV File To A Markdown Table With <code>=csv</code> And <code>=endcsv</code></a><ul>
 <li><a href="#controlling-table-alignment-with-colalign">Controlling Table Alignment With <code>=colalign</code></a></li>
 <li><a href="#controlling-table-column-widths-with-colwidth">Controlling Table Column Widths With <code>=colwidth</code></a></li>
@@ -1392,11 +1392,12 @@ The default is not to - as it is more likely you won&rsquo;t want to regenerate 
 </code></pre>
 <p>In this case the file that will be included is <code>b.mdp</code>.</p>
 <h3 id="defining-variables-with-def">Defining Variables With <code>=def</code><a class="headerlink" href="#defining-variables-with-def" title="Permanent link"></a></h3>
-<p>You can define variables with one of three forms of the <code>=def</code> statement:</p>
+<p>You can define variables with one of four forms of the <code>=def</code> statement:</p>
 <ol>
 <li><code>=def varName</code></li>
 <li><code>=def varName varValue</code></li>
 <li><code>=def varName command-string</code></li>
+<li><code>=def varName1,varname2 command-string</code></li>
 </ol>
 <p>The variable name cannot contain spaces. If you try the parser will interpret anything after the first space as a value. Other than that there are no restrictions on variable names.</p>
 <p>Defining variables is useful with the <code>=ifdef</code> and <code>=ifndef</code> statements.</p>
@@ -1411,7 +1412,7 @@ For example:</p>
 </code></pre>
 <p>If you don&rsquo;t terminate the use of the variable with a semicolon it won&rsquo;t be substituted. If the variable isn&rsquo;t defined at the point of usage it won&rsquo;t be substituted.</p>
 <p>You can also define variables and, optionally, set their value with the <code>-d</code> command line parameter. See <a href="#defining-variables">Defining Variables</a> for more.</p>
-<p>For the third form, the command string needs to be enclosed in backticks.
+<p>For the third and fourth forms, the command string needs to be enclosed in backticks.
 The command is platform dependent.
 So, for example, on Mac OS the following works. It might not work on Windows.</p>
 <pre><code>=def listing `ls -l | sed -e 's/^/* /'`
@@ -1422,6 +1423,11 @@ It can be multiline.</p>
 This can be useful for creating a bulleted list.
 Note also the <code>|</code> character, allowing complex pipelines of commands.
 Again, applicability is platform specific.</p>
+<p>The fourth form allows you to capture the stderr from the command string:</p>
+<ul>
+<li>The first variable name captures the stdout</li>
+<li>The second variable name captures the stderr</li>
+</ul>
 <h3 id="undefining-variables-with-undef">Undefining Variables With <code>=undef</code><a class="headerlink" href="#undefining-variables-with-undef" title="Permanent link"></a></h3>
 <p>Just as you can use <code>=def</code> to define a variable you can remove it from the variable table using <code>=undef</code>. For example,</p>
 <pre><code>=undef xyzzy
@@ -1444,7 +1450,7 @@ Again, applicability is platform specific.</p>
 =dec counter1
 </code></pre>
 <p>In this example counter1 will start with the value 1 and after the <code>=dec</code> its value will be 0.</p>
-<h3 id="conditional-inclusion-with-ifdef-ifndef-and-endif">Conditional Inclusion With <code>=ifdef</code>, <code>=ifndef</code>, And <code>=endif</code><a class="headerlink" href="#conditional-inclusion-with-ifdef-ifndef-and-endif" title="Permanent link"></a></h3>
+<h3 id="conditional-inclusion-with-ifdef-ifndef-ifempty-ifnotempty-and-endif">Conditional Inclusion With <code>=ifdef</code>, <code>=ifndef</code>, <code>=ifempty</code>, <code>=ifnotempty</code>, And <code>=endif</code><a class="headerlink" href="#conditional-inclusion-with-ifdef-ifndef-ifempty-ifnotempty-and-endif" title="Permanent link"></a></h3>
 <p><code>=ifdef</code> and <code>=ifndef</code> perform very similar functions, but are complementary to each other.</p>
 <p>With <code>=ifdef</code>, if the variable referred to is defined (whatever its value) the following text is processed.</p>
 <p>The conditional bracket is ended with a line with <code>=endif</code> on it.</p>
@@ -1464,11 +1470,15 @@ Here is some text that would be included by the test on the line above.
 =include theWorks.mdp
 =endif
 </code></pre>
-<p>You can define variables for use with <code>=ifdef</code> and <code>ifndef</code> in one of two ways:</p>
+<p>You can define variables for use with <code>=ifdef</code>, <code>=ifndef</code>, <code>=ifempty</code>, and <code>=ifnotempty</code> in one of two ways:</p>
 <ul>
 <li>With <code>=def</code>, described in <a href="#defining-variables-with-def">Defining Variables With <code>=def</code></a>.</li>
 <li>With the <code>-d</code> command line switch, described in <a href="#defining-variables">Defining Variables</a>.</li>
 </ul>
+<p><code>=ifempty</code> and <code>=ifnotempty</code> test for whether a variable is defined with an empty string or not.
+This might happen, for example, if the variable was defined as the stderr from a command.</p>
+<p>If the variable is not defined it fails both the <code>=ifempty</code> and <code>=ifenotempty</code> tests.</p>
+<p>An alternative form of <code>=ifnotempty</code> is <code>=ifnempty</code>.</p>
 <h3 id="converting-a-csv-file-to-a-markdown-table-with-csv-and-endcsv">Converting A CSV File To A Markdown Table With <code>=csv</code> And <code>=endcsv</code><a class="headerlink" href="#converting-a-csv-file-to-a-markdown-table-with-csv-and-endcsv" title="Permanent link"></a></h3>
 <p>If you have a Comma-Separated Value (CSV) file you want to render as a table in a Markdown document use the <code>=csv</code> statement.</p>
 <p>Here is an example:</p>

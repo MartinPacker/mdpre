@@ -2,6 +2,12 @@
 
 =toc 2 2 Releases
 
+### v0.8.1 - 9 May, 2025
+
+* **FIXED** [Issue 32](https://github.com/MartinPacker/mdpre/issues/32): Verbose output for `=def` doesn't cope with colons
+* **ENHANCED** [Issue 30](https://github.com/MartinPacker/mdpre/issues/30): Allow Variable To Be Set To stderr Value For a Command
+* **ENHANCED** [Issue 31](https://github.com/MartinPacker/mdpre/issues/31): Support `=ifempty` & `=ifnotempty`
+
 ### v0.8 - 3 May, 2025
 
 * **ENHANCED** mdpre's `=def` support enhanced for shell commands - if value enclosed in backticks - [Issue 28](https://github.com/MartinPacker/mdpre/issues/28).

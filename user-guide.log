@@ -1,15 +1,15 @@
 
-mdpre Markdown Preprocessor v0.8 (3 May, 2025)
-==============================================
+mdpre Markdown Preprocessor v0.8.1 (9 May, 2025)
+================================================
 - opened <stdout> for writing
-Def mdpre_date = 3 May, 2025
-Def mdpre_level = 0.8
+Def mdpre_date = 9 May, 2025
+Def mdpre_level = 0.8.1
 Def userid = martinpacker
-Def day = 3
+Def day = 9
 Def month = May
 Def year = 2025
-Def time = 13&colon;27
-Def date = 3 May&comma; 2025
+Def time = 17&colon;04
+Def date = 9 May&comma; 2025
 Def TOC = Table Of Contents
 Markdown Preprocessor User Guide
 Table Of Contents - spec '2 * Table Of Contents'
@@ -29,7 +29,7 @@ Table Of Contents - spec '2 * Table Of Contents'
 ..... .....  Undefining Variables With `=undef`
 ..... .....  Incrementing Integer Variables Wth `=inc`
 ..... .....  Decrementing Integer Variables Wth `=dec`
-..... .....  Conditional Inclusion With `=ifdef`, `=ifndef`, And `=endif`
+..... .....  Conditional Inclusion With `=ifdef`, `=ifndef`, `=ifempty`, `=ifnotempty`, And `=endif`
 ..... .....  Converting A CSV File To A Markdown Table With `=csv` And `=endcsv`
 CSV Start
 CSV Stop
@@ -61,7 +61,7 @@ Column Alignment - spec 'l l l'
 Column Width - spec ' 2 4 1'
 CSV Start
 CSV Stop
-----------------------------------------------
+------------------------------------------------
 - Processing completed.
-----------------------------------------------
+------------------------------------------------
 
