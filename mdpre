@@ -34,8 +34,8 @@ from enum import Enum
 import calendar
 
 
-mdpre_level = "0.8"
-mdpre_date = "3 May, 2025"
+mdpre_level = "0.8+"
+mdpre_date = "9 May, 2025"
 banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
 
 log = partial(print, file=sys.stderr)  # | create log to stderr
@@ -106,15 +106,15 @@ def find_variable(targetVar):
 
 # Set a variable for the first time - or update it if it already exists
 def setOrUpdateVariable(varName, varValue):
-    global vars
-    var = parse_def(varName + " " + varValue)
-    var_index = find_variable(var[0])
-    if var_index > -1:
-        # Replace the variable with its new definition
-        vars[var_index] = var
-    else:
-         # Add the variable as it's new
-        vars.append(var)
+	global vars
+	for var in parse_def(varName + " " + varValue):
+		var_index = find_variable(var[0])
+		if var_index > -1:
+			# Replace the variable with its new definition
+			vars[var_index] = var
+		else:
+			 # Add the variable as it's new
+			vars.append(var)
 
 class OutputType(Enum):
     """preparation for later usage. support e.g. other outputs like MMD or ADOC"""
@@ -446,22 +446,27 @@ def parse_calnote(noteString, cal_notes):
     return cal_notes
 
 
+# Handle =def - which might return more than one variable
 def parse_def(defString):
     spacePos = defString.find(" ")
-    varName = defString[:spacePos]
+    varNameString = defString[:spacePos]
     residue = defString[spacePos + 1 :]
     if spacePos == -1:
+        # Is a flag
         varType = "F"
         varValue = ""
-        varName = defString
+        varNameString = defString
+
+        return [[varNameString, varType, varValue]]
     else:
+        # Is a value or values
         varType = "T"
         if (residue[0] == "`") & (residue[-1] == "`"):
-            varValue = handle_exec(residue[1:-1])
+            return handle_exec(varNameString, residue[1:-1])
         else:
             varValue = residue
+            return [[varNameString, varType, varValue]]
 
-    return [varName, varType, varValue]
 
 
 def parse_inc(line):
@@ -517,9 +522,88 @@ def parse_dec(line):
             "Variable " + targetVar + " not found. Cannot be decremented.\n"
         )
 
-def handle_exec(command):
-    commandOutput = subprocess.check_output(command, shell=True)
-    return commandOutput.decode('utf-8').rstrip('\n')
+def handle_exec(nameString, commandString):
+    outputVariables = []
+    
+    varNames = nameString.split(",")
+    
+    # Always have a stdout variable
+    stdoutVarname = varNames[0]
+
+    # Run the command string
+    cp = subprocess.run(commandString, capture_output = True, shell = True)
+
+    # Put stdout into a variable
+    outputVariables.append([stdoutVarname, "T", cp.stdout.decode('utf-8').rstrip('\n')])
+        
+    if len(varNames) == 2:
+        # Have a stderr variable
+        stderrVarname = varNames[1]
+        
+        # Put stderr into a variable    
+        outputVariables.append([stderrVarname, "T", cp.stderr.decode('utf-8').rstrip('\n')])
+        
+    return outputVariables
+
+
+# =ifempty encountered
+def handle_ifempty(ifemptyString):
+    global ifStack, vars
+    verbosity = ""
+
+    for varName, varType, varValue in vars:
+        if varName == ifemptyString:
+            # Variable is defined
+            if varValue == "":
+                if wantVerbose is True:
+                    verbosity = "<!--mdpre-ifempty:true:" + ifemptyString + "-->"
+
+                ifStack.append(True)
+            else:
+                if wantVerbose is True:
+                    verbosity = "<!--mdpre-ifempty:false:" + ifemptyString + "-->"
+
+                ifStack.append(False)
+
+            return verbosity
+
+    # Variable is undefined
+    ifStack.append(False)
+
+    if wantVerbose is True:
+        verbosity = "<!--mdpre-ifempty:undefined:" + ifemptyString + "-->"
+
+    return verbosity
+
+# =ifnotempty or =ifnempty encountered
+def handle_ifnotempty(ifnotEmptyString):
+    global ifStack, vars
+    verbosity = ""
+
+    for varName, varType, varValue in vars:
+        if varName == ifnotEmptyString:
+            # Variable is defined
+            if varValue != "":
+                if wantVerbose is True:
+                    verbosity = "<!--mdpre-ifnotempty:true:" + ifnotEmptyString + "-->"
+
+                ifStack.append(True)
+            else:
+                if wantVerbose is True:
+                    verbosity = "<!--mdpre-ifnotempty:false:" + ifnotEmptyString + "-->"
+
+                ifStack.append(False)
+
+            return verbosity
+
+    # Variable is undefined
+    ifStack.append(False)
+
+    if wantVerbose is True:
+        verbosity = "<!--mdpre-ifnotempty:undefined:" + ifnotEmptyString + "-->"
+
+    return verbosity
+
 
 # =ifdef encountered
 def handle_ifdef(ifdefString):
@@ -870,33 +954,33 @@ def parse_include(input_file):
                     return [stopIt, input_file2, vars]
 
             elif line.startswith("=def ") is True:
-                var = parse_def(line[5:-1].lstrip())
-                var_index = find_variable(var[0])
-                if var_index > -1:
-                    # Replace the variable with its new definition
-                    vars[var_index] = var
-                else:
-                    # Add the variable as it's new
-                    vars.append(var)
-
-                if wantVerbose is True:
-                    varName, varType, varValue = var
-                    
+                for var in parse_def(line[5:-1].lstrip()):
+                    var_index = find_variable(var[0])
                     if var_index > -1:
-                        redefined =" (redefined)"
+                        # Replace the variable with its new definition
+                        vars[var_index] = var
                     else:
-                        redefined =""
+                        # Add the variable as it's new
+                        vars.append(var)
+    
+                    if wantVerbose is True:
+                        varName, varType, varValue = var
                         
-                    input_file2.append(
-                        "<!--mdpre-def:"
-                        + varName
-                        + ":"
-                        + varType
-                        + ":"
-                        + varValue
-                        + redefined
-                        + "-->"
-                    )
+                        if var_index > -1:
+                            redefined =" (redefined)"
+                        else:
+                            redefined =""
+                            
+                        input_file2.append(
+                            "<!--mdpre-def:"
+                            + varName
+                            + ":"
+                            + varType
+                            + ":"
+                            + varValue
+                            + redefined
+                            + "-->"
+                        )
 
             elif line.startswith("=for ") is True:
                 verbosity = handle_for(line[5:-1].lstrip())
@@ -928,6 +1012,24 @@ def parse_include(input_file):
             elif line.startswith("=undef") is True:
                 varName = line[7:-1].lstrip()
                 verbosity = handle_undef(varName)
+
+                if wantVerbose is True:
+                    input_file2.append(verbosity)
+
+            elif line.startswith("=ifempty ") is True:
+                verbosity = handle_ifempty(line[9:].lstrip().rstrip())
+
+                if wantVerbose is True:
+                    input_file2.append(verbosity)
+
+            elif line.startswith("=ifnotempty ") is True:
+                verbosity = handle_ifnotempty(line[12:].lstrip().rstrip())
+
+                if wantVerbose is True:
+                    input_file2.append(verbosity)
+
+            elif line.startswith("=ifnempty ") is True:
+                verbosity = handle_ifnotempty(line[10:].lstrip().rstrip())
 
                 if wantVerbose is True:
                     input_file2.append(verbosity)
@@ -1154,7 +1256,7 @@ def handle_verbose(line):
 
     elif verboseType == "def":
         if verboseArray[2] == "T":
-            sys.stderr.write("Def " + verboseArray[1] + " = " + verboseArray[3] + "\n")
+            sys.stderr.write("Def " + verboseArray[1] + " = " + ":".join(verboseArray[3:]) + "\n")
         else:
             sys.stderr.write("Def " + verboseArray[1] + "\n")
 
@@ -1178,6 +1280,18 @@ def handle_verbose(line):
             sys.stderr.write("Ifndef true " + verboseArray[2] + "\n")
         else:
             sys.stderr.write("Ifndef untrue " + verboseArray[2] + "\n")
+
+    elif verboseType == "ifempty":
+        if verboseArray[1] == "true":
+            sys.stderr.write("IfEmpty true " + verboseArray[2] + "\n")
+        else:
+            sys.stderr.write("IfEmpty nottrue " + verboseArray[2] + "\n")
+
+    elif verboseType == "ifnotempty":
+        if verboseArray[1] == "true":
+            sys.stderr.write("IfNotEmpty true " + verboseArray[2] + "\n")
+        else:
+            sys.stderr.write("IfNotEmpty nottrue " + verboseArray[2] + "\n")
 
     elif verboseType == "for":
         sys.stderr.write("For " + verboseArray[1] + "\n")
