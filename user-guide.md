@@ -116,7 +116,7 @@ This document describes the mdpre Markdown preprocessor.
 
 In this document we'll refer to it as "mdpre", pronounced "em dee pree".
 
-This document was converted to HTML at 17&colon;04 on 9 May&comma; 2025.
+This document was converted to HTML at 16&colon;28 on 17 May&comma; 2025.
 
 ### Table Of Contents
 
@@ -135,7 +135,10 @@ This document was converted to HTML at 17&colon;04 on 9 May&comma; 2025.
 	* [Undefining Variables With `=undef`](#undefining-variables-with-undef)
 	* [Incrementing Integer Variables Wth `=inc`](#incrementing-integer-variables-wth-inc)
 	* [Decrementing Integer Variables Wth `=dec`](#decrementing-integer-variables-wth-dec)
-	* [Conditional Inclusion With `=ifdef`, `=ifndef`, `=ifempty`, `=ifnotempty`, And `=endif`](#conditional-inclusion-with-ifdef-ifndef-ifempty-ifnotempty-and-endif)
+	* [Conditional Inclusion](#conditional-inclusion)
+		* [`=ifdef` And `=ifndef`](#ifdef-and-ifndef)
+		* [`=ifempty` And `=ifnotempty`](#ifempty-and-ifnotempty)
+		* [`=ifmatch` And `=ifnotmatch`](#ifmatch-and-ifnotmatch)
 	* [Converting A CSV File To A Markdown Table With `=csv` And `=endcsv`](#converting-a-csv-file-to-a-markdown-table-with-csv-and-endcsv)
 		* [Controlling Table Alignment With `=colalign`](#controlling-table-alignment-with-colalign)
 		* [Controlling Table Column Widths With `=colwidth`](#controlling-table-column-widths-with-colwidth)
@@ -284,7 +287,7 @@ You can define variables on the command line when you run mdpre. Use the `-d` sw
 
 	mdpre -v -dfred -dbrian < test.mdp > test.md
 
-will set two variables - fred and brian. These can be used with `=ifdef` and `=ifndef` to control processing. See [Conditional Inclusion With `=ifdef`, `=ifndef`, And `=endif`](#conditional-inclusion-with-ifdef-ifndef-and-endif) for more.
+will set two variables - fred and brian. These can be used with `=ifdef` and `=ifndef` to control processing. See [Conditional Inclusion](#conditional-inclusion) for more.
 
 You can also set their value. For example
 
@@ -367,7 +370,8 @@ You can define variables with one of four forms of the `=def` statement:
 
 The variable name cannot contain spaces. If you try the parser will interpret anything after the first space as a value. Other than that there are no restrictions on variable names.
 
-Defining variables is useful with the `=ifdef` and `=ifndef` statements.
+Defining variables is useful with the `=ifdef` and `=ifndef` statements, and their analogues.
+See [Conditional Inclusion](#conditional-inclusion).
 
 To use a variable you've defined with a value code the variable name preceded by an ampersand and terminated by a semicolon.
 For example:
@@ -434,13 +438,34 @@ If a variable has an integer value it can be decremented. For example,
 
 In this example counter1 will start with the value 1 and after the `=dec` its value will be 0.
 
-### Conditional Inclusion With `=ifdef`, `=ifndef`, `=ifempty`, `=ifnotempty`, And `=endif`
+### Conditional Inclusion 
+
+mdpre can include data based on a number of tests:
+
+* Whether a variable is defined or undefined - with `=ifdef` and `=ifndef`.
+* Whether a variable is the empty string or not - with `=ifempty` and `=ifnotempty`.
+* Whether a variable's contents match a regular expression, or don't - with `=ifmatch` and `=ifnonmatch`.
+
+The bracket is ended by `=endif`.
+
+Any mdpre statement can be included in the bracket. For example, you could conditionally include another file with `=include`. For example:
+
+	=def wantLongVersion
+
+	=ifdef wantLongVersion
+	=include theWorks.mdp
+	=endif
+
+You can define variables for use with these tests in one of two ways:
+
+* With `=def`, described in [Defining Variables With `=def`](#defining-variables-with-def).
+* With the `-d` command line switch, described in [Defining Variables](#defining-variables).
+
+####  `=ifdef` And `=ifndef`
 
 `=ifdef` and `=ifndef` perform very similar functions, but are complementary to each other.
 
 With `=ifdef`, if the variable referred to is defined (whatever its value) the following text is processed.
-
-The conditional bracket is ended with a line with `=endif` on it.
 
 Here is an example:
 
@@ -454,18 +479,7 @@ Only one line is included - and only if the variable `includeMe` has been define
 
 To exclude the line if the variable is set use `=ifndef` instead.
 
-Any mdpre statement can be included in the bracket. For example, you could conditionally include another file with `=include`. For example:
-
-	=def wantLongVersion
-
-	=ifdef wantLongVersion
-	=include theWorks.mdp
-	=endif
-
-You can define variables for use with `=ifdef`, `=ifndef`, `=ifempty`, and `=ifnotempty` in one of two ways:
-
-* With `=def`, described in [Defining Variables With `=def`](#defining-variables-with-def).
-* With the `-d` command line switch, described in [Defining Variables](#defining-variables).
+####  `=ifempty` And `=ifnotempty`
 
 `=ifempty` and `=ifnotempty` test for whether a variable is defined with an empty string or not.
 This might happen, for example, if the variable was defined as the stderr from a command.
@@ -473,6 +487,25 @@ This might happen, for example, if the variable was defined as the stderr from a
 If the variable is not defined it fails both the `=ifempty` and `=ifenotempty` tests.
 
 An alternative form of `=ifnotempty` is `=ifnempty`.
+
+####  `=ifmatch` And `=ifnotmatch`
+
+`=ifmatch` and `=ifnotmatch` test for whether a variable matches a regular expression or not.
+One case might be whether mdpre is running on  Mac OS or Windows:
+
+	=ifmatch system ^Dar.+$
+	System is Darwin
+	=endif
+	
+	=ifnmatch system dows
+	System is not Windows
+	=endif
+
+If the variable is not defined it fails both the `=ifmatch` and `=ifnotmatch` tests.
+
+Regular expression matching uses the Python `re` module - and the kinds of regular expression syntax that module supports.
+
+An alternative form of `=ifnotmatch` is `=ifnmatch`.
 
 ### Converting A CSV File To A Markdown Table With `=csv` And `=endcsv`
 
@@ -764,6 +797,7 @@ As you work on your text you can, of course, move the `=stop` line down.
 
 ## Additional Information
 
+<a id="builtin-variables"></a>
 ### Built-In Variables
 
 mdpre has the following built-in variables:
@@ -778,4 +812,18 @@ mdpre has the following built-in variables:
 |day|Day of month when mdpre started running|`3`|
 |month|Month when mdpre started running|`May`|
 |year|Year when mdpre started running|`2025`|
+
+The following variables are from Python's `platform` module and are said to be available on all platforms.
+
+|Variable|Description|Example Result|
+|:--|:----|:-|
+|node|Machine node name|bluemac.local|
+|version|Operating system version|Darwin Kernel Version 24.4.0: Fri Apr 11 18:33:47 PDT 2025; root:xnu-11417.101.15~117/RELEASE_ARM64_T6000|
+|architecture|Machine architecture|64bit|
+|machine|Also machine architeture|arm64|
+|system|System type|Darwin|
+|release|Software release|24.4.0|
+|python_version|Python version|3.12.3|
+|python_implementation|Python implementation|CPython|
+|processor|Processor type|arm|
 

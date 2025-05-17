@@ -1,18 +1,28 @@
 
-mdpre Markdown Preprocessor v0.8.1 (9 May, 2025)
-================================================
+mdpre Markdown Preprocessor v0.9 (17 May, 2025)
+===============================================
 - opened <stdout> for writing
-Def mdpre_date = 9 May, 2025
-Def mdpre_level = 0.8.1
+Def node = bluemac.local
+Def version = Darwin Kernel Version 24.5.0: Tue Apr 22 19:54:49 PDT 2025; root:xnu-11417.121.6~2/RELEASE_ARM64_T6000
+Def architecture = 64bit
+Def machine = arm64
+Def system = Darwin
+Def release = 24.5.0
+Def pythonVersion = 3.12.3
+Def pythonImplementation = CPython
+Def processor = arm
+Def mdpre_date = 17 May, 2025
+Def mdpre_level = 0.9
 Def userid = martinpacker
-Def day = 9
+Def day = 17
 Def month = May
 Def year = 2025
-Def time = 16&colon;49
-Def date = 9 May&comma; 2025
+Def time = 15&colon;51
+Def date = 17 May&comma; 2025
 This Is The Change Log For mdpre Markdown Preprocessor
 Table Of Contents - spec '2 2 Releases'
 2 2 Releases
+..... .....  v0.9 - 17 May, 2025
 ..... .....  v0.8.1 - 9 May, 2025
 ..... .....  v0.8 - 3 May, 2025
 ..... .....  v0.7.1 - 21  April, 2025
@@ -40,7 +50,7 @@ Table Of Contents - spec '2 2 Releases'
 ..... .....  v0.2 - 26 March, 2018
 ..... .....  v0.1 - 17 March, 2018
 ..... .....  v0.0 - 12 March, 2018
-------------------------------------------------
+-----------------------------------------------
 - Processing completed.
-------------------------------------------------
+-----------------------------------------------
 

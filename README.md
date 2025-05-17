@@ -20,4 +20,18 @@ It also uses stderr for all messages.
 Verbose mode (`-v`) gives you lots of messages.
 For syntax help use `-h`.
 
-Latest release (v0.6.9) is [here](https://github.com/MartinPacker/mdpre).
+Latest release  is [here](https://github.com/MartinPacker/mdpre).
+
+
+### Future Python Release Support
+
+Please note, and plan accordingly:
+
+    From 1 April, 2025 expect releases to only support 3.10 or later
+    From 1 April, 2026 expect releases to only support 3.11 or later
+
+md2pre moves forward on Python every so often to:
+
+    Take advantage of new language capabilities
+    Remain on a supported Python release with adequate fix likelihood.
+

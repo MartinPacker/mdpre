@@ -2,6 +2,11 @@
 
 =toc 2 2 Releases
 
+### v0.9 - 17 May, 2025
+
+* **ENHANCED** [Issue 33](https://github.com/MartinPacker/mdpre/issues/33): Add environment variables
+* **ENHANCED** [Issue 34](https://github.com/MartinPacker/mdpre/issues/34): Support `=ifmatch` & `=ifnonmatch`
+
 ### v0.8.1 - 9 May, 2025
 
 * **FIXED** [Issue 32](https://github.com/MartinPacker/mdpre/issues/32): Verbose output for `=def` doesn't cope with colons

@@ -24,6 +24,7 @@ import shutil
 import zipfile
 import io
 import subprocess
+import platform
 
 # import StringIO
 import re
@@ -34,8 +35,8 @@ from enum import Enum
 import calendar
 
 
-mdpre_level = "0.8.1"
-mdpre_date = "9 May, 2025"
+mdpre_level = "0.9"
+mdpre_date = "17 May, 2025"
 banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
 
 log = partial(print, file=sys.stderr)  # | create log to stderr
@@ -604,6 +605,77 @@ def handle_ifnotempty(ifnotEmptyString):
 
     return verbosity
 
+# =ifmatch encountered
+def handle_ifmatch(ifmatchString):
+    global ifStack, vars
+    verbosity = ""
+    
+    spacePos = ifmatchString.find(" ")
+    expressionPos = spacePos + 1
+    ifmatchVariable = ifmatchString[:spacePos]
+    ifmatchExpression = ifmatchString[expressionPos:]
+    ifmatchRE = re.compile(ifmatchExpression)
+
+    for varName, varType, varValue in vars:
+        if varName == ifmatchVariable:
+            # Variable is defined
+            if ifmatchRE.match(varValue) is not None:
+                if wantVerbose is True:
+                    verbosity = "<!--mdpre-ifmatch:true:" + ifmatchString + "-->"
+
+                ifStack.append(True)
+            else:
+                if wantVerbose is True:
+                    verbosity = "<!--mdpre-ifmatch:false:" + ifmatchString + "-->"
+
+                ifStack.append(False)
+
+            return verbosity
+
+    # Variable is undefined
+    ifStack.append(False)
+
+    if wantVerbose is True:
+        verbosity = "<!--mdpre-ifmatch:undefined:" + ifmatchString + "-->"
+
+    return verbosity
+
+
+# =ifnotmatch or =ifnmatch encountered
+def handle_ifnotmatch(ifnmatchString):
+    global ifStack, vars
+    verbosity = ""
+
+    spacePos = ifnmatchString.find(" ")
+    expressionPos = spacePos + 1
+    ifnmatchVariable = ifnmatchString[:spacePos]
+    ifnmatchExpression = ifnmatchString[expressionPos:]
+    ifnmatchRE = re.compile(ifnmatchExpression)
+
+    for varName, varType, varValue in vars:
+        if varName == ifnmatchVariable:
+            # Variable is defined
+            if ifnmatchRE.match(varValue) is None:
+                if wantVerbose is True:
+                    verbosity = "<!--mdpre-ifnotmatch:true:" + ifnmatchString + "-->"
+
+                ifStack.append(True)
+            else:
+                if wantVerbose is True:
+                    verbosity = "<!--mdpre-ifnotmatch:false:" + ifnmatchString + "-->"
+
+                ifStack.append(False)
+
+            return verbosity
+
+    # Variable is undefined
+    ifStack.append(False)
+
+    if wantVerbose is True:
+        verbosity = "<!--mdpre-ifnotmatch:undefined:" + ifnmatchString + "-->"
+
+    return verbosity
+
 
 # =ifdef encountered
 def handle_ifdef(ifdefString):
@@ -1034,6 +1106,24 @@ def parse_include(input_file):
                 if wantVerbose is True:
                     input_file2.append(verbosity)
 
+            elif line.startswith("=ifmatch ") is True:
+                verbosity = handle_ifmatch(line[9:].lstrip().rstrip())
+
+                if wantVerbose is True:
+                    input_file2.append(verbosity)
+
+            elif line.startswith("=ifnotmatch ") is True:
+                verbosity = handle_ifnotmatch(line[12:].lstrip().rstrip())
+
+                if wantVerbose is True:
+                    input_file2.append(verbosity)
+
+            elif line.startswith("=ifnmatch ") is True:
+                verbosity = handle_ifnotmatch(line[10:].lstrip().rstrip())
+
+                if wantVerbose is True:
+                    input_file2.append(verbosity)
+
             elif line.startswith("=ifdef ") is True:
                 verbosity = handle_ifdef(line[7:].lstrip().rstrip())
 
@@ -1293,6 +1383,18 @@ def handle_verbose(line):
         else:
             sys.stderr.write("IfNotEmpty nottrue " + verboseArray[2] + "\n")
 
+    elif verboseType == "ifmatch":
+        if verboseArray[1] == "true":
+            sys.stderr.write("IfMatch true " + verboseArray[2] + "\n")
+        else:
+            sys.stderr.write("IfMatch nottrue " + verboseArray[2] + "\n")
+
+    elif verboseType == "ifnotmatch":
+        if verboseArray[1] == "true":
+            sys.stderr.write("IfNotMatch true " + verboseArray[2] + "\n")
+        else:
+            sys.stderr.write("IfNotMatch nottrue " + verboseArray[2] + "\n")
+
     elif verboseType == "for":
         sys.stderr.write("For " + verboseArray[1] + "\n")
 
@@ -1344,6 +1446,21 @@ def setupStandardVariables():
     input_file.insert(0, "=def mdpre_level " + mdpre_level + " ")
     input_file.insert(0, "=def mdpre_date " + mdpre_date + " ")
 
+
+    input_file.insert(0, "=def processor " + platform.processor() + " ")
+    input_file.insert(0, "=def python_implementation " + platform.python_implementation() + " ")
+    input_file.insert(0, "=def python_version " + platform.python_version() + " ")
+    input_file.insert(0, "=def release " + platform.release() + " ")
+    input_file.insert(0, "=def system " + platform.system() + " ")
+    input_file.insert(0, "=def machine " + platform.machine() + " ")
+    arch1, arch2 = platform.architecture()
+    if arch2 == "":
+        architecture = arch1
+    else:
+        architecture = arch1 + " " + arch2
+    input_file.insert(0, "=def architecture " + architecture + " ")
+    input_file.insert(0, "=def version " + platform.version() + " ")
+    input_file.insert(0, "=def node " + platform.node() + " ")
 
 def exit_script(p_output, p_code=0):
     if p_output != None:

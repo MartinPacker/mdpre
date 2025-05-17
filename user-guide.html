@@ -1189,7 +1189,7 @@ body .markdown-body
 <h1 id="markdown-preprocessor-user-guide">Markdown Preprocessor User Guide<a class="headerlink" href="#markdown-preprocessor-user-guide" title="Permanent link"></a></h1>
 <p>This document describes the mdpre Markdown preprocessor.</p>
 <p>In this document we&rsquo;ll refer to it as &ldquo;mdpre&rdquo;, pronounced &ldquo;em dee pree&rdquo;.</p>
-<p>This document was converted to HTML at 17&colon;04 on 9 May&comma; 2025.</p>
+<p>This document was converted to HTML at 16&colon;28 on 17 May&comma; 2025.</p>
 <h3 id="table-of-contents">Table Of Contents<a class="headerlink" href="#table-of-contents" title="Permanent link"></a></h3>
 <ul>
 <li><a href="#why-a-preprocessor">Why A Preprocessor?</a></li>
@@ -1209,7 +1209,12 @@ body .markdown-body
 <li><a href="#undefining-variables-with-undef">Undefining Variables With <code>=undef</code></a></li>
 <li><a href="#incrementing-integer-variables-wth-inc">Incrementing Integer Variables Wth <code>=inc</code></a></li>
 <li><a href="#decrementing-integer-variables-wth-dec">Decrementing Integer Variables Wth <code>=dec</code></a></li>
-<li><a href="#conditional-inclusion-with-ifdef-ifndef-ifempty-ifnotempty-and-endif">Conditional Inclusion With <code>=ifdef</code>, <code>=ifndef</code>, <code>=ifempty</code>, <code>=ifnotempty</code>, And <code>=endif</code></a></li>
+<li><a href="#conditional-inclusion">Conditional Inclusion</a><ul>
+<li><a href="#ifdef-and-ifndef"><code>=ifdef</code> And <code>=ifndef</code></a></li>
+<li><a href="#ifempty-and-ifnotempty"><code>=ifempty</code> And <code>=ifnotempty</code></a></li>
+<li><a href="#ifmatch-and-ifnotmatch"><code>=ifmatch</code> And <code>=ifnotmatch</code></a></li>
+</ul>
+</li>
 <li><a href="#converting-a-csv-file-to-a-markdown-table-with-csv-and-endcsv">Converting A CSV File To A Markdown Table With <code>=csv</code> And <code>=endcsv</code></a><ul>
 <li><a href="#controlling-table-alignment-with-colalign">Controlling Table Alignment With <code>=colalign</code></a></li>
 <li><a href="#controlling-table-column-widths-with-colwidth">Controlling Table Column Widths With <code>=colwidth</code></a></li>
@@ -1347,7 +1352,7 @@ The default is not to - as it is more likely you won&rsquo;t want to regenerate 
 <p>You can define variables on the command line when you run mdpre. Use the <code>-d</code> switch. For example</p>
 <pre><code>mdpre -v -dfred -dbrian &lt; test.mdp &gt; test.md
 </code></pre>
-<p>will set two variables - fred and brian. These can be used with <code>=ifdef</code> and <code>=ifndef</code> to control processing. See <a href="#conditional-inclusion-with-ifdef-ifndef-and-endif">Conditional Inclusion With <code>=ifdef</code>, <code>=ifndef</code>, And <code>=endif</code></a> for more.</p>
+<p>will set two variables - fred and brian. These can be used with <code>=ifdef</code> and <code>=ifndef</code> to control processing. See <a href="#conditional-inclusion">Conditional Inclusion</a> for more.</p>
 <p>You can also set their value. For example</p>
 <pre><code>mdpre -v '-djon=bon jovi' &lt; test.mdp &gt; test.md
 </code></pre>
@@ -1400,7 +1405,8 @@ The default is not to - as it is more likely you won&rsquo;t want to regenerate 
 <li><code>=def varName1,varname2 command-string</code></li>
 </ol>
 <p>The variable name cannot contain spaces. If you try the parser will interpret anything after the first space as a value. Other than that there are no restrictions on variable names.</p>
-<p>Defining variables is useful with the <code>=ifdef</code> and <code>=ifndef</code> statements.</p>
+<p>Defining variables is useful with the <code>=ifdef</code> and <code>=ifndef</code> statements, and their analogues.
+See <a href="#conditional-inclusion">Conditional Inclusion</a>.</p>
 <p>To use a variable you&rsquo;ve defined with a value code the variable name preceded by an ampersand and terminated by a semicolon.
 For example:</p>
 <pre><code>=def greeting Hello
@@ -1450,10 +1456,29 @@ Again, applicability is platform specific.</p>
 =dec counter1
 </code></pre>
 <p>In this example counter1 will start with the value 1 and after the <code>=dec</code> its value will be 0.</p>
-<h3 id="conditional-inclusion-with-ifdef-ifndef-ifempty-ifnotempty-and-endif">Conditional Inclusion With <code>=ifdef</code>, <code>=ifndef</code>, <code>=ifempty</code>, <code>=ifnotempty</code>, And <code>=endif</code><a class="headerlink" href="#conditional-inclusion-with-ifdef-ifndef-ifempty-ifnotempty-and-endif" title="Permanent link"></a></h3>
+<h3 id="conditional-inclusion">Conditional Inclusion<a class="headerlink" href="#conditional-inclusion" title="Permanent link"></a></h3>
+<p>mdpre can include data based on a number of tests:</p>
+<ul>
+<li>Whether a variable is defined or undefined - with <code>=ifdef</code> and <code>=ifndef</code>.</li>
+<li>Whether a variable is the empty string or not - with <code>=ifempty</code> and <code>=ifnotempty</code>.</li>
+<li>Whether a variable&rsquo;s contents match a regular expression, or don&rsquo;t - with <code>=ifmatch</code> and <code>=ifnonmatch</code>.</li>
+</ul>
+<p>The bracket is ended by <code>=endif</code>.</p>
+<p>Any mdpre statement can be included in the bracket. For example, you could conditionally include another file with <code>=include</code>. For example:</p>
+<pre><code>=def wantLongVersion
+
+=ifdef wantLongVersion
+=include theWorks.mdp
+=endif
+</code></pre>
+<p>You can define variables for use with these tests in one of two ways:</p>
+<ul>
+<li>With <code>=def</code>, described in <a href="#defining-variables-with-def">Defining Variables With <code>=def</code></a>.</li>
+<li>With the <code>-d</code> command line switch, described in <a href="#defining-variables">Defining Variables</a>.</li>
+</ul>
+<h4 id="ifdef-and-ifndef"><code>=ifdef</code> And <code>=ifndef</code><a class="headerlink" href="#ifdef-and-ifndef" title="Permanent link"></a></h4>
 <p><code>=ifdef</code> and <code>=ifndef</code> perform very similar functions, but are complementary to each other.</p>
 <p>With <code>=ifdef</code>, if the variable referred to is defined (whatever its value) the following text is processed.</p>
-<p>The conditional bracket is ended with a line with <code>=endif</code> on it.</p>
 <p>Here is an example:</p>
 <pre><code>=def includeMe
 
@@ -1463,22 +1488,25 @@ Here is some text that would be included by the test on the line above.
 </code></pre>
 <p>Only one line is included - and only if the variable <code>includeMe</code> has been defined.</p>
 <p>To exclude the line if the variable is set use <code>=ifndef</code> instead.</p>
-<p>Any mdpre statement can be included in the bracket. For example, you could conditionally include another file with <code>=include</code>. For example:</p>
-<pre><code>=def wantLongVersion
-
-=ifdef wantLongVersion
-=include theWorks.mdp
-=endif
-</code></pre>
-<p>You can define variables for use with <code>=ifdef</code>, <code>=ifndef</code>, <code>=ifempty</code>, and <code>=ifnotempty</code> in one of two ways:</p>
-<ul>
-<li>With <code>=def</code>, described in <a href="#defining-variables-with-def">Defining Variables With <code>=def</code></a>.</li>
-<li>With the <code>-d</code> command line switch, described in <a href="#defining-variables">Defining Variables</a>.</li>
-</ul>
+<h4 id="ifempty-and-ifnotempty"><code>=ifempty</code> And <code>=ifnotempty</code><a class="headerlink" href="#ifempty-and-ifnotempty" title="Permanent link"></a></h4>
 <p><code>=ifempty</code> and <code>=ifnotempty</code> test for whether a variable is defined with an empty string or not.
 This might happen, for example, if the variable was defined as the stderr from a command.</p>
 <p>If the variable is not defined it fails both the <code>=ifempty</code> and <code>=ifenotempty</code> tests.</p>
 <p>An alternative form of <code>=ifnotempty</code> is <code>=ifnempty</code>.</p>
+<h4 id="ifmatch-and-ifnotmatch"><code>=ifmatch</code> And <code>=ifnotmatch</code><a class="headerlink" href="#ifmatch-and-ifnotmatch" title="Permanent link"></a></h4>
+<p><code>=ifmatch</code> and <code>=ifnotmatch</code> test for whether a variable matches a regular expression or not.
+One case might be whether mdpre is running on  Mac OS or Windows:</p>
+<pre><code>=ifmatch system ^Dar.+$
+System is Darwin
+=endif
+
+=ifnmatch system dows
+System is not Windows
+=endif
+</code></pre>
+<p>If the variable is not defined it fails both the <code>=ifmatch</code> and <code>=ifnotmatch</code> tests.</p>
+<p>Regular expression matching uses the Python <code>re</code> module - and the kinds of regular expression syntax that module supports.</p>
+<p>An alternative form of <code>=ifnotmatch</code> is <code>=ifnmatch</code>.</p>
 <h3 id="converting-a-csv-file-to-a-markdown-table-with-csv-and-endcsv">Converting A CSV File To A Markdown Table With <code>=csv</code> And <code>=endcsv</code><a class="headerlink" href="#converting-a-csv-file-to-a-markdown-table-with-csv-and-endcsv" title="Permanent link"></a></h3>
 <p>If you have a Comma-Separated Value (CSV) file you want to render as a table in a Markdown document use the <code>=csv</code> statement.</p>
 <p>Here is an example:</p>
@@ -1838,6 +1866,7 @@ Indeed this paragraph was written that way.
 <p>A line beginning <code>=stop</code> causes all further input lines to be ignored.</p>
 <p>As you work on your text you can, of course, move the <code>=stop</code> line down.</p>
 <h2 id="additional-information">Additional Information<a class="headerlink" href="#additional-information" title="Permanent link"></a></h2>
+<p><a id="builtin-variables"></a></p>
 <h3 id="built-in-variables">Built-In Variables<a class="headerlink" href="#built-in-variables" title="Permanent link"></a></h3>
 <p>mdpre has the following built-in variables:</p>
 <table>
@@ -1888,6 +1917,63 @@ Indeed this paragraph was written that way.
 <td align="left">year</td>
 <td align="left">Year when mdpre started running</td>
 <td align="left"><code>2025</code></td>
+</tr>
+</tbody>
+</table>
+<p>The following variables are from Python&rsquo;s <code>platform</code> module and are said to be available on all platforms.</p>
+<table>
+<thead>
+<tr>
+<th align="left">Variable</th>
+<th align="left">Description</th>
+<th align="left">Example Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">node</td>
+<td align="left">Machine node name</td>
+<td align="left">bluemac.local</td>
+</tr>
+<tr>
+<td align="left">version</td>
+<td align="left">Operating system version</td>
+<td align="left">Darwin Kernel Version 24.4.0: Fri Apr 11 18:33:47 PDT 2025; root:xnu-11417.101.15~117/RELEASE_ARM64_T6000</td>
+</tr>
+<tr>
+<td align="left">architecture</td>
+<td align="left">Machine architecture</td>
+<td align="left">64bit</td>
+</tr>
+<tr>
+<td align="left">machine</td>
+<td align="left">Also machine architeture</td>
+<td align="left">arm64</td>
+</tr>
+<tr>
+<td align="left">system</td>
+<td align="left">System type</td>
+<td align="left">Darwin</td>
+</tr>
+<tr>
+<td align="left">release</td>
+<td align="left">Software release</td>
+<td align="left">24.4.0</td>
+</tr>
+<tr>
+<td align="left">python_version</td>
+<td align="left">Python version</td>
+<td align="left">3.12.3</td>
+</tr>
+<tr>
+<td align="left">python_implementation</td>
+<td align="left">Python implementation</td>
+<td align="left">CPython</td>
+</tr>
+<tr>
+<td align="left">processor</td>
+<td align="left">Processor type</td>
+<td align="left">arm</td>
 </tr>
 </tbody>
 </table></article></body></html>
