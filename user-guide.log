@@ -14,11 +14,11 @@ Def processor = arm
 Def mdpre_date = 17 May, 2025
 Def mdpre_level = 0.9
 Def userid = martinpacker
-Def day = 17
+Def day = 18
 Def month = May
 Def year = 2025
-Def time = 16&colon;28
-Def date = 17 May&comma; 2025
+Def time = 15&colon;57
+Def date = 18 May&comma; 2025
 Def TOC = Table Of Contents
 Markdown Preprocessor User Guide
 Table Of Contents - spec '2 * Table Of Contents'

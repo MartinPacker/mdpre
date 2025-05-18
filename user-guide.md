@@ -116,7 +116,7 @@ This document describes the mdpre Markdown preprocessor.
 
 In this document we'll refer to it as "mdpre", pronounced "em dee pree".
 
-This document was converted to HTML at 16&colon;28 on 17 May&comma; 2025.
+This document was converted to HTML at 15&colon;57 on 18 May&comma; 2025.
 
 ### Table Of Contents
 
@@ -820,7 +820,7 @@ The following variables are from Python's `platform` module and are said to be a
 |node|Machine node name|bluemac.local|
 |version|Operating system version|Darwin Kernel Version 24.4.0: Fri Apr 11 18:33:47 PDT 2025; root:xnu-11417.101.15~117/RELEASE_ARM64_T6000|
 |architecture|Machine architecture|64bit|
-|machine|Also machine architeture|arm64|
+|machine|Also machine architecture|arm64|
 |system|System type|Darwin|
 |release|Software release|24.4.0|
 |python_version|Python version|3.12.3|
