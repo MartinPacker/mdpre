@@ -31,7 +31,7 @@ import calendar
 
 
 mdpre_level = "0.9+"
-mdpre_date = "18 May, 2025"
+mdpre_date = "20 May, 2025"
 banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
 
 log = partial(print, file=sys.stderr)  # | create log to stderr
@@ -1456,6 +1456,30 @@ def setupStandardVariables():
     input_file.insert(0, "=def architecture " + architecture + " ")
     input_file.insert(0, "=def version " + platform.version() + " ")
     input_file.insert(0, "=def node " + platform.node() + " ")
+    
+    # Filenames
+    if inputFilename == "":
+        input_file.insert(0, "=def input stdin ")
+    else:
+        input_file.insert(0, "=def input " + inputFilename + " ")
+        
+    if outputFilename == "":
+        input_file.insert(0, "=def output stdout ")
+    else:
+        input_file.insert(0, "=def output " + outputFilename + " ")
+        
+    if makefileFilename == "":
+        try:
+            # If this succeeds file descriptor 3 was available to write to
+            os.write(3, bytes("", "UTF-8"))
+            input_file.insert(0, "=def makefile file-3 ")
+        except:
+            # Handle the case where file descriptor 3 was not available to write to
+            input_file.insert(0, "=def makefile none ")
+
+    else:
+        input_file.insert(0, "=def makefile " + makefileFilename + " ")
+        
 
 def exit_script(p_output, p_code=0):
     if p_output != None:
@@ -1485,7 +1509,7 @@ def create_output_file(p_file_path=""):
     else:
         if Path(p_file_path).exists():
             if wantVerbose:
-                sys.stderr.write("WARNING: overwriting file!")
+                sys.stderr.write("WARNING: overwriting output Markdown file!")
             pass
         to_file = open(p_file_path, "w")
         r_output = Output(to_file)
@@ -1508,7 +1532,7 @@ wantVerbose = False
 
 wantTextBundle = False
 wantTextPack = False
-awaitingFilename = False
+
 textBundleFilename = ""
 
 rootLoopController = None
@@ -1516,17 +1540,25 @@ currentLoopController = None
 
 parmVars = []
 
-input_file = ""  # | TODO: add input file from command line for file output later
-
 g_output = None  # | global variable for writing output
+
 markdownFile = ""
+
+# If any of these remain empty a stream is used
+inputFilename = ""
+outputFilename = ""
+makefileFilename = ""
 
 def bold(p_text):
     return BOLD + p_text + END
 
 arguments = len(sys.argv) - 1
+
+lastArgument = ""
+
 for arg in range(1, arguments + 1):
     argument = sys.argv[arg]
+    
     if argument == "-h":
         # Print help
         sys.stderr.write(
@@ -1595,12 +1627,10 @@ for arg in range(1, arguments + 1):
     elif argument == "-t":
         wantTextBundle = True
         wantTextPack = False
-        awaitingFilename = True
 
     elif argument == "-z":
         wantTextBundle = True
         wantTextPack = True
-        awaitingFilename = True
 
     elif argument[:2] == "-d":
         handleCommandLineDefine(argument[2:])
@@ -1608,11 +1638,27 @@ for arg in range(1, arguments + 1):
     elif argument == "-c":
         g_wrapInCSV = True
 
-    elif awaitingFilename is True:
+    elif lastArgument in ["-t", "-z"]:
         if textBundleFilename == "":
             textBundleFilename = argument
         else:
             textBundleFilename = textBundleFilename + " " + argument
+
+        lastArgument = ""
+
+    elif lastArgument == "-i":
+        # This argument is the input filename
+        inputFilename = argument
+
+    elif lastArgument == "-o":
+        # This argument is the output filename
+        outputFilename = argument
+
+    elif lastArgument == "-m":
+        # This argument is the makefile fragment filename
+        makefileFilename = argument
+
+    lastArgument = argument
 
 # Preliminaries if creating a textbundle
 if textBundleFilename != "":
@@ -1682,16 +1728,14 @@ elif markdownFile != "":
 
 else:  # | ## stdout
     g_output = (
-        create_output_file()
-    )  # | NOTE: Write to stdout as not making a textbundle
+        create_output_file(outputFilename)
+    )
 
-if input_file == "":
-    input_filename = ""
+if inputFilename == "":
     input_file = sys.stdin.readlines()
 else:
-    input_filename = input_file
-    if os.path.isfile(input_file) is True:
-        with open(input_file, "r") as file_handle:
+    if os.path.isfile(inputFilename) is True:
+        with open(inputFilename, "r") as file_handle:
             input_file = file_handle.readlines()
 
 
@@ -1889,12 +1933,23 @@ for dnum, d in enumerate(dependencies):
     else:
         makefile += " \n\n"
 
-makefile += "\tmdpre -v < $(target).mdp > $(target).md 2>$(target).log $(makefragment)"
+makefile += "\tmdpre -v < $(target).mdp > $(target).md 2>$(target).log $(makefragment)\n"
 
-# Try to write the make file insert to File Descriptor 3
-try:
-    os.write(3, bytes(makefile,"UTF-8"))
-except:
-    pass
+if makefileFilename != "":
+    # Write the make file fragment to the file specified
+    if Path(makefileFilename).exists():
+        if wantVerbose:
+            sys.stderr.write("WARNING: overwriting output makefile fragment file!")
+        pass
+
+    with open(makefileFilename, "w") as m:
+        m.write(makefile)
+    
+else:
+    # Try to write the make file insert to File Descriptor 3
+    try:
+        os.write(3, bytes(makefile,"UTF-8"))
+    except:
+        pass
 
 exit_script(g_output, 0)
