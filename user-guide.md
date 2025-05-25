@@ -116,7 +116,7 @@ This document describes the mdpre Markdown preprocessor.
 
 In this document we'll refer to it as "mdpre", pronounced "em dee pree".
 
-This document was converted to HTML at 15&colon;57 on 18 May&comma; 2025.
+This document was converted to HTML at 15&colon;57 on 25 May&comma; 2025.
 
 ### Table Of Contents
 
@@ -127,6 +127,7 @@ This document was converted to HTML at 15&colon;57 on 18 May&comma; 2025.
 	* [Creating A Make File Fragment](#creating-a-make-file-fragment)
 	* [Defining Variables](#defining-variables)
 	* [Filenames](#filenames)
+	* [Specifying Filenames On The Command Line](#specifying-filenames-on-the-command-line)
 	* [TextBundle And TextPack Support](#textbundle-and-textpack-support)
 	* [Processing Flow](#processing-flow)
 * [Language Elements](#language-elements)
@@ -301,6 +302,19 @@ You can use any names you like but an extension to denote that the input file is
 
 Similarly, common file extensions for Markdown files are .md and .markdown.
 
+### Specifying Filenames On The Command Line
+
+As well as using stdin, stdout, stderr, and file handle 3 you can specify filenames on the command line:
+
+* `-i` specifies the top-level input filename
+* `-o` specifies the output filename
+* `-l` specifies the log output filename (especially useful with `-v`)
+* `-m` specifies the filename for a makefile fragment (containing dependencies)
+
+For example
+
+	mdpre -v -i user-guide.mdp -o user-guide.md -l user-guide.log -m user-guide.mak
+
 ### TextBundle And TextPack Support
 
 [TextBundle and TextPack](http://http://textbundle.org) are formats for storing complete documents, including graphics, in a container. They are available in two flavours:
@@ -406,6 +420,12 @@ The fourth form allows you to capture the stderr from the command string:
 
 * The first variable name captures the stdout
 * The second variable name captures the stderr
+
+You can substitute variables into the command string. For example:
+
+	=def lsFlags -l
+	=def command ls &lsFlags;
+	=def listing,myErr `&command;`
 
 ### Undefining Variables With `=undef`
 

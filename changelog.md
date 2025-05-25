@@ -3,6 +3,11 @@
 ### Releases
 
 
+### v1.0 - 25 May, 2025
+
+* **ENHANCED** [Issue 1](https://github.com/MartinPacker/mdpre/issues/1): Filenames on command line
+* **DOCUMENTED** [Issue 29](https://github.com/MartinPacker/mdpre/issues/29): Allow variable substitution in commands
+
 ### v0.9 - 17 May, 2025
 
 * **ENHANCED** [Issue 33](https://github.com/MartinPacker/mdpre/issues/33): Add environment variables

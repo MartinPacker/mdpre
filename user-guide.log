@@ -1,80 +1,165 @@
 
-mdpre Markdown Preprocessor v0.9 (17 May, 2025)
+mdpre Markdown Preprocessor v1.0 (25 May, 2025)
 ===============================================
-- opened <stdout> for writing
-Def node = bluemac.local
+
+WARNING: overwriting output Markdown file!
+- opened user-guide.md for writing
+Def makefile = user-guide.mak
+
+Def logfile = user-guide.log
+
+Def output = user-guide.md
+
+Def input = user-guide.mdp
+
+Def node = MacBookPro.domain_not_set.invalid
+
 Def version = Darwin Kernel Version 24.5.0: Tue Apr 22 19:54:49 PDT 2025; root:xnu-11417.121.6~2/RELEASE_ARM64_T6000
+
 Def architecture = 64bit
+
 Def machine = arm64
+
 Def system = Darwin
+
 Def release = 24.5.0
+
 Def python_version = 3.12.3
+
 Def python_implementation = CPython
+
 Def processor = arm
-Def mdpre_date = 17 May, 2025
-Def mdpre_level = 0.9
+
+Def mdpre_date = 25 May, 2025
+
+Def mdpre_level = 1.0
+
 Def userid = martinpacker
-Def day = 18
+
+Def day = 25
+
 Def month = May
+
 Def year = 2025
+
 Def time = 15&colon;57
-Def date = 18 May&comma; 2025
+
+Def date = 25 May&comma; 2025
+
 Def TOC = Table Of Contents
+
 Markdown Preprocessor User Guide
+
 Table Of Contents - spec '2 * Table Of Contents'
+
 2 4 Table Of Contents
 .....  Why A Preprocessor?
+
 .....  How Do You Use mdpre?
+
 ..... .....  Help
+
 ..... .....  Verbose Mode
+
 ..... .....  Creating A Make File Fragment
+
 ..... .....  Defining Variables
+
 ..... .....  Filenames
+
+..... .....  Specifying Filenames On The Command Line
+
 ..... .....  TextBundle And TextPack Support
+
 ..... .....  Processing Flow
+
 .....  Language Elements
+
 ..... .....  Including files with `=include`
+
 ..... .....  Defining Variables With `=def`
+
 ..... .....  Undefining Variables With `=undef`
+
 ..... .....  Incrementing Integer Variables Wth `=inc`
+
 ..... .....  Decrementing Integer Variables Wth `=dec`
+
 ..... .....  Conditional Inclusion 
+
 ..... ..... .....   `=ifdef` And `=ifndef`
+
 ..... ..... .....   `=ifempty` And `=ifnotempty`
+
 ..... ..... .....   `=ifmatch` And `=ifnotmatch`
+
 ..... .....  Converting A CSV File To A Markdown Table With `=csv` And `=endcsv`
+
 CSV Start
+
 CSV Stop
+
 ..... ..... .....  Controlling Table Alignment With `=colalign`
+
 Column Alignment - spec 'l r r'
+
 CSV Start
+
 CSV Stop
+
 ..... ..... .....  Controlling Table Column Widths With `=colwidth`
+
 ..... ..... .....  Colouring Whole Rows' Text With `=rowspan`
+
 ..... .....  Creating A Calendar Month Table With `=cal`
+
 Calendar Start
+
 Calendar Day Span
+
 Calendar Day Span
+
 Calendar Class Days
+
 Calendar Class Days
+
 Calendar Days Note
+
 Calendar Days Note
+
 Calendar Days Note
+
 Calendar Stop
+
 ..... ..... .....  Controlling How Day Numbers Are Displayed With `=caldays`
+
 ..... ..... .....  Adding A Key To The Day Numbers' Styling With `=calkey`
+
 ..... ..... .....  Adding Information To A Cell With `=calnote`
+
 ..... .....  Concatenating Lines With `\`
+
 ..... .....  Generating A Table Of Contents With `=toc`
+
 ..... .....  Terminating Input With `=stop`
+
 .....  Additional Information
+
 ..... .....  Built-In Variables
+
 Column Alignment - spec 'l l l'
+
 Column Width - spec ' 2 4 1'
+
 CSV Start
+
 CSV Stop
+
 CSV Start
+
 CSV Stop
+
+WARNING: overwriting output makefile fragment file!
 -----------------------------------------------
 - Processing completed.
 -----------------------------------------------

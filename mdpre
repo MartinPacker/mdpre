@@ -2,15 +2,8 @@
 """
 mdpre - Preprocesses a file into Markdown
 
-First argument is file to write to
-
-Reads from stdin
-
+Use -h for help
 """
-
-# TODO: (later) new log instead of sys.stderr.write + verbose
-# With log( ) we could replace sys.stderr.write
-# With log_verbose( ) we could more the if VERBOSE inside the function
 
 import os
 import sys
@@ -24,18 +17,31 @@ import platform
 # import StringIO
 import re
 import datetime
-from functools import partial
 from pathlib import Path
 from enum import Enum
 import calendar
+import tempfile
 
-
-mdpre_level = "0.9+"
-mdpre_date = "20 May, 2025"
+mdpre_level = "1.0"
+mdpre_date = "25 May, 2025"
 banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
 
-log = partial(print, file=sys.stderr)  # | create log to stderr
 
+def log(textToLog):
+    logfileHandle.write(textToLog + "\n")
+
+def checkFileDescriptorExists(fdNumber):
+    try:
+        r = os.stat(fdNumber)
+        return True
+    except:
+        return False
+
+# Ensure file descriptor 3 exists so any explicitly opened file doesn't
+# try to use it.
+if checkFileDescriptorExists(3) is False:
+    # Force creation of a temporary file with file descriptor 3
+    t = tempfile.TemporaryFile()
 
 monthNames = [
     "January",
@@ -321,7 +327,7 @@ class Output(object):
                 shutil.copy(graphic, realpath + "/" + adjustedGraphic)
             fragment += 1
         if wantVerbose is True:
-            sys.stderr.write("Adjusting >>" + adjustedLine + "<<<\n")
+            log("Adjusting >>" + adjustedLine + "<<<\n")
 
         self.write(adjustedLine)
 
@@ -472,13 +478,13 @@ def parse_inc(line):
     if foundVar > -1:
         varRecord = vars[foundVar]
         if varRecord[1] != "T":
-            sys.stderr.write(
+            log(
                 "Variable " + targetVar + " is a flag. Cannot be incremented.\n"
             )
         else:
             intVal, OK = intTryParse(varRecord[2])
             if OK is False:
-                sys.stderr.write(
+                log(
                     "Variable "
                     + targetVar
                     + " is not an integer. Cannot be incremented.\n"
@@ -487,7 +493,7 @@ def parse_inc(line):
                 vars[foundVar] = [targetVar, "T", str(intVal + 1)]
 
     else:
-        sys.stderr.write(
+        log(
             "Variable " + targetVar + " not found. Cannot be incremented.\n"
         )
 
@@ -499,13 +505,13 @@ def parse_dec(line):
     if foundVar > -1:
         varRecord = vars[foundVar]
         if varRecord[1] != "T":
-            sys.stderr.write(
+            log(
                 "Variable " + targetVar + " is a flag. Cannot be decremented.\n"
             )
         else:
             intVal, OK = intTryParse(varRecord[2])
             if OK is False:
-                sys.stderr.write(
+                log(
                     "Variable "
                     + targetVar
                     + " is not an integer. Cannot be decremented.\n"
@@ -514,7 +520,7 @@ def parse_dec(line):
                 vars[foundVar] = [targetVar, "T", str(intVal - 1)]
 
     else:
-        sys.stderr.write(
+        log(
             "Variable " + targetVar + " not found. Cannot be decremented.\n"
         )
 
@@ -763,8 +769,8 @@ def handle_for(forArguments):
     argCount = len(forArgs)
 
     if argCount < 3:
-        sys.stderr.write(f"Syntax error: {forArguments}\n")
-        sys.stderr.write("Stopping.")
+        log(f"Syntax error: {forArguments}\n")
+        log("Stopping.")
         sys.exit()
 
     elif forArgs[1].lower() == "in":
@@ -787,8 +793,8 @@ def handle_for(forArguments):
         loopFirst = int(forArgs[1])
 
         if forArgs[2].lower() != "to":
-            sys.stderr.write(f"Syntax error: {forArguments}\n")
-            sys.stderr.write("Stopping.")
+            log(f"Syntax error: {forArguments}\n")
+            log("Stopping.")
             sys.exit()
         
         loopLast = int(forArgs[3])
@@ -801,15 +807,15 @@ def handle_for(forArguments):
         loopFirst = int(forArgs[1])
 
         if forArgs[2].lower() != "to":
-            sys.stderr.write(f"Syntax error: {forArguments}\n")
-            sys.stderr.write("Stopping.")
+            log(f"Syntax error: {forArguments}\n")
+            log("Stopping.")
             sys.exit()
         
         loopLast = int(forArgs[3])
 
         if forArgs[4].lower() != "by":
-            sys.stderr.write(f"Syntax error: {forArguments}\n")
-            sys.stderr.write("Stopping.")
+            log(f"Syntax error: {forArguments}\n")
+            log("Stopping.")
             sys.exit()
         
 
@@ -895,7 +901,7 @@ def interpretLoops(input_file2, loopController):
 
                 # Check for recursive inclusion
                 if include_name in includeStack:
-                    sys.stderr.write(
+                    log(
                         f"File '{include_name}' recursively included. Stopping."
                     )
                     sys.exit()
@@ -916,7 +922,7 @@ def interpretLoops(input_file2, loopController):
                     with open(include_name, "r") as f:
                         stopIt, include_lines = parse_include(f.readlines())
                 except:
-                    sys.stderr.write(f"File {include_name} missing. Terminating.\n")
+                    log(f"File {include_name} missing. Terminating.\n")
                     exit()
 
                 for line2 in include_lines:
@@ -982,7 +988,7 @@ def parse_include(input_file):
 
                 # Check for recursive inclusion
                 if include_name in includeStack:
-                    sys.stderr.write(
+                    log(
                         f"File '{include_name}' recursively included. Stopping."
                     )
                     sys.exit()
@@ -1004,7 +1010,7 @@ def parse_include(input_file):
                     with open(include_name, "r") as f:
                         stopIt, include_lines = parse_include(f.readlines())
                 except:
-                    sys.stderr.write(f"File {include_name} missing. Terminating.\n")
+                    log(f"File {include_name} missing. Terminating.\n")
                     exit()
                 
                 for line2 in include_lines:
@@ -1297,110 +1303,110 @@ def handle_verbose(line):
 
     if verboseType == "embed-start":
         embedLevel = int(verboseArray[1])
-        sys.stderr.write(("---" * embedLevel) + "> Start of " + verboseArray[2] + " (@" + str(embedLevel) + ")\n")
+        log(("---" * embedLevel) + "> Start of " + verboseArray[2] + " (@" + str(embedLevel) + ")\n")
 
     elif verboseType == "embed-stop":
         embedLevel = int(verboseArray[1])
-        sys.stderr.write(("---" * embedLevel) + "> End of " + verboseArray[2] + " (@" + str(embedLevel) + ")\n")
+        log(("---" * embedLevel) + "> End of " + verboseArray[2] + " (@" + str(embedLevel) + ")\n")
 
     elif verboseType == "heading":
-        sys.stderr.write(line[18:-3].replace("#", "..... ")[6:].lstrip() + "\n")
+        log(line[18:-3].replace("#", "..... ")[6:].lstrip() + "\n")
 
     elif verboseType == "toc":
-        sys.stderr.write("Table Of Contents - spec '" + noPrefixSuffix[9:] + "'\n")
+        log("Table Of Contents - spec '" + noPrefixSuffix[9:] + "'\n")
 
     elif verboseType == "csv":
-        sys.stderr.write("CSV Start\n")
+        log("CSV Start\n")
 
     elif verboseType == "endcsv":
-        sys.stderr.write("CSV Stop\n")
+        log("CSV Stop\n")
 
     elif verboseType == "cal":
-        sys.stderr.write("Calendar Start\n")
+        log("Calendar Start\n")
 
     elif verboseType == "endcal":
-        sys.stderr.write("Calendar Stop\n")
+        log("Calendar Stop\n")
 
     elif verboseType == "caldays":
-        sys.stderr.write("Calendar Day Span\n")
+        log("Calendar Day Span\n")
 
     elif verboseType == "calkey":
-        sys.stderr.write("Calendar Class Days\n")
+        log("Calendar Class Days\n")
 
     elif verboseType == "calnote":
-        sys.stderr.write("Calendar Days Note\n")
+        log("Calendar Days Note\n")
 
     elif verboseType == "colalign":
-        sys.stderr.write("Column Alignment - spec '" + noPrefixSuffix[19:] + "'\n")
+        log("Column Alignment - spec '" + noPrefixSuffix[19:] + "'\n")
 
     elif verboseType == "colwidth":
-        sys.stderr.write("Column Width - spec '" + noPrefixSuffix[19:] + "'\n")
+        log("Column Width - spec '" + noPrefixSuffix[19:] + "'\n")
     
     elif verboseType == "rowspan":
-        sys.stderr.write("Row span - spec '" + noPrefixSuffix[17:] + "'\n")
+        log("Row span - spec '" + noPrefixSuffix[17:] + "'\n")
 
     elif verboseType == "def":
         if verboseArray[2] == "T":
-            sys.stderr.write("Def " + verboseArray[1] + " = " + ":".join(verboseArray[3:]) + "\n")
+            log("Def " + verboseArray[1] + " = " + ":".join(verboseArray[3:]) + "\n")
         else:
-            sys.stderr.write("Def " + verboseArray[1] + "\n")
+            log("Def " + verboseArray[1] + "\n")
 
     elif verboseType == "undef":
         if verboseArray[1] == "found":
-            sys.stderr.write("Undef successful " + verboseArray[2] + "\n")
+            log("Undef successful " + verboseArray[2] + "\n")
         else:
-            sys.stderr.write("Undef failed " + verboseArray[2] + "\n")
+            log("Undef failed " + verboseArray[2] + "\n")
 
     elif verboseType == "endif":
-        sys.stderr.write("Endif\n")
+        log("Endif\n")
 
     elif verboseType == "ifdef":
         if verboseArray[1] == "true":
-            sys.stderr.write("Ifdef true " + verboseArray[2] + "\n")
+            log("Ifdef true " + verboseArray[2] + "\n")
         else:
-            sys.stderr.write("Ifdef nottrue " + verboseArray[2] + "\n")
+            log("Ifdef nottrue " + verboseArray[2] + "\n")
 
     elif verboseType == "ifndef":
         if verboseArray[1] == "true":
-            sys.stderr.write("Ifndef true " + verboseArray[2] + "\n")
+            log("Ifndef true " + verboseArray[2] + "\n")
         else:
-            sys.stderr.write("Ifndef untrue " + verboseArray[2] + "\n")
+            log("Ifndef untrue " + verboseArray[2] + "\n")
 
     elif verboseType == "ifempty":
         if verboseArray[1] == "true":
-            sys.stderr.write("IfEmpty true " + verboseArray[2] + "\n")
+            log("IfEmpty true " + verboseArray[2] + "\n")
         else:
-            sys.stderr.write("IfEmpty nottrue " + verboseArray[2] + "\n")
+            log("IfEmpty nottrue " + verboseArray[2] + "\n")
 
     elif verboseType == "ifnotempty":
         if verboseArray[1] == "true":
-            sys.stderr.write("IfNotEmpty true " + verboseArray[2] + "\n")
+            log("IfNotEmpty true " + verboseArray[2] + "\n")
         else:
-            sys.stderr.write("IfNotEmpty nottrue " + verboseArray[2] + "\n")
+            log("IfNotEmpty nottrue " + verboseArray[2] + "\n")
 
     elif verboseType == "ifmatch":
         if verboseArray[1] == "true":
-            sys.stderr.write("IfMatch true " + verboseArray[2] + "\n")
+            log("IfMatch true " + verboseArray[2] + "\n")
         else:
-            sys.stderr.write("IfMatch nottrue " + verboseArray[2] + "\n")
+            log("IfMatch nottrue " + verboseArray[2] + "\n")
 
     elif verboseType == "ifnotmatch":
         if verboseArray[1] == "true":
-            sys.stderr.write("IfNotMatch true " + verboseArray[2] + "\n")
+            log("IfNotMatch true " + verboseArray[2] + "\n")
         else:
-            sys.stderr.write("IfNotMatch nottrue " + verboseArray[2] + "\n")
+            log("IfNotMatch nottrue " + verboseArray[2] + "\n")
 
     elif verboseType == "for":
-        sys.stderr.write("For " + verboseArray[1] + "\n")
+        log("For " + verboseArray[1] + "\n")
 
     elif verboseType == "endfor":
-        sys.stderr.write("Endfor " + "\n")
+        log("Endfor " + "\n")
 
     elif verboseType == "exec":
-        sys.stderr.write("Exec " + verboseArray[1][6:] + "\n")
+        log("Exec " + verboseArray[1][6:] + "\n")
 
     else:
-        sys.stderr.write("Unknown " + line + "\n")
+        log("Unknown " + line + "\n")
 
     return
 
@@ -1468,6 +1474,11 @@ def setupStandardVariables():
     else:
         input_file.insert(0, "=def output " + outputFilename + " ")
         
+    if logFilename == "":
+        input_file.insert(0, "=def logfile stderr ")
+    else:
+        input_file.insert(0, "=def logfile " + logFilename + " ")
+        
     if makefileFilename == "":
         try:
             # If this succeeds file descriptor 3 was available to write to
@@ -1509,7 +1520,7 @@ def create_output_file(p_file_path=""):
     else:
         if Path(p_file_path).exists():
             if wantVerbose:
-                sys.stderr.write("WARNING: overwriting output Markdown file!")
+                log("WARNING: overwriting output Markdown file!")
             pass
         to_file = open(p_file_path, "w")
         r_output = Output(to_file)
@@ -1525,8 +1536,6 @@ BOLD = "\033[1m"
 END = "\033[0m"
 
 bannerUnderline = "=" * len(banner)
-
-sys.stderr.write("\n" + banner + "\n" + bannerUnderline + "\n")
 
 wantVerbose = False
 
@@ -1549,6 +1558,11 @@ inputFilename = ""
 outputFilename = ""
 makefileFilename = ""
 
+logFilename = ""
+
+# sys.stderr is the default logging destination
+logfileHandle = sys.stderr
+
 def bold(p_text):
     return BOLD + p_text + END
 
@@ -1556,67 +1570,93 @@ arguments = len(sys.argv) - 1
 
 lastArgument = ""
 
+# First pass argument parsing - just to pick up any log filename
+for arg in range(1, arguments + 1):
+    argument = sys.argv[arg]
+
+    if argument == "-l":
+        if arg > arguments - 1:
+            log("-l with no filename parameter. Ignoring")
+        else:
+            # Parameter after -l is log filename
+            logFilename = sys.argv[arg + 1]
+
+            # Nullify filename parameter
+            sys.argv[arg + 1] = ""
+            
+            logfileHandle = open(logFilename, "w")
+
+        # Nullify -l parameter
+        sys.argv[arg] = ""
+
+log("\n" + banner + "\n" + bannerUnderline + "\n")
+
+# Second pass argument parsing - to pick up all the rest
 for arg in range(1, arguments + 1):
     argument = sys.argv[arg]
     
-    if argument == "-h":
+    if argument == "":
+        # Parameters nullified by first pass argument parsing
+        pass
+
+    elif argument == "-h":
         # Print help
-        sys.stderr.write(
+        log(
             "\n\nThe mdpre program is a Markdown preprocessor, making writing complex\nMarkdown documents easier.\n\n"
         )
-        sys.stderr.write(
+        log(
             "\n" + BOLD + "Usage:" + END + "\n\nmdpre < inputfile > outputfile\n\n"
         )
-        sys.stderr.write("which processes from inputfile to outputfile.\n\n")
+        log("which processes from inputfile to outputfile.\n\n")
 
-        sys.stderr.write(BOLD + "or:\n\n" + END)
-        sys.stderr.write("mdpre -h\n\n")
-        sys.stderr.write("which generates this help.\n\n")
+        log(BOLD + "or:\n\n" + END)
+        log("mdpre -h\n\n")
+        log("which generates this help.\n\n")
 
-        sys.stderr.write(BOLD + "or:\n\n" + END)
-        sys.stderr.write("mdpre -v < inputfile > outputfile\n\n")
-        sys.stderr.write('which writes additional information in "verbose mode".\n\n')
+        log(BOLD + "or:\n\n" + END)
+        log("mdpre -v < inputfile > outputfile\n\n")
+        log('which writes additional information in "verbose mode".\n\n')
 
-        sys.stderr.write(BOLD + "or:\n\n" + END)
-        sys.stderr.write("mdpre -t < inputfile outputdir\n\n")
-        sys.stderr.write(
+        log(BOLD + "or:\n\n" + END)
+        log("mdpre -t < inputfile outputdir\n\n")
+        log(
             "which creates a textbundle directory from inputfile. -v can be used with -t.\n\n"
         )
 
-        sys.stderr.write(BOLD + "or:\n\n" + END)
-        sys.stderr.write("mdpre -z < inputfile outputfile\n\n")
-        sys.stderr.write(
+        log(BOLD + "or:\n\n" + END)
+        log("mdpre -z < inputfile outputfile\n\n")
+        log(
             "which creates a textpack (zipped textbundle) file from inputfile. -v can be used with -z.\n\n"
         )
 
-        sys.stderr.write(BOLD + "Logging:\n\n" + END)
-        sys.stderr.write(BOLD + "--------\n\n" + END)
-        sys.stderr.write("Add 2>logfileName to get logging.\n\n")
+        log(BOLD + "Logging:\n\n" + END)
+        log(BOLD + "--------\n\n" + END)
+        log("Add 2>logfileName to get logging.\n\n")
 
-        sys.stderr.write(BOLD + "Make File Fragments:\n\n" + END)
-        sys.stderr.write(BOLD + "--------------------\n\n" + END)
-        sys.stderr.write("Add 3>makefile to get make file dependencies written to a file.\n\n")
+        log(BOLD + "Make File Fragments:\n\n" + END)
+        log(BOLD + "--------------------\n\n" + END)
+        log("Add 3>makefile to get make file dependencies written to a file.\n\n")
 
-        sys.stderr.write("\n\n" + BOLD + "Variables\n\n" + END)
-        sys.stderr.write(BOLD + "---------\n\n" + END)
-        sys.stderr.write(
+        log("\n\n" + BOLD + "Variables\n\n" + END)
+        log(BOLD + "---------\n\n" + END)
+        log(
             "\nYou can define a variable without a value with the -d flag:\n\n"
         )
-        sys.stderr.write("mdpre -dfred < inputfile outputfile\n\n")
-        sys.stderr.write(
+        log("mdpre -dfred < inputfile outputfile\n\n")
+        log(
             "You can define a variable with a value also with the -d flag:\n\n"
         )
-        sys.stderr.write("mdpre '-djon=bon jovi' < inputfile outputfile\n\n")
-        sys.stderr.write(
+        log("mdpre '-djon=bon jovi' < inputfile outputfile\n\n")
+        log(
             "In this case quotes were used to allow a variable to take a value with spaces in.\n\n"
         )
 
-        sys.stderr.write("\n\n" + BOLD + "Process As A CSV File\n\n" + END)
-        sys.stderr.write(BOLD + "---------------------\n\n" + END)
-        sys.stderr.write(
+        log("\n\n" + BOLD + "Process As A CSV File\n\n" + END)
+        log(BOLD + "---------------------\n\n" + END)
+        log(
             "\nmdpre can treat the whole input file as a CSV file, creating a Markdown table from it, if you specify the -c flag:\n\n"
         )
-        sys.stderr.write("mdpre -c < input.csv outputfile\n\n")
+        log("mdpre -c < input.csv outputfile\n\n")
 
         exit_script(g_output, 1)
 
@@ -1668,34 +1708,34 @@ if textBundleFilename != "":
         realpath = realpath + "-temp"
 
     if wantVerbose is True:
-        sys.stderr.write("Writing to Textbundle " + realpath + "\n\n")
+        log("Writing to Textbundle " + realpath + "\n\n")
 
     # Check if path exists as a directory
     if os.path.exists(realpath):
         if os.path.isfile(realpath) is True:
             # Regular file of that name exists so quitting
-            sys.stderr.write(realpath + " is a regular file. Quitting.\n")
+            log(realpath + " is a regular file. Quitting.\n")
             sys.exit(0)
         else:
             # Directory already exists
             if wantVerbose is True:
-                sys.stderr.write(
+                log(
                     "Directory exists so not creating. It might already have files, some of which might be overwritten.\n\n"
                 )
     else:
         # Directory doesn't exist so create it
         if wantVerbose is True:
-            sys.stderr.write("Directory does not exist - so creating.\n\n")
+            log("Directory does not exist - so creating.\n\n")
         os.mkdir(realpath)
 
     # Check if assets path exists
     assets = realpath + "/assets"
     if os.path.exists(assets):
         if wantVerbose is True:
-            sys.stderr.write("assets directory exists so not creating.\n\n")
+            log("assets directory exists so not creating.\n\n")
     else:
         if wantVerbose is True:
-            sys.stderr.write("Creating assets directory.\n\n")
+            log("Creating assets directory.\n\n")
         os.mkdir(assets)
 
     # Add info.json file
@@ -1808,7 +1848,7 @@ for line in input_file:
         if wantVerbose is True:
             handle_verbose("<!--mdpre-toc:" + line + "-->")
         minLevel, maxLevel, heading = parseTocStatement(line, minTocLevel, maxTocLevel)
-        print(minLevel, maxLevel, heading, file=sys.stderr)
+        print(minLevel, maxLevel, heading, file = logfileHandle)
         g_output.printTableOfContents(
             minLevel, maxLevel, "### " + heading, tableOfContents
         )
@@ -1902,9 +1942,9 @@ for line in input_file:
 # Issue a warning if 1 or more =endif statements are missing
 if (l := len(ifStack)) > 1:
     if l == 2:
-        sys.stderr.write(f'Warning 1 =endif statement missing.')
+        log(f'Warning 1 =endif statement missing.')
     else:
-        sys.stderr.write(f'Warning {str(l - 1)} =endif statements missing.')
+        log(f'Warning {str(l - 1)} =endif statements missing.')
 
 # Optionally zip into TextPack format
 if wantTextPack is True:
@@ -1939,7 +1979,7 @@ if makefileFilename != "":
     # Write the make file fragment to the file specified
     if Path(makefileFilename).exists():
         if wantVerbose:
-            sys.stderr.write("WARNING: overwriting output makefile fragment file!")
+            log("WARNING: overwriting output makefile fragment file!")
         pass
 
     with open(makefileFilename, "w") as m:

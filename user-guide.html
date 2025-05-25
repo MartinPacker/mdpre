@@ -1189,7 +1189,7 @@ body .markdown-body
 <h1 id="markdown-preprocessor-user-guide">Markdown Preprocessor User Guide<a class="headerlink" href="#markdown-preprocessor-user-guide" title="Permanent link"></a></h1>
 <p>This document describes the mdpre Markdown preprocessor.</p>
 <p>In this document we&rsquo;ll refer to it as &ldquo;mdpre&rdquo;, pronounced &ldquo;em dee pree&rdquo;.</p>
-<p>This document was converted to HTML at 15&colon;57 on 18 May&comma; 2025.</p>
+<p>This document was converted to HTML at 15&colon;57 on 25 May&comma; 2025.</p>
 <h3 id="table-of-contents">Table Of Contents<a class="headerlink" href="#table-of-contents" title="Permanent link"></a></h3>
 <ul>
 <li><a href="#why-a-preprocessor">Why A Preprocessor?</a></li>
@@ -1199,6 +1199,7 @@ body .markdown-body
 <li><a href="#creating-a-make-file-fragment">Creating A Make File Fragment</a></li>
 <li><a href="#defining-variables">Defining Variables</a></li>
 <li><a href="#filenames">Filenames</a></li>
+<li><a href="#specifying-filenames-on-the-command-line">Specifying Filenames On The Command Line</a></li>
 <li><a href="#textbundle-and-textpack-support">TextBundle And TextPack Support</a></li>
 <li><a href="#processing-flow">Processing Flow</a></li>
 </ul>
@@ -1360,6 +1361,17 @@ The default is not to - as it is more likely you won&rsquo;t want to regenerate 
 <h3 id="filenames">Filenames<a class="headerlink" href="#filenames" title="Permanent link"></a></h3>
 <p>You can use any names you like but an extension to denote that the input file is a preprocessable one is handy. In the above example .mdp was used. This seems like a sensible convention.</p>
 <p>Similarly, common file extensions for Markdown files are .md and .markdown.</p>
+<h3 id="specifying-filenames-on-the-command-line">Specifying Filenames On The Command Line<a class="headerlink" href="#specifying-filenames-on-the-command-line" title="Permanent link"></a></h3>
+<p>As well as using stdin, stdout, stderr, and file handle 3 you can specify filenames on the command line:</p>
+<ul>
+<li><code>-i</code> specifies the top-level input filename</li>
+<li><code>-o</code> specifies the output filename</li>
+<li><code>-l</code> specifies the log output filename (especially useful with <code>-v</code>)</li>
+<li><code>-m</code> specifies the filename for a makefile fragment (containing dependencies)</li>
+</ul>
+<p>For example</p>
+<pre><code>mdpre -v -i user-guide.mdp -o user-guide.md -l user-guide.log -m user-guide.mak
+</code></pre>
 <h3 id="textbundle-and-textpack-support">TextBundle And TextPack Support<a class="headerlink" href="#textbundle-and-textpack-support" title="Permanent link"></a></h3>
 <p><a href="http://http://textbundle.org">TextBundle and TextPack</a> are formats for storing complete documents, including graphics, in a container. They are available in two flavours:</p>
 <ul>
@@ -1434,6 +1446,11 @@ Again, applicability is platform specific.</p>
 <li>The first variable name captures the stdout</li>
 <li>The second variable name captures the stderr</li>
 </ul>
+<p>You can substitute variables into the command string. For example:</p>
+<pre><code>=def lsFlags -l
+=def command ls &amp;lsFlags;
+=def listing,myErr `&amp;command;`
+</code></pre>
 <h3 id="undefining-variables-with-undef">Undefining Variables With <code>=undef</code><a class="headerlink" href="#undefining-variables-with-undef" title="Permanent link"></a></h3>
 <p>Just as you can use <code>=def</code> to define a variable you can remove it from the variable table using <code>=undef</code>. For example,</p>
 <pre><code>=undef xyzzy
