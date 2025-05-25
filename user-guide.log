@@ -4,7 +4,7 @@ mdpre Markdown Preprocessor v1.0 (25 May, 2025)
 
 WARNING: overwriting output Markdown file!
 - opened user-guide.md for writing
-Def makefile = user-guide.mak
+Def makefile = file-3
 
 Def logfile = user-guide.log
 
@@ -42,7 +42,7 @@ Def month = May
 
 Def year = 2025
 
-Def time = 15&colon;57
+Def time = 16&colon;11
 
 Def date = 25 May&comma; 2025
 
@@ -159,7 +159,6 @@ CSV Start
 
 CSV Stop
 
-WARNING: overwriting output makefile fragment file!
 -----------------------------------------------
 - Processing completed.
 -----------------------------------------------

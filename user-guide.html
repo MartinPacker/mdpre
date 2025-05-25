@@ -1189,7 +1189,7 @@ body .markdown-body
 <h1 id="markdown-preprocessor-user-guide">Markdown Preprocessor User Guide<a class="headerlink" href="#markdown-preprocessor-user-guide" title="Permanent link"></a></h1>
 <p>This document describes the mdpre Markdown preprocessor.</p>
 <p>In this document we&rsquo;ll refer to it as &ldquo;mdpre&rdquo;, pronounced &ldquo;em dee pree&rdquo;.</p>
-<p>This document was converted to HTML at 15&colon;57 on 25 May&comma; 2025.</p>
+<p>This document was converted to HTML at 16&colon;11 on 25 May&comma; 2025.</p>
 <h3 id="table-of-contents">Table Of Contents<a class="headerlink" href="#table-of-contents" title="Permanent link"></a></h3>
 <ul>
 <li><a href="#why-a-preprocessor">Why A Preprocessor?</a></li>
@@ -1449,7 +1449,7 @@ Again, applicability is platform specific.</p>
 <p>You can substitute variables into the command string. For example:</p>
 <pre><code>=def lsFlags -l
 =def command ls &amp;lsFlags;
-=def listing,myErr `&amp;command;`
+    =def listing,myErr `&amp;command;`
 </code></pre>
 <h3 id="undefining-variables-with-undef">Undefining Variables With <code>=undef</code><a class="headerlink" href="#undefining-variables-with-undef" title="Permanent link"></a></h3>
 <p>Just as you can use <code>=def</code> to define a variable you can remove it from the variable table using <code>=undef</code>. For example,</p>
@@ -1935,6 +1935,26 @@ Indeed this paragraph was written that way.
 <td align="left">Year when mdpre started running</td>
 <td align="left"><code>2025</code></td>
 </tr>
+<tr>
+<td align="left">input</td>
+<td align="left">Name of input file&comma; or <code>stdin</code></td>
+<td align="left"><code>test.mdp</code></td>
+</tr>
+<tr>
+<td align="left">output</td>
+<td align="left">Name of output file&comma; or <code>stdout</code></td>
+<td align="left"><code>test.md</code></td>
+</tr>
+<tr>
+<td align="left">logfile</td>
+<td align="left">Name of log file&comma; or <code>stderr</code></td>
+<td align="left"><code>test.log</code></td>
+</tr>
+<tr>
+<td align="left">makefile</td>
+<td align="left">Name of makefile fragment&comma; or <code>file-3</code></td>
+<td align="left"><code>test.mak</code></td>
+</tr>
 </tbody>
 </table>
 <p>The following variables are from Python&rsquo;s <code>platform</code> module and are said to be available on all platforms.</p>
@@ -1950,47 +1970,47 @@ Indeed this paragraph was written that way.
 <tr>
 <td align="left">node</td>
 <td align="left">Machine node name</td>
-<td align="left">bluemac.local</td>
+<td align="left"><code>bluemac.local</code></td>
 </tr>
 <tr>
 <td align="left">version</td>
 <td align="left">Operating system version</td>
-<td align="left">Darwin Kernel Version 24.4.0: Fri Apr 11 18:33:47 PDT 2025; root:xnu-11417.101.15~117/RELEASE_ARM64_T6000</td>
+<td align="left"><code>Darwin Kernel Version 24.4.0: Fri Apr 11 18:33:47 PDT 2025; root:xnu-11417.101.15~117/RELEASE_ARM64_T6000</code></td>
 </tr>
 <tr>
 <td align="left">architecture</td>
 <td align="left">Machine architecture</td>
-<td align="left">64bit</td>
+<td align="left"><code>64bit</code></td>
 </tr>
 <tr>
 <td align="left">machine</td>
 <td align="left">Also machine architecture</td>
-<td align="left">arm64</td>
+<td align="left"><code>arm64</code></td>
 </tr>
 <tr>
 <td align="left">system</td>
 <td align="left">System type</td>
-<td align="left">Darwin</td>
+<td align="left"><code>Darwin</code></td>
 </tr>
 <tr>
 <td align="left">release</td>
 <td align="left">Software release</td>
-<td align="left">24.4.0</td>
+<td align="left"><code>24.4.0</code></td>
 </tr>
 <tr>
 <td align="left">python_version</td>
 <td align="left">Python version</td>
-<td align="left">3.12.3</td>
+<td align="left"><code>3.12.3</code></td>
 </tr>
 <tr>
 <td align="left">python_implementation</td>
 <td align="left">Python implementation</td>
-<td align="left">CPython</td>
+<td align="left"><code>CPython</code></td>
 </tr>
 <tr>
 <td align="left">processor</td>
 <td align="left">Processor type</td>
-<td align="left">arm</td>
+<td align="left"><code>arm</code></td>
 </tr>
 </tbody>
 </table></article></body></html>

@@ -116,7 +116,7 @@ This document describes the mdpre Markdown preprocessor.
 
 In this document we'll refer to it as "mdpre", pronounced "em dee pree".
 
-This document was converted to HTML at 15&colon;57 on 25 May&comma; 2025.
+This document was converted to HTML at 16&colon;11 on 25 May&comma; 2025.
 
 ### Table Of Contents
 
@@ -425,7 +425,7 @@ You can substitute variables into the command string. For example:
 
 	=def lsFlags -l
 	=def command ls &lsFlags;
-	=def listing,myErr `&command;`
+		=def listing,myErr `&command;`
 
 ### Undefining Variables With `=undef`
 
@@ -832,18 +832,22 @@ mdpre has the following built-in variables:
 |day|Day of month when mdpre started running|`3`|
 |month|Month when mdpre started running|`May`|
 |year|Year when mdpre started running|`2025`|
+|input|Name of input file&comma; or `stdin`|`test.mdp`|
+|output|Name of output file&comma; or `stdout`|`test.md`|
+|logfile|Name of log file&comma; or `stderr`|`test.log`|
+|makefile|Name of makefile fragment&comma; or `file-3`|`test.mak`|
 
 The following variables are from Python's `platform` module and are said to be available on all platforms.
 
 |Variable|Description|Example Result|
 |:--|:----|:-|
-|node|Machine node name|bluemac.local|
-|version|Operating system version|Darwin Kernel Version 24.4.0: Fri Apr 11 18:33:47 PDT 2025; root:xnu-11417.101.15~117/RELEASE_ARM64_T6000|
-|architecture|Machine architecture|64bit|
-|machine|Also machine architecture|arm64|
-|system|System type|Darwin|
-|release|Software release|24.4.0|
-|python_version|Python version|3.12.3|
-|python_implementation|Python implementation|CPython|
-|processor|Processor type|arm|
+|node|Machine node name|`bluemac.local`|
+|version|Operating system version|`Darwin Kernel Version 24.4.0: Fri Apr 11 18:33:47 PDT 2025; root:xnu-11417.101.15~117/RELEASE_ARM64_T6000`|
+|architecture|Machine architecture|`64bit`|
+|machine|Also machine architecture|`arm64`|
+|system|System type|`Darwin`|
+|release|Software release|`24.4.0`|
+|python_version|Python version|`3.12.3`|
+|python_implementation|Python implementation|`CPython`|
+|processor|Processor type|`arm`|
 
