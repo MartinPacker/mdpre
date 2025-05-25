@@ -27,11 +27,11 @@ Latest release  is [here](https://github.com/MartinPacker/mdpre).
 
 Please note, and plan accordingly:
 
-    From 1 April, 2025 expect releases to only support 3.10 or later
-    From 1 April, 2026 expect releases to only support 3.11 or later
+* From 1 April, 2025 releases only supported 3.10 or later
+* From 1 April, 2026 expect releases to only support 3.11 or later
 
 md2pre moves forward on Python every so often to:
 
-    Take advantage of new language capabilities
-    Remain on a supported Python release with adequate fix likelihood.
+* Take advantage of new language capabilities
+* Remain on a supported Python release with adequate fix likelihood.
 
