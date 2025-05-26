@@ -22,8 +22,8 @@ from enum import Enum
 import calendar
 import tempfile
 
-mdpre_level = "1.0"
-mdpre_date = "25 May, 2025"
+mdpre_level = "1.0+"
+mdpre_date = "26 May, 2025"
 banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
 
 
@@ -68,8 +68,8 @@ def log_status(p_line):
 g_output = None
 g_wrapInCSV = False
 
-csv_colaligns = []
-csv_colwidths = []
+CSV_colaligns = []
+CSV_colwidths = []
 in_csv = False
 
 cal_date = (0, 0, 2)
@@ -156,17 +156,39 @@ class Output(object):
         for row in CSV_reader:
             columns = max(columns, len(row))
             CSV_lines.append(row)
+        
+        # Expand colalign shorthand
+        colalign2 = []
+        for ca in colalign:
+            if ca.find("x") > -1:
+                alignment, replication = ca.split("x")
+                replication = int(replication)
+            else:
+                alignment, replication = ca, 1
+
+            colalign2.extend([alignment] * replication)
+
+        colalign = colalign2
 
         # Extend colalign to cover all columns - now we know how many there are
-        colalign_len = len(colalign)
-        for i in range(colalign_len, columns + 1):
-            colalign.append("l")
+        colalign.extend(["l"]* (columns - len(colalign)))
+           
+        # Expand colwidth shorthand
+        colwidth2 = []
+        for cw in colwidth:
+            if cw.find("x") > -1:
+                width, replication = cw.split("x")
+                replication = int(replication)
+            else:
+                width, replication = cw, 1
+
+            colwidth2.extend([int(width)] * replication)
+
+        colwidth = colwidth2
 
         # Extend colwidth to cover all columns - now we know how many there are
-        colwidth_len = len(colwidth)
-        for i in range(colwidth_len, columns + 1):
-            colwidth.append(1)
-
+        colwidth.extend([1]* (columns - len(colwidth)))
+           
         # Now print the table
         first_row = True
         for row in CSV_lines:
@@ -374,7 +396,7 @@ def parse_colwidth(colString, p_separator = r"\s+"):
     colwidths = re.split(p_separator, cs)
     colwidthInt = []
     for c in colwidths:
-        colwidthInt.append(int(c))
+        colwidthInt.append(c)
 
     return colwidthInt
 
@@ -1827,8 +1849,8 @@ input_file = handle_linejoins(input_file)
 minTocLevel, maxTocLevel, tableOfContents = extractTableOfContents(input_file)
 
 # Do any other processing, such as CSV to table
-csv_colaligns = []
-csv_colwidths = []
+CSV_colaligns = []
+CSV_colwidths = []
 in_csv = False
 in_cal = False
 
@@ -1861,18 +1883,18 @@ for line in input_file:
             handle_verbose("<!--mdpre-csv:" + line + "-->")
 
     elif (line.startswith("=endcsv")) & (in_csv is True):
-        g_output.formatCSV(CSV_lines, csv_colaligns, csv_colwidths)
+        g_output.formatCSV(CSV_lines, CSV_colaligns, CSV_colwidths)
         in_csv = False
         if wantVerbose is True:
             handle_verbose("<!--mdpre-endcsv:" + line + "-->")
 
     elif line.startswith("=colalign "):
-        csv_colaligns = parse_colalign(line[10:])
+        CSV_colaligns = parse_colalign(line[10:])
         if wantVerbose is True:
             handle_verbose("<!--mdpre-colalign:" + line + "-->")
 
     elif line.startswith("=colwidth "):
-        csv_colwidths = parse_colwidth(line[10:])
+        CSV_colwidths = parse_colwidth(line[10:])
         if wantVerbose is True:
             handle_verbose("<!--mdpre-colwidth:" + line + "-->")
     elif line.startswith("=rowspan"):
