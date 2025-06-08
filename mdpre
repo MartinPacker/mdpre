@@ -13,6 +13,7 @@ import zipfile
 import io
 import subprocess
 import platform
+import math
 
 # import StringIO
 import re
@@ -22,8 +23,8 @@ from enum import Enum
 import calendar
 import tempfile
 
-mdpre_level = "1.0+"
-mdpre_date = "26 May, 2025"
+mdpre_level = "1.1"
+mdpre_date = "8 June, 2025"
 banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
 
 
@@ -70,6 +71,9 @@ g_wrapInCSV = False
 
 CSV_colaligns = []
 CSV_colwidths = []
+CSV_flowLines = 0
+CSV_flowGutterCells = 0
+
 in_csv = False
 
 cal_date = (0, 0, 2)
@@ -123,6 +127,43 @@ class OutputType(Enum):
 
     MD = 1
 
+def handle_CSVrule(rules, spec):
+    specWords = spec.strip().split(" ")
+    if len(specWords) == 1:
+        if specWords[0] == "delete":
+            rules = []
+        else:
+            rules.append(spec)
+    else:
+        rules.append(spec)
+
+    return rules
+
+def handle_CSVflow(spec):
+    goodSpec = True
+    specWords = spec.strip().split(" ")
+
+    try:
+        flowLines = int(specWords[0])
+    except:
+        log(f"ERROR: =csvflow requires an integer. \"{spec}\" specified")
+        goodSpec = False
+
+    if len(specWords) == 1:
+        flowGutterCells = 0
+    else:
+        try:
+            flowGutterCells = int(specWords[-1])
+        except:
+            log(f"ERROR: =csvflow requires an integer for the second parameter. \"{specWords[-1]}\" specified")
+            goodSpec = False
+
+    if goodSpec:
+        return flowLines, flowGutterCells
+    else:
+        # Return the previous values
+        return CSV_flowLines, CSV_flowGutterCells
+
 
 class Output(object):
     NL = "\n"
@@ -147,81 +188,201 @@ class Output(object):
     def write_line(self, p_text):
         self.write(f"{p_text}{self.NL}")
 
-    def formatCSV(self, CSV_lines, colalign, colwidth):
-        CSV_reader = csv.reader(CSV_lines)
+    def formatCSV(self, CSV_lines, colalign, colwidth, rules, flowLines, flowGutterCells):
+        if csvDialect == "":
+            CSV_reader = csv.reader(CSV_lines)
+        else:
+            CSV_reader = csv.reader(CSV_lines, csvDialect)
 
         # Find out how many columns and prime CSV_lines
-        columns = 0
+        rowCount = 0
+        columnCount = 0
+
         CSV_lines = []
-        for row in CSV_reader:
-            columns = max(columns, len(row))
+        for rowNumber, row in enumerate(CSV_reader):
+            columnCount = max(columnCount, len(row))
+
+            rowCount += 1 
+
             CSV_lines.append(row)
+
+        # Potentially flow the input CSV into a wider table
+        if flowLines > 0:
+            # The first row is treated as a title row - perhaps to be replicated
+            dataRowCount = rowCount - 1
+        
+            # Calculate how many times the cells need to be replicated
+            flowings = math.ceil(dataRowCount / flowLines)
+
+            # Create a list with gutter cells in
+            gutterCells = [" "] * flowGutterCells
+
+
+            # Extend each pre-existing line to the maximum length,
+            # including the title line, adding any gutter cells.
+            for lineNumber in range(len(CSV_lines)):
+                CSV_lines[lineNumber].extend([" "] * (columnCount - len(CSV_lines[lineNumber])))
+                CSV_lines[lineNumber].extend(gutterCells)
+            
+            titleLine = CSV_lines[0]
+             
+            # Replicate the cells in the title row the right number of times
+            titleLine *= flowings
+            titleLine = titleLine[:-flowGutterCells]
+            
+            # Operate on the data lines
+            dataLines = CSV_lines[1:]
+            # Flow the data lines - if needed
+            if flowings > 1:
+                for lineNumber, CSV_line in enumerate(dataLines):
+                    targetLine = lineNumber % flowLines
+                    if lineNumber >= flowLines:
+                        dataLines[targetLine].extend(dataLines[lineNumber])
+
+            # Get rid of surplus data lines - now they've been appended
+            if len(dataLines) >= flowLines:
+                dataLines = dataLines[:flowLines]
+
+            # Complete padding
+            padCells = [" "] * columnCount
+            padCells.extend(gutterCells)
+            
+            for lineNumber, dataLine in enumerate(dataLines):
+                if len(dataLine) < (columnCount + flowGutterCells) * flowings:
+                    dataLines[lineNumber].extend(padCells)
+                #dataLines[lineNumber].extend(gutterCells)
+            
+            # Adjust column count - due to flowing and gutters
+            columnCount = (columnCount + flowGutterCells) * flowings - flowGutterCells
+            
+            # Reconstruct CSV lines from title and reformatted data            
+            CSV_lines = []
+            CSV_lines.append(titleLine)
+            CSV_lines.extend(dataLines)
+
+            for lineNumber, _ in enumerate(CSV_lines):	
+                CSV_lines[lineNumber] = CSV_lines[lineNumber][:-1]
+                print(CSV_lines[lineNumber])
+
+            
+        # Prime column width and alignment extenders
+        colWidthExtender = 1
+        colAlignExtender = "l"
         
         # Expand colalign shorthand
         colalign2 = []
-        for ca in colalign:
+        lastColAlign = len(colalign) - 1
+        for caNumber, ca in enumerate(colalign):
             if ca.find("x") > -1:
                 alignment, replication = ca.split("x")
-                replication = int(replication)
+                
+                if (replication == "*") and (caNumber == lastColAlign):
+                    replication = 1
+                    colAlignExtender = alignment
+                else:
+                    replication = int(replication)
             else:
                 alignment, replication = ca, 1
 
+            # Extend list by the replication factor
             colalign2.extend([alignment] * replication)
 
         colalign = colalign2
 
         # Extend colalign to cover all columns - now we know how many there are
-        colalign.extend(["l"]* (columns - len(colalign)))
+        colalign.extend([colAlignExtender]* (columnCount - len(colalign)))
            
         # Expand colwidth shorthand
         colwidth2 = []
-        for cw in colwidth:
+        lastColWidth = len(colwidth) - 1
+        for cwNumber, cw in enumerate(colwidth):
             if cw.find("x") > -1:
                 width, replication = cw.split("x")
-                replication = int(replication)
+
+                if (replication == "*") and (cwNumber == lastColWidth):
+                    replication = 1
+                    colWidthExtender = width
+                else:
+                    replication = int(replication)
             else:
                 width, replication = cw, 1
 
+            # Extend list by the replication factor
             colwidth2.extend([int(width)] * replication)
 
         colwidth = colwidth2
 
         # Extend colwidth to cover all columns - now we know how many there are
-        colwidth.extend([1]* (columns - len(colwidth)))
+        colwidth.extend([int(colWidthExtender)] * (columnCount - len(colwidth)))
            
         # Now print the table
-        first_row = True
-        for row in CSV_lines:
+        for rowNumber0, row in enumerate(CSV_lines):
+            # Human-understandable row number (1-indexed)
+            rowNumber = rowNumber0 + 1
+
             row_text = "|"
-            cell_prefix = ""
-            cell_suffix = ""
             for col_index, col_text in enumerate(row):
+                # Human-understandable column number (1-indexed)
+                columnNumber = col_index + 1
+
+                # Human-understandable variable containing original cell text
+                cellText = col_text
+
+                spanClass = ""
+
+                # For each cell first apply any rowspan class
                 if (col_index == 0) & (col_text.startswith("=rowspan ")):
                     rowspan2 = col_text.split("!!XYZZY!!")
                     spanClass = rowspan2[0][9:]
                     col_text = rowspan2[1][1:-1]
+                
+                # Apply any rules to the cell
+                for rule in rules:
+                    # Following splits at white space of any kind and only returns 2 items
+                    # (white space of any length)
+                    (ruleClass, ruleCondition) = tuple(rule.split(None, 1))
+
+                    try:
+                        ruleMet =eval(ruleCondition)
+                    except:
+                        ruleMet = False
+                    
+                    if ruleMet:
+                        spanClass = ruleClass
+                
+                if spanClass == "":
+                    cell_prefix = ""
+                    cell_suffix = ""
+                else:
                     cell_prefix = "<span class=\"" + spanClass +"\">"
                     cell_suffix = "</span>"
                       
                 row_text = row_text + cell_prefix + col_text + cell_suffix + "|"
             self.write(row_text)
 
-            titleUnderline = "|"
-            if first_row is True:
-                for col_index in range(columns):
+            if rowNumber0 == 0:
+                # Insert line under title line
+                titleUnderline = "|"
+                
+                for col_index in range(columnCount):
+                    # Handle column width with dashes - for md2pptx
+                    # (and probably no other tool)
                     dashes = "-" * (colwidth[col_index])
-                    # NOTE: col_width is ratio not characters
+
+                    # Add in the column alignment character - as appropriate                    
                     if colalign[col_index] == "r":
                         titleUnderline = titleUnderline + dashes + ":|"
+                    
                     elif colalign[col_index] == "c":
                         titleUnderline = titleUnderline + ":" + dashes + ":|"
+                    
                     elif colalign[col_index] == "l":
                         titleUnderline = titleUnderline + ":" + dashes + "|"
+                    
                     else:
                         titleUnderline = titleUnderline + dashes + "|"
 
                 self.write(titleUnderline)
-                first_row = False
         return
 
     def formatCalendar(self, cal_lines, cal_date, cal_spans, cal_keys, cal_notes):
@@ -472,6 +633,7 @@ def parse_calnote(noteString, cal_notes):
 
 # Handle =def - which might return more than one variable
 def parse_def(defString):
+    defString = defString.rstrip()
     spacePos = defString.find(" ")
     varNameString = defString[:spacePos]
     residue = defString[spacePos + 1 :]
@@ -1337,6 +1499,12 @@ def handle_verbose(line):
     elif verboseType == "toc":
         log("Table Of Contents - spec '" + noPrefixSuffix[9:] + "'\n")
 
+    elif verboseType == "csvrule":
+        log("CSV rule '" + noPrefixSuffix[17:] + "'\n")
+    
+    elif verboseType == "csvflow":
+        log("CSV row flowing '" + noPrefixSuffix[17:] + "'\n")
+    
     elif verboseType == "csv":
         log("CSV Start\n")
 
@@ -1851,6 +2019,7 @@ minTocLevel, maxTocLevel, tableOfContents = extractTableOfContents(input_file)
 # Do any other processing, such as CSV to table
 CSV_colaligns = []
 CSV_colwidths = []
+CSV_rules =  []
 in_csv = False
 in_cal = False
 
@@ -1875,18 +2044,46 @@ for line in input_file:
             minLevel, maxLevel, "### " + heading, tableOfContents
         )
 
+    elif line.startswith("=csvrule"):
+        CSV_rules = handle_CSVrule(CSV_rules, line[9:])
+        
+        if wantVerbose is True:
+            handle_verbose("<!--mdpre-csvrule:" + line + "-->")
+
+    elif line.startswith("=csvflow"):
+        CSV_flowLines, CSV_flowGutterCells = handle_CSVflow(line[9:])
+        
+        if wantVerbose is True:
+            handle_verbose("<!--mdpre-csvflow:" + line + "-->")
+
     elif (line.startswith("=csv")) & (in_csv is False):
+        csvWords = line.split(" ")
+        if len(csvWords) > 1:
+            csvDialectWord = csvWords[1]
+            csvDialects = csv.list_dialects()
+            availableDialects = ", ".join(csvDialects)
+            if csvDialectWord in csvDialects:
+                csvDialect = csvDialectWord
+            else:
+                log(f"Unavailable CSV dialect specified - {csvDialectWord}. Using default.")
+                log(f"Available dialects are: {availableDialects}")
+                csvDialect = ""
+        else:
+            csvDialect = ""
+
         in_csv = True
         in_rowspan = False
         CSV_lines = []
+
         if wantVerbose is True:
             handle_verbose("<!--mdpre-csv:" + line + "-->")
 
     elif (line.startswith("=endcsv")) & (in_csv is True):
-        g_output.formatCSV(CSV_lines, CSV_colaligns, CSV_colwidths)
+        g_output.formatCSV(CSV_lines, CSV_colaligns, CSV_colwidths, CSV_rules, CSV_flowLines, CSV_flowGutterCells)
         in_csv = False
         if wantVerbose is True:
             handle_verbose("<!--mdpre-endcsv:" + line + "-->")
+
 
     elif line.startswith("=colalign "):
         CSV_colaligns = parse_colalign(line[10:])
@@ -1897,6 +2094,7 @@ for line in input_file:
         CSV_colwidths = parse_colwidth(line[10:])
         if wantVerbose is True:
             handle_verbose("<!--mdpre-colwidth:" + line + "-->")
+
     elif line.startswith("=rowspan"):
         in_rowspan = True
         if wantVerbose is True:

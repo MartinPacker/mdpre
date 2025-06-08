@@ -3,6 +3,15 @@
 ### Releases
 
 
+### v1.1 - 8 June, 2025
+
+* **ENHANCED** [Issue 35](https://github.com/MartinPacker/mdpre/issues/35): Allow `=colwidth` and `=colalign` multipliers shorthand
+* **ENHANCED** [Issue 36](https://github.com/MartinPacker/mdpre/issues/36): Allow `=csv` to specify a dialect
+* **ENHANCED** [Issue 37](https://github.com/MartinPacker/mdpre/issues/37): Add `=cellrule` for `=csv` to allow e.g. cell colouring via simple rules
+* **ENHANCED** [Issue 39](https://github.com/MartinPacker/mdpre/issues/39): Add `=csvflow` to enable flowing of tables processed with `=csv`
+* **FIXED** [Issue 38](https://github.com/MartinPacker/mdpre/issues/38): `=def` line terminated with a space causes a crash
+
+
 ### v1.0 - 25 May, 2025
 
 * **ENHANCED** [Issue 1](https://github.com/MartinPacker/mdpre/issues/1): Filenames on command line

@@ -1,16 +1,15 @@
 
-mdpre Markdown Preprocessor v1.0 (25 May, 2025)
-===============================================
+mdpre Markdown Preprocessor v1.0+ (7 June, 2025)
+================================================
 
-WARNING: overwriting output Markdown file!
-- opened user-guide.md for writing
+- opened <stdout> for writing
 Def makefile = file-3
 
-Def logfile = user-guide.log
+Def logfile = stderr
 
-Def output = user-guide.md
+Def output = stdout
 
-Def input = user-guide.mdp
+Def input = stdin
 
 Def node = MacBookPro.domain_not_set.invalid
 
@@ -30,21 +29,21 @@ Def python_implementation = CPython
 
 Def processor = arm
 
-Def mdpre_date = 25 May, 2025
+Def mdpre_date = 7 June, 2025
 
-Def mdpre_level = 1.0
+Def mdpre_level = 1.0+
 
 Def userid = martinpacker
 
-Def day = 25
+Def day = 8
 
-Def month = May
+Def month = June
 
 Def year = 2025
 
-Def time = 16&colon;11
+Def time = 12&colon;21
 
-Def date = 25 May&comma; 2025
+Def date = 8 June&comma; 2025
 
 Def TOC = Table Of Contents
 
@@ -52,7 +51,7 @@ Markdown Preprocessor User Guide
 
 Table Of Contents - spec '2 * Table Of Contents'
 
-2 4 Table Of Contents
+2 5 Table Of Contents
 .....  Why A Preprocessor?
 
 .....  How Do You Use mdpre?
@@ -109,7 +108,19 @@ CSV Stop
 
 ..... ..... .....  Controlling Table Column Widths With `=colwidth`
 
-..... ..... .....  Colouring Whole Rows' Text With `=rowspan`
+..... ..... .....  Applying A CSS Class To Whole Rows With `=rowspan`
+
+..... ..... .....  Applying A CSS Class To Cells Based On Rules  With `=csvrule`
+
+..... ..... .....  Some Useful CSS And Javascript Examples With `=rowspan` and `=csvrule`
+
+..... ..... ..... .....  Colouring The Cell's Text With CSS
+
+..... ..... ..... .....  Colouring The Cell's Background With CSS
+
+..... ..... ..... .....  Alerting Based On A Cell's Class With Javascript
+
+..... ..... .....  Flowing A Table - To Shorten And Widen It - With `=csvflow`
 
 ..... .....  Creating A Calendar Month Table With `=cal`
 
@@ -159,7 +170,7 @@ CSV Start
 
 CSV Stop
 
------------------------------------------------
+------------------------------------------------
 - Processing completed.
------------------------------------------------
+------------------------------------------------
 

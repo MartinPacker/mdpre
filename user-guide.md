@@ -116,7 +116,7 @@ This document describes the mdpre Markdown preprocessor.
 
 In this document we'll refer to it as "mdpre", pronounced "em dee pree".
 
-This document was converted to HTML at 16&colon;11 on 25 May&comma; 2025.
+This document was converted to HTML at 12&colon;21 on 8 June&comma; 2025.
 
 ### Table Of Contents
 
@@ -143,7 +143,13 @@ This document was converted to HTML at 16&colon;11 on 25 May&comma; 2025.
 	* [Converting A CSV File To A Markdown Table With `=csv` And `=endcsv`](#converting-a-csv-file-to-a-markdown-table-with-csv-and-endcsv)
 		* [Controlling Table Alignment With `=colalign`](#controlling-table-alignment-with-colalign)
 		* [Controlling Table Column Widths With `=colwidth`](#controlling-table-column-widths-with-colwidth)
-		* [Colouring Whole Rows' Text With `=rowspan`](#colouring-whole-rows-text-with-rowspan)
+		* [Applying A CSS Class To Whole Rows With `=rowspan`](#applying-a-css-class-to-whole-rows-with-rowspan)
+		* [Applying A CSS Class To Cells Based On Rules  With `=csvrule`](#applying-a-css-class-to-cells-based-on-rules-with-csvrule)
+		* [Some Useful CSS And Javascript Examples With `=rowspan` and `=csvrule`](#some-useful-css-and-javascript-examples-with-rowspan-and-csvrule)
+			* [Colouring The Cell's Text With CSS](#colouring-the-cells-text-with-css)
+			* [Colouring The Cell's Background With CSS](#colouring-the-cells-background-with-css)
+			* [Alerting Based On A Cell's Class With Javascript](#alerting-based-on-a-cells-class-with-javascript)
+		* [Flowing A Table - To Shorten And Widen It - With `=csvflow`](#flowing-a-table-to-shorten-and-widen-it-with-csvflow)
 	* [Creating A Calendar Month Table With `=cal`](#creating-a-calendar-month-table-with-cal)
 		* [Controlling How Day Numbers Are Displayed With `=caldays`](#controlling-how-day-numbers-are-displayed-with-caldays)
 		* [Adding A Key To The Day Numbers' Styling With `=calkey`](#adding-a-key-to-the-day-numbers-styling-with-calkey)
@@ -558,6 +564,20 @@ If you have a file which is purely CSV you don't actually need to code `=csv` an
 
 	mdpre -c < input.csv > output.md
 
+
+mdpre uses Python's built-in `csv` module.
+Just coding `=csv` causes mdpre to treat the data as the "excel" dialect of CSV - with commas as separators.
+This might not suit your case.
+So you can specify a different dialect.
+
+For example, to use a tab as the separator, code 
+
+	=csv excel-tab
+
+"excel-tab" is another built in dialect.
+Your platform might support other dialects, such as "unix".
+If you specify a dialect that is not available mdpre will list the available dialects.
+
 #### Controlling Table Alignment With `=colalign`
 
 You can control the alignment with e.g.
@@ -580,6 +600,25 @@ The actual Markdown for the table produced is:
 
 You can specify one of three alignments: `l` (for "left"), `r` (for "right"), or `c` (for "centre"). The default for a column is `l`.
 
+If you have a large number of columns you might find it tedious or fiddly to specify them.
+mdpre has a shorthand that addresses this.
+
+
+For example, coding
+
+	=colalign l rx4 lx2 c
+
+Is the equivalent of 
+
+	=colalign l r r r r l l c
+
+The first value is the alignment specifier, the second being the count of columns it applies to.
+
+If there aren't enough column specifiers for the rows in the table additional ones are implicitly added.
+By default these will contain the value "l".
+You can override this by making the last one have "*" as the replication factor.
+For example `rx*` would make the unspecified columns right aligned, as well as the last specified one.
+
 #### Controlling Table Column Widths With `=colwidth`
 
 You can control the column widths with statements like
@@ -594,19 +633,153 @@ Adding that to the above produces the following Markdown
 
 Here the third column is specified as double the width of the others.
 
+If you have a large number of columns you might find it tedious or fiddly to specify them.
+mdpre has a shorthand that addresses this.
+
+For example, coding
+
+	=colwidth 1x4 2x3 1
+
+Is the equivalent of 
+
+	=colwidth 1 1 1 1 2 2 2 1
+
+The first value is the width specifier, the second being the count of columns it applies to.
+
+If there aren't enough column specifiers for the rows in the table additional ones are implicitly added.
+By default these will contain the value "1".
+You can override this by making the last one have "*" as the replication factor.
+For example `3x*` would make the unspecified columns have a width specifier of "3", as well as the last specified one.
+
 **Note:** Many Markdown processors ignore width directives. The developer's other Markdown tool doesn't. :-)
 
-#### Colouring Whole Rows' Text With `=rowspan`
+#### Applying A CSS Class To Whole Rows With `=rowspan`
 
-You can set the `<span>` element's `class` attribute for each cell in the immediately following row using `=rowspan`. For example
+You can set the `<span>` element's `class` attribute for the text in each cell in the immediately following row using `=rowspan`. For example
 
-    =rowspan bad
+    =rowspan blue
 
-wraps each table cell in the following row with `<span class="bad">` and `</span>`.
+wraps each table cell's text in the following row with `<span class="blue">` and `</span>`.
 
 Of course this class can apply any styling - through CSS - you like. But typically it would be used for colouring the text.
+Some basic examples of what you can do with CSS are in
+[Some Useful CSS And Javascript Examples With `=rowspan` and `=csvrule`](#some-useful-css-and-javascript-examples-with-rowspan-and-csvrule).
 
 **Note:** This styling only applies to the immediately following row.
+
+#### Applying A CSS Class To Cells Based On Rules  With `=csvrule`
+
+You can set the `<span>` element's `class` attribute for each cell that meets some criteria.
+For example:
+
+    =csvrule red float(cellText) >= 99
+
+wraps each table cell's text that meets the criterion with `<span class="red">` and `</span>`.
+
+Each `=csvrule` statement is followed immediately by a single-word class name and an expression.
+The expression is passed to Python's `eval` function.
+It should return a truthy value for the class to be applied.
+
+Only code `=csvrule` outside of a `=csv` / `=endcsv` bracket.
+Each rule will apply to subsequent tables.
+You can code multiple rules for the same class name, each with their own expression.
+
+Three variables you can use in the expression are:
+
+* `cellText`
+* `columnNumber` - which is 1-indexed
+* `rowNumber` - which is 1-indexed
+
+Because mdpre imports the built-in `re` module you can use matching expressions for the text, such as:
+
+    =csvrule blue ((re.match(".+a", cellText)) and (columnNumber == 3))
+
+The above example combines a regular expression match with a column number rule.
+
+You can, of course, do strict string matches.
+For example:
+
+    =csvrule green cellText == "Alpha"
+
+For numeric comparisons you need to coerce the cell text into the appropriate type.
+So the following wouldn't work:
+
+    =csvrule red cellText >= 99
+
+Speaking of mathematics, mdpre also imports the built-in `math` module.
+
+Some basic examples of what you can do with CSS are in
+[Some Useful CSS And Javascript Examples With `=rowspan` and `=csvrule`](#some-useful-css-and-javascript-examples-with-rowspan-and-csvrule).
+
+To delete all the rules, affecting future tables code
+
+    =csvrule delete
+
+#### Some Useful CSS And Javascript Examples With `=rowspan` and `=csvrule`
+
+[`=rowspan`](#applying-a-css-class-to-whole-rows-with-rowspan) and [`=csvrule`](#applying-a-css-class-to-cells-based-on-rules-with-csvrule)
+assign `<span>` classes.
+
+mdpre passes CSS and other HTML elements through to the output file.
+A normal Markdown processor would pass these through into the HTML it might create.
+The full range of CSS (or indeed Javascript query) capabilities are available to the output of mdpre.
+
+Here are some CSS and Javascript ideas, based off `<span>` classes.
+
+##### Colouring The Cell's Text With CSS
+
+This CSS
+
+    .red {
+        color: #FF0000;
+    }
+
+colours the text in a cell with the "red" class to red.
+
+##### Colouring The Cell's Background With CSS
+
+This CSS
+
+    td:has(.grey){
+        background-color: #888888; 
+    }
+
+colours the background of a cell with the "grey" class to grey.
+
+##### Alerting Based On A Cell's Class With Javascript
+
+This Javascript
+
+    blueElements = document.getElementsByClassName("blue")
+    for(i = 0; i < blueElements.length ; i++){
+        alert(blueElements[i].innerHTML)
+    }
+
+pops up an alert dialog with the text of each cell whose class is "blue".
+
+#### Flowing A Table - To Shorten And Widen It - With `=csvflow`
+
+You can widen and shorten a table by taking rows towards the end and appending them to prior rows.
+You might do this to make the table fit better on a (md2pptx-generated) slide.
+
+The syntax is:
+
+    =csvflow <dataRows> <gutterColumns>
+
+For example, if a table has 17 data rows (plus heading row) and the value of the `<dataRows>` parameter is 10, the last 7 data rows will be appended to the first 7.
+Three more blank sets of cells will "square up" the rectangle.
+
+If a table has 24 data rows and the value of `<dataRows>` is 10, there will be three columns - with 10, 10, and 10 rows.
+The final 6 sets of cells in the third row will each contain blank cells.
+
+All rows will be squared up - so the overall effect is to create a rectangular table - with no cells missing.
+You could use `=csvflow` to square up a table where the number of rows **doesn't** exceed the `<dataRows>` value.
+
+The `<gutterColumns>` parameter is optional and defaults to "0".
+If you code "1" a single column "gutter" of cells with just a single space in will be added to the table
+prior to flowing.
+(The line-terminating gutter cells will be removed after flowing.)
+If you coded "2" then two gutter columns would be added - as appropriate.
 
 ### Creating A Calendar Month Table With `=cal`
 
