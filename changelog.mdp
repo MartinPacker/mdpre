@@ -2,6 +2,10 @@
 
 =toc 2 2 Releases
 
+### v1.1.1 - 9 June, 2025
+
+* **FIXED** [Issue 40](https://github.com/MartinPacker/mdpre/issues/40): "Gutter" code in `=csvflow` messed up the output table
+
 ### v1.1 - 8 June, 2025
 
 * **ENHANCED** [Issue 35](https://github.com/MartinPacker/mdpre/issues/35): Allow `=colwidth` and `=colalign` multipliers shorthand

@@ -23,8 +23,8 @@ from enum import Enum
 import calendar
 import tempfile
 
-mdpre_level = "1.1"
-mdpre_date = "8 June, 2025"
+mdpre_level = "1.1.1"
+mdpre_date = "9 June, 2025"
 banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
 
 
@@ -225,11 +225,10 @@ class Output(object):
                 CSV_lines[lineNumber].extend(gutterCells)
             
             titleLine = CSV_lines[0]
-             
+
             # Replicate the cells in the title row the right number of times
             titleLine *= flowings
-            titleLine = titleLine[:-flowGutterCells]
-            
+                        
             # Operate on the data lines
             dataLines = CSV_lines[1:]
             # Flow the data lines - if needed
@@ -259,12 +258,11 @@ class Output(object):
             CSV_lines = []
             CSV_lines.append(titleLine)
             CSV_lines.extend(dataLines)
-
-            for lineNumber, _ in enumerate(CSV_lines):	
-                CSV_lines[lineNumber] = CSV_lines[lineNumber][:-1]
-                print(CSV_lines[lineNumber])
-
             
+            if flowGutterCells > 0:
+                for lineNumber, _ in enumerate(CSV_lines):
+                    CSV_lines[lineNumber] = CSV_lines[lineNumber][:-flowGutterCells]
+
         # Prime column width and alignment extenders
         colWidthExtender = 1
         colAlignExtender = "l"

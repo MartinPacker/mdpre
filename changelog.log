@@ -1,6 +1,6 @@
 
-mdpre Markdown Preprocessor v1.1 (8 June, 2025)
-===============================================
+mdpre Markdown Preprocessor v1.1.1 (9 June, 2025)
+=================================================
 
 - opened <stdout> for writing
 Def makefile = file-3
@@ -11,7 +11,7 @@ Def output = stdout
 
 Def input = stdin
 
-Def node = MacBookPro.domain_not_set.invalid
+Def node = bluemac.local
 
 Def version = Darwin Kernel Version 24.5.0: Tue Apr 22 19:54:49 PDT 2025; root:xnu-11417.121.6~2/RELEASE_ARM64_T6000
 
@@ -29,27 +29,29 @@ Def python_implementation = CPython
 
 Def processor = arm
 
-Def mdpre_date = 8 June, 2025
+Def mdpre_date = 9 June, 2025
 
-Def mdpre_level = 1.1
+Def mdpre_level = 1.1.1
 
 Def userid = martinpacker
 
-Def day = 8
+Def day = 9
 
 Def month = June
 
 Def year = 2025
 
-Def time = 14&colon;48
+Def time = 21&colon;04
 
-Def date = 8 June&comma; 2025
+Def date = 9 June&comma; 2025
 
 This Is The Change Log For mdpre Markdown Preprocessor
 
 Table Of Contents - spec '2 2 Releases'
 
 2 2 Releases
+..... .....  v1.1.1 - 9 June, 2025
+
 ..... .....  v1.1 - 8 June, 2025
 
 ..... .....  v1.0 - 25 May, 2025
@@ -110,7 +112,7 @@ Table Of Contents - spec '2 2 Releases'
 
 ..... .....  v0.0 - 12 March, 2018
 
------------------------------------------------
+-------------------------------------------------
 - Processing completed.
------------------------------------------------
+-------------------------------------------------
 
