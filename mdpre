@@ -23,8 +23,8 @@ from enum import Enum
 import calendar
 import tempfile
 
-mdpre_level = "1.1.1"
-mdpre_date = "9 June, 2025"
+mdpre_level = "1.1.1+"
+mdpre_date = "12 June, 2025"
 banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
 
 
@@ -902,6 +902,7 @@ def handle_ifndef(ifndefString):
     # Variable is undefined
 
     ifStack.append(True)
+
     if wantVerbose is True:
         verbosity = "<!--mdpre-ifndef:true:" + ifndefString + "-->"
 
@@ -916,7 +917,14 @@ def handle_endif():
     else:
         verbosity = ""
 
-    ifStack.pop()
+    if len(ifStack) == 1:
+        log(f"Missing 'if' condition encountered.")
+    else:        
+        try:
+            ifStack.pop()
+        except:
+            log(f"Missing 'if' condition encountered.")
+
 
     return verbosity
 
@@ -1164,7 +1172,12 @@ def parse_include(input_file):
         unsubstitutedLine = line
         line = substitute_variables(line)
 
-        if ifStack[-1] is True:
+        try:
+            ifStackTop = ifStack[-1]
+        except:
+            ifStackTop = True
+        
+        if ifStackTop is True:
             if (line.startswith("=include ")) & (rootLoopController == None):
                 include_name = substitute_variables(line[9:].rstrip().lstrip())
 
