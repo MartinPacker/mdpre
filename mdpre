@@ -24,7 +24,7 @@ import calendar
 import tempfile
 
 mdpre_level = "1.1.1+"
-mdpre_date = "12 June, 2025"
+mdpre_date = "18 August, 2025"
 banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
 
 
@@ -83,16 +83,16 @@ in_cal = False
 def getResourceNames(line):
     resourceNames = []
     
-    for (_, name) in re.findall(graphicRegex, line):
+    for (_, name, *_) in re.findall(graphicRegex, line):
         resourceNames.append(name)
     
-    for (_, name) in re.findall(videoRegex, line):
+    for (_, name, *_) in re.findall(videoRegex, line):
         resourceNames.append(name)
     
-    for (_, name) in re.findall(clickableGraphicRegex, line):
+    for (_, name, *_) in re.findall(clickableGraphicRegex, line):
         resourceNames.append(name)
     
-    for (_, name) in re.findall(audioRegex, line):
+    for (_, name, *_) in re.findall(audioRegex, line):
         resourceNames.append(name)
     
     return resourceNames
