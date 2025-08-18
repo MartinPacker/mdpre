@@ -2156,7 +2156,9 @@ for line in input_file:
         cal_lines.append(line)
 
     elif line.find("![") > -1:
-        dependencies += getResourceNames(line)
+        if (line[0:4] != "    ") & (line[0:1] != "\t"):
+            # Match is not in a code block
+            dependencies += getResourceNames(line)
         
         if(wantTextBundle is True):
             # Fix up graphics references and copy graphics to assets folder
