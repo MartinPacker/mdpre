@@ -3,6 +3,10 @@
 ### Releases
 
 
+### v1.1.2 - 19 August, 2025
+
+* **FIXED** [Issue 42](https://github.com/MartinPacker/mdpre/issues/42): Crash With Dependency Extraction In A Code Block
+
 ### v1.1.1 - 9 June, 2025
 
 * **FIXED** [Issue 40](https://github.com/MartinPacker/mdpre/issues/40): "Gutter" code in `=csvflow` messed up the output table
