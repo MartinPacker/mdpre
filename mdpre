@@ -23,8 +23,8 @@ from enum import Enum
 import calendar
 import tempfile
 
-mdpre_level = "1.1.2"
-mdpre_date = "19 August, 2025"
+mdpre_level = "1.1.3"
+mdpre_date = "28 September, 2025"
 banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
 
 
@@ -1368,15 +1368,32 @@ def substitute_variables(input_line):
     # Go through the remaining fragments, extracting their data
     for f in range(ampersands):
         fragment = fragments[f + 1]
-        semicolonPos = fragment.find(";")
-        if semicolonPos == -1:
-            # No terminating semicolon
-            output_line += "&" + fragment
-        else:
+
+        if (semicolonPos := fragment.find(";")) > -1:
             # Terminating semicolon so extract variable name
             varName = fragment[:semicolonPos]
+
             tail = fragment[semicolonPos + 1 :]
+
             output_line += replace_varname(varName) + tail
+
+        elif (spacePos := fragment.find(" ")) > -1:
+            # Terminating space so extract variable name
+            varName = fragment[:spacePos]
+
+            tail = fragment[spacePos:]
+
+            output_line += replace_varname(varName) + tail
+
+        else:
+            if f == ampersands - 1:
+                # Last fragment on the line
+                output_line += replace_varname(fragment[: -1])
+
+            else:
+                # No terminating semicolon
+                output_line += "&" + fragment
+
     return output_line
 
 

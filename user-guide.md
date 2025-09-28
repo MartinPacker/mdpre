@@ -116,7 +116,7 @@ This document describes the mdpre Markdown preprocessor.
 
 In this document we'll refer to it as "mdpre", pronounced "em dee pree".
 
-This document was converted to HTML at 12&colon;21 on 8 June&comma; 2025.
+This document was converted to HTML at 13&colon;47 on 28 September&comma; 2025.
 
 ### Table Of Contents
 
@@ -133,6 +133,7 @@ This document was converted to HTML at 12&colon;21 on 8 June&comma; 2025.
 * [Language Elements](#language-elements)
 	* [Including files with `=include`](#including-files-with-include)
 	* [Defining Variables With `=def`](#defining-variables-with-def)
+		* [Substituting Variables In Text](#substituting-variables-in-text)
 	* [Undefining Variables With `=undef`](#undefining-variables-with-undef)
 	* [Incrementing Integer Variables Wth `=inc`](#incrementing-integer-variables-wth-inc)
 	* [Decrementing Integer Variables Wth `=dec`](#decrementing-integer-variables-wth-dec)
@@ -393,19 +394,6 @@ The variable name cannot contain spaces. If you try the parser will interpret an
 Defining variables is useful with the `=ifdef` and `=ifndef` statements, and their analogues.
 See [Conditional Inclusion](#conditional-inclusion).
 
-To use a variable you've defined with a value code the variable name preceded by an ampersand and terminated by a semicolon.
-For example:
-
-	=def greeting Hello
-
-	&greeting; World!
-
-will produce:
-	
-	Hello World!
-
-If you don't terminate the use of the variable with a semicolon it won't be substituted. If the variable isn't defined at the point of usage it won't be substituted.
-
 You can also define variables and, optionally, set their value with the `-d` command line parameter. See [Defining Variables](#defining-variables) for more.
 
 For the third and fourth forms, the command string needs to be enclosed in backticks.
@@ -432,6 +420,27 @@ You can substitute variables into the command string. For example:
 	=def lsFlags -l
 	=def command ls &lsFlags;
 		=def listing,myErr `&command;`
+
+#### Substituting Variables In Text
+
+To substitute a variable in text you've defined with its value code the variable name preceded by an ampersand and terminated by a semicolon.
+
+For example:
+
+	=def greeting Hello
+
+	&greeting; World!
+
+will produce:
+	
+	Hello World!
+
+If you don't terminate the use of the variable with a semicolon it won't be substituted unless one of the following is true:
+
+* The variable name is terminated by a space. (The space will be preserved.)
+* The variable name is at the end of the line. (The newline will be preserved.)
+
+If the variable isn't defined at the point of usage it won't be substituted.
 
 ### Undefining Variables With `=undef`
 

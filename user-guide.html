@@ -1189,7 +1189,7 @@ body .markdown-body
 <h1 id="markdown-preprocessor-user-guide">Markdown Preprocessor User Guide<a class="headerlink" href="#markdown-preprocessor-user-guide" title="Permanent link"></a></h1>
 <p>This document describes the mdpre Markdown preprocessor.</p>
 <p>In this document we&rsquo;ll refer to it as &ldquo;mdpre&rdquo;, pronounced &ldquo;em dee pree&rdquo;.</p>
-<p>This document was converted to HTML at 12&colon;21 on 8 June&comma; 2025.</p>
+<p>This document was converted to HTML at 13&colon;44 on 28 September&comma; 2025.</p>
 <h3 id="table-of-contents">Table Of Contents<a class="headerlink" href="#table-of-contents" title="Permanent link"></a></h3>
 <ul>
 <li><a href="#why-a-preprocessor">Why A Preprocessor?</a></li>
@@ -1206,7 +1206,10 @@ body .markdown-body
 </li>
 <li><a href="#language-elements">Language Elements</a><ul>
 <li><a href="#including-files-with-include">Including files with <code>=include</code></a></li>
-<li><a href="#defining-variables-with-def">Defining Variables With <code>=def</code></a></li>
+<li><a href="#defining-variables-with-def">Defining Variables With <code>=def</code></a><ul>
+<li><a href="#substituting-variables-in-text">Substituting Variables In Text</a></li>
+</ul>
+</li>
 <li><a href="#undefining-variables-with-undef">Undefining Variables With <code>=undef</code></a></li>
 <li><a href="#incrementing-integer-variables-wth-inc">Incrementing Integer Variables Wth <code>=inc</code></a></li>
 <li><a href="#decrementing-integer-variables-wth-dec">Decrementing Integer Variables Wth <code>=dec</code></a></li>
@@ -1341,11 +1344,10 @@ $(target).md:
     mdpre -v &lt; $(target).mdp &gt; $(target).md 2&gt;$(target).log $(makefragment)
 </code></pre>
 <p>You could, for example, include the following lines in your main make file (possibly called &ldquo;makefile&rdquo;):</p>
-<div class="highlight"><pre>target=user-guide
-
-include fragment.mak
-</pre></div>
-
+<p>```
+target=user-guide</p>
+<p>include fragment.mak
+```</p>
 <p>This would set the make variable <code>target</code> to the value &ldquo;user-guide&rdquo;.
 The result of this is that running make invokes mdpre against user-guide.mdp, creating as output user-guide.md and sending messages to user-guide.log.
 Verbose Mode is turned on - which is probably what you want with a log file as a destination for messages.</p>
@@ -1427,16 +1429,6 @@ The default is not to - as it is more likely you won&rsquo;t want to regenerate 
 <p>The variable name cannot contain spaces. If you try the parser will interpret anything after the first space as a value. Other than that there are no restrictions on variable names.</p>
 <p>Defining variables is useful with the <code>=ifdef</code> and <code>=ifndef</code> statements, and their analogues.
 See <a href="#conditional-inclusion">Conditional Inclusion</a>.</p>
-<p>To use a variable you&rsquo;ve defined with a value code the variable name preceded by an ampersand and terminated by a semicolon.
-For example:</p>
-<pre><code>=def greeting Hello
-
-&amp;greeting; World!
-</code></pre>
-<p>will produce:</p>
-<pre><code>Hello World!
-</code></pre>
-<p>If you don&rsquo;t terminate the use of the variable with a semicolon it won&rsquo;t be substituted. If the variable isn&rsquo;t defined at the point of usage it won&rsquo;t be substituted.</p>
 <p>You can also define variables and, optionally, set their value with the <code>-d</code> command line parameter. See <a href="#defining-variables">Defining Variables</a> for more.</p>
 <p>For the third and fourth forms, the command string needs to be enclosed in backticks.
 The command is platform dependent.
@@ -1459,6 +1451,22 @@ Again, applicability is platform specific.</p>
 =def command ls &amp;lsFlags;
     =def listing,myErr `&amp;command;`
 </code></pre>
+<h4 id="substituting-variables-in-text">Substituting Variables In Text<a class="headerlink" href="#substituting-variables-in-text" title="Permanent link"></a></h4>
+<p>To substitute a variable in text you&rsquo;ve defined with its value code the variable name preceded by an ampersand and terminated by a semicolon.</p>
+<p>For example:</p>
+<pre><code>=def greeting Hello
+
+&amp;greeting; World!
+</code></pre>
+<p>will produce:</p>
+<pre><code>Hello World!
+</code></pre>
+<p>If you don&rsquo;t terminate the use of the variable with a semicolon it won&rsquo;t be substituted unless one of the following is true:</p>
+<ul>
+<li>The variable name is terminated by a space. (The space will be preserved.)</li>
+<li>The variable name is at the end of the line. (The newline will be preserved.)</li>
+</ul>
+<p>If the variable isn&rsquo;t defined at the point of usage it won&rsquo;t be substituted.</p>
 <h3 id="undefining-variables-with-undef">Undefining Variables With <code>=undef</code><a class="headerlink" href="#undefining-variables-with-undef" title="Permanent link"></a></h3>
 <p>Just as you can use <code>=def</code> to define a variable you can remove it from the variable table using <code>=undef</code>. For example,</p>
 <pre><code>=undef xyzzy
@@ -1915,16 +1923,12 @@ If you coded &ldquo;2&rdquo; then two gutter columns would be added - as appropr
 <p>although in md2pptx the bullets would be coloured appropriately - and mdpre actually centres the month.</p>
 <h4 id="controlling-how-day-numbers-are-displayed-with-caldays">Controlling How Day Numbers Are Displayed With <code>=caldays</code><a class="headerlink" href="#controlling-how-day-numbers-are-displayed-with-caldays" title="Permanent link"></a></h4>
 <p>You can style days in the calendar with CSS using the <code>class</code> attribute. For example:</p>
-<div class="highlight"><pre>=caldays blue 14 15 16 17
-=caldays orange 18
-</pre></div>
-
+<p><code>=caldays blue 14 15 16 17
+=caldays orange 18</code></p>
 <p>In this case days 14, 15, 16, and 17 are styled with CSS class <code>blue</code>, whereas day 18 is styled with CSS class <code>orange</code>. You need to code the CSS for classes <code>blue</code> and <code>orange</code> for these specifications to be effective.</p>
 <p><code>=caldays</code> must be specified on its own line between the <code>=cal</code> and <code>=endcal</code> lines. You can specify as many <code>=caldays</code> lines as you like within this bracket.</p>
 <p>You can specify a range of days in the following manner:</p>
-<div class="highlight"><pre>=caldays blue 14-17 22-24 27
-</pre></div>
-
+<p><code>=caldays blue 14-17 22-24 27</code></p>
 <p><strong>Notes:</strong></p>
 <ol>
 <li>In a range specification there mustn&rsquo;t be spaces between the <code>-</code> and the numbers either side.</li>
@@ -1932,15 +1936,11 @@ If you coded &ldquo;2&rdquo; then two gutter columns would be added - as appropr
 </ol>
 <h4 id="adding-a-key-to-the-day-numbers-styling-with-calkey">Adding A Key To The Day Numbers&rsquo; Styling With <code>=calkey</code><a class="headerlink" href="#adding-a-key-to-the-day-numbers-styling-with-calkey" title="Permanent link"></a></h4>
 <p>You can add bullets below the table to explain what each style means. For example:</p>
-<div class="highlight"><pre>=calkey blue We have data for **somehow**
-=calkey orange Is focus day
-</pre></div>
-
+<p><code>=calkey blue We have data for **somehow**
+=calkey orange Is focus day</code></p>
 <p>causes the following Markdown / HTML to be generated:</p>
-<div class="highlight"><pre>* &lt;span class=&#39;blue&#39;&gt;&amp;nbsp;&lt;/span&gt;We have data for **somehow**
-* &lt;span class=&#39;orange&#39;&gt;&amp;nbsp;&lt;/span&gt;Is focus day
-</pre></div>
-
+<p><code>* &lt;span class='blue'&gt;&amp;nbsp;&lt;/span&gt;We have data for **somehow**
+* &lt;span class='orange'&gt;&amp;nbsp;&lt;/span&gt;Is focus day</code></p>
 <p>As with <code>=caldays</code>, you need to code the CSS for classes <code>blue</code> and <code>orange</code> for these specifications to be effective.</p>
 <p><code>=calkey</code> must be specified on its own line between the <code>=cal</code> and <code>=endcal</code> lines. You can specify as many <code>=calkey</code> lines as you like within this bracket.</p>
 <p><strong>Notes:</strong> </p>
@@ -1952,19 +1952,15 @@ If you coded &ldquo;2&rdquo; then two gutter columns would be added - as appropr
 </ol>
 <h4 id="adding-information-to-a-cell-with-calnote">Adding Information To A Cell With <code>=calnote</code><a class="headerlink" href="#adding-information-to-a-cell-with-calnote" title="Permanent link"></a></h4>
 <p>You can add annotations to individual calendar dates with <code>=calnote</code>. For example:</p>
-<div class="highlight"><pre>=calnote 17 A
-=calnote 18 &lt;span class=&quot;green&quot;&gt;B&lt;/span&gt;
-</pre></div>
-
+<p><code>=calnote 17 A
+=calnote 18 &lt;span class="green"&gt;B&lt;/span&gt;</code></p>
 <ol>
 <li><code>=calnote 17 A</code> adds the text &ldquo;A&rdquo; to the cell for 17th of the month.</li>
 <li><code>=calnote 18 &lt;span class="green"&gt;B&lt;/span&gt;</code> adds the text &ldquo;B&rdquo; in (presumably) green to the cell for the 18th of the month.</li>
 </ol>
 <p><code>=calnote</code> must be specified on its own line between the <code>=cal</code> and <code>=endcal</code> lines. You can specify as many <code>=calnote</code> lines as you like within this bracket.</p>
 <p>You can specify a range of days in the following manner:</p>
-<div class="highlight"><pre>=calnote 14-17 RMF
-</pre></div>
-
+<p><code>=calnote 14-17 RMF</code></p>
 <p><strong>Notes:</strong></p>
 <ol>
 <li>In the examples given the text is short. It probably looks worse if the text is long.</li>

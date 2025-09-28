@@ -3,6 +3,10 @@
 ### Releases
 
 
+### v1.1.3 - 28 September, 2025
+
+* **ENHANCED** [Issue 45](https://github.com/MartinPacker/mdpre/issues/45): Variable Substitution Rules Relaxed
+
 ### v1.1.2 - 19 August, 2025
 
 * **FIXED** [Issue 42](https://github.com/MartinPacker/mdpre/issues/42): Crash With Dependency Extraction In A Code Block
@@ -28,13 +32,13 @@
 ### v0.9 - 17 May, 2025
 
 * **ENHANCED** [Issue 33](https://github.com/MartinPacker/mdpre/issues/33): Add environment variables
-* **ENHANCED** [Issue 34](https://github.com/MartinPacker/mdpre/issues/34): Support `=ifmatch` & `=ifnonmatch`
+* **ENHANCED** [Issue 34](https://github.com/MartinPacker/mdpre/issues/34): Support `=ifmatch` &; `=ifnonmatch`
 
 ### v0.8.1 - 9 May, 2025
 
 * **FIXED** [Issue 32](https://github.com/MartinPacker/mdpre/issues/32): Verbose output for `=def` doesn't cope with colons
 * **ENHANCED** [Issue 30](https://github.com/MartinPacker/mdpre/issues/30): Allow Variable To Be Set To stderr Value For a Command
-* **ENHANCED** [Issue 31](https://github.com/MartinPacker/mdpre/issues/31): Support `=ifempty` & `=ifnotempty`
+* **ENHANCED** [Issue 31](https://github.com/MartinPacker/mdpre/issues/31): Support `=ifempty` &; `=ifnotempty`
 
 ### v0.8 - 3 May, 2025
 

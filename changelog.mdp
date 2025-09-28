@@ -2,6 +2,10 @@
 
 =toc 2 2 Releases
 
+### v1.1.3 - 28 September, 2025
+
+* **ENHANCED** [Issue 45](https://github.com/MartinPacker/mdpre/issues/45): Variable Substitution Rules Relaxed
+
 ### v1.1.2 - 19 August, 2025
 
 * **FIXED** [Issue 42](https://github.com/MartinPacker/mdpre/issues/42): Crash With Dependency Extraction In A Code Block
