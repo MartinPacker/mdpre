@@ -24,6 +24,7 @@ For syntax help use `-h`.
 
 Latest release  is [here](https://github.com/MartinPacker/mdpre).
 
+Issues can be raised here. Discussion probably belongs in [this Subreddit](https://www.reddit.com/r/md2pptx_mdpre/).
 
 ### Future Python Release Support
 
