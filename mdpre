@@ -569,7 +569,45 @@ def parse_calstart(calString, p_separator = r"\s+"):
     else:
         cal_cellHeight = int(ym[2])
 
-    return (int(ym[0]), int(ym[1]), cal_cellHeight)
+    yearSpec = ym[0]
+    if yearSpec == "*":
+        calYear = datetime.datetime.now().year
+
+    else:
+        try:
+            calYear = int(yearSpec)
+        except:
+            calYear = datetime.datetime.now().year
+
+    monthNames = [
+        "JAN",
+        "FEB",
+        "MAR",
+        "APR",
+        "MAY",
+        "JUN",
+        "JUL",
+        "AUG",
+        "SEP",
+        "OCT",
+        "NOV",
+        "DEC",
+    ]
+
+    monthSpec = ym[1]
+    if monthSpec == "*":
+        calMonth = datetime.datetime.now().month
+
+    elif monthSpec[:3].upper() in monthNames:
+        calMonth = monthNames.index(monthSpec[:3].upper()) + 1
+      
+    else:
+        try:
+            calMonth = int(monthSpec)
+        except:
+            calMonth = datetime.datetime.now().month
+        
+    return (calYear, calMonth, cal_cellHeight)
 
 
 def parse_caldays(spanString, cal_spans, p_separator = r"\s+"):
@@ -2217,7 +2255,8 @@ makefile += "\t$(target).mdp \\\n"
 dependencyCount = len(dependencies)
 
 for dnum, d in enumerate(dependencies):
-    makefile += f"\t{d.replace(" ", "\\ ")}"
+    makefileFragment = "\t" + d.replace(" ", "\\ ")
+    makefile += makefileFragment
     if dnum < dependencyCount - 1:
         makefile += " \\\n"
     else:
