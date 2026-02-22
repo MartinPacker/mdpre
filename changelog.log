@@ -1,9 +1,9 @@
 
-mdpre Markdown Preprocessor v1.1.3 (28 September, 2025)
+mdpre Markdown Preprocessor v1.1.3+ (10 February, 2026)
 =======================================================
 
 - opened <stdout> for writing
-Def makefile = file-3
+Def makefile = none
 
 Def logfile = stderr
 
@@ -11,46 +11,48 @@ Def output = stdout
 
 Def input = stdin
 
-Def node = Mac.domain_not_set.invalid
+Def node = Mac-Studio-Max.local
 
-Def version = Darwin Kernel Version 25.1.0: Fri Sep 19 19:14:26 PDT 2025; root:xnu-12377.40.77.505.1~4/RELEASE_ARM64_T6000
+Def version = Darwin Kernel Version 25.4.0: Sun Feb  8 23:36:18 PST 2026; root:xnu-12377.100.591.501.2~2/RELEASE_ARM64_T6000
 
-Def architecture = 64bit Mach-O
+Def architecture = 64bit
 
 Def machine = arm64
 
 Def system = Darwin
 
-Def release = 25.1.0
+Def release = 25.4.0
 
-Def python_version = 3.13.1
+Def python_version = 3.9.6
 
 Def python_implementation = CPython
 
 Def processor = arm
 
-Def mdpre_date = 28 September, 2025
+Def mdpre_date = 10 February, 2026
 
-Def mdpre_level = 1.1.3
+Def mdpre_level = 1.1.3+
 
 Def userid = martinpacker
 
-Def day = 28
+Def day = 22
 
-Def month = September
+Def month = February
 
-Def year = 2025
+Def year = 2026
 
-Def time = 13&colon;47
+Def time = 20&colon;11
 
-Def date = 28 September&comma; 2025
+Def date = 22 February&comma; 2026
 
 This Is The Change Log For mdpre Markdown Preprocessor
 
 Table Of Contents - spec '2 2 Releases'
 
 2 2 Releases
-..... .....  v1.1.3 - 28 September, 2025
+..... .....  v1.1.3+ - 8 February, 20256
+
+..... .....  v1.1.3 - 28 September, 2025 
 
 ..... .....  v1.1.2 - 19 August, 2025
 
