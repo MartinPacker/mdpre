@@ -116,7 +116,7 @@ This document describes the mdpre Markdown preprocessor.
 
 In this document we'll refer to it as "mdpre", pronounced "em dee pree".
 
-This document was converted to HTML at 13&colon;47 on 28 September&comma; 2025.
+This document was converted to HTML at 20&colon;17 on 22 February&comma; 2026.
 
 ### Table Of Contents
 
@@ -861,10 +861,8 @@ although in md2pptx the bullets would be coloured appropriately - and mdpre actu
 
 You can style days in the calendar with CSS using the `class` attribute. For example:
 
-```
-=caldays blue 14 15 16 17
-=caldays orange 18
-```
+    =caldays blue 14 15 16 17
+    =caldays orange 18
 
 In this case days 14, 15, 16, and 17 are styled with CSS class `blue`, whereas day 18 is styled with CSS class `orange`. You need to code the CSS for classes `blue` and `orange` for these specifications to be effective.
 
