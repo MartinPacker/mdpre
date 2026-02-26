@@ -612,7 +612,11 @@ def parse_calstart(calString, p_separator = r"\s+"):
 
 def parse_caldays(spanString, cal_spans, p_separator = r"\s+"):
     sp = spanString.rstrip().lstrip()
-    
+
+    # Allow colon and comma as separators    
+    sp = sp.replace(":", "-")
+    sp = sp.replace(",", " ")
+
     # Remove any whitespace around dashes
     sp = re.sub(r'\s?-\s?','-', sp)
 

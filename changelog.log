@@ -11,7 +11,7 @@ Def output = stdout
 
 Def input = stdin
 
-Def node = Mac.domain_not_set.invalid
+Def node = Mac-Studio-Max.local
 
 Def version = Darwin Kernel Version 25.4.0: Sun Feb 15 21:26:30 PST 2026; root:xnu-12377.100.625.0.3~12/RELEASE_ARM64_T6000
 
@@ -41,7 +41,7 @@ Def month = February
 
 Def year = 2026
 
-Def time = 17&colon;09
+Def time = 17&colon;56
 
 Def date = 26 February&comma; 2026
 
