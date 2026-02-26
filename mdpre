@@ -24,7 +24,7 @@ import calendar
 import tempfile
 
 mdpre_level = "1.1.3+"
-mdpre_date = "10 February, 2026"
+mdpre_date = "26 February, 2026"
 banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
 
 
@@ -612,6 +612,10 @@ def parse_calstart(calString, p_separator = r"\s+"):
 
 def parse_caldays(spanString, cal_spans, p_separator = r"\s+"):
     sp = spanString.rstrip().lstrip()
+    
+    # Remove any whitespace around dashes
+    sp = re.sub(r'\s?-\s?','-', sp)
+
     words = re.split(p_separator, sp)
 
     for w in range(len(words)):
