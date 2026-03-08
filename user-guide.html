@@ -1350,7 +1350,7 @@ body .markdown-body
 <h1 id="markdown-preprocessor-user-guide">Markdown Preprocessor User Guide<a class="headerlink" href="#markdown-preprocessor-user-guide" title="Permanent link"></a></h1>
 <p>This document describes the mdpre Markdown preprocessor.</p>
 <p>In this document we&rsquo;ll refer to it as &ldquo;mdpre&rdquo;, pronounced &ldquo;em dee pree&rdquo;.</p>
-<p>This document was converted to HTML at 20&colon;17 on 22 February&comma; 2026.</p>
+<p>This document was converted to HTML at 14&colon;55 on 8 March&comma; 2026.</p>
 <h3 id="table-of-contents">Table Of Contents<a class="headerlink" href="#table-of-contents" title="Permanent link"></a></h3>
 <ul>
 <li><a href="#why-a-preprocessor">Why A Preprocessor?</a></li>
@@ -2083,6 +2083,11 @@ If you coded &ldquo;2&rdquo; then two gutter columns would be added - as appropr
 </li>
 </ul>
 <p>although in md2pptx the bullets would be coloured appropriately - and mdpre actually centres the month.</p>
+<p>Months can be specified by name - <code>jan</code>, <code>feb</code>, <code>mar</code>. <code>apr</code>, <code>may</code>, <code>jun</code>, <code>jul</code>, <code>aug</code>, <code>sep</code>, <code>oct</code>, <code>nov</code>, <code>dec</code> - as well as by number.</p>
+<p>The current year and month can both be specified with <code>*</code>.
+For example January of this year can be specified with</p>
+<pre><code>=cal * jan
+</code></pre>
 <h4 id="controlling-how-day-numbers-are-displayed-with-caldays">Controlling How Day Numbers Are Displayed With <code>=caldays</code><a class="headerlink" href="#controlling-how-day-numbers-are-displayed-with-caldays" title="Permanent link"></a></h4>
 <p>You can style days in the calendar with CSS using the <code>class</code> attribute. For example:</p>
 <pre><code>=caldays blue 14 15 16 17
@@ -2096,7 +2101,9 @@ If you coded &ldquo;2&rdquo; then two gutter columns would be added - as appropr
 
 <p><strong>Notes:</strong></p>
 <ol>
-<li>In a range specification there mustn&rsquo;t be spaces between the <code>-</code> and the numbers either side.</li>
+<li>In a range specification there can be spaces between the <code>-</code> and the numbers either side.</li>
+<li>In a range specification a <code>:</code> can be used instead of a dash.</li>
+<li><code>=caldays</code> can have commas instead of spaces.</li>
 <li>A later <code>=caldays</code> line overrides a prior one in the sequence - within a <code>=cal</code> / <code>=endcal</code> bracket.</li>
 </ol>
 <h4 id="adding-a-key-to-the-day-numbers-styling-with-calkey">Adding A Key To The Day Numbers&rsquo; Styling With <code>=calkey</code><a class="headerlink" href="#adding-a-key-to-the-day-numbers-styling-with-calkey" title="Permanent link"></a></h4>

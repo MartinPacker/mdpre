@@ -116,7 +116,7 @@ This document describes the mdpre Markdown preprocessor.
 
 In this document we'll refer to it as "mdpre", pronounced "em dee pree".
 
-This document was converted to HTML at 20&colon;17 on 22 February&comma; 2026.
+This document was converted to HTML at 14&colon;55 on 8 March&comma; 2026.
 
 ### Table Of Contents
 
@@ -857,6 +857,16 @@ It produces something like this:
 
 although in md2pptx the bullets would be coloured appropriately - and mdpre actually centres the month.
 
+Months can be specified by name - `jan`, `feb`, `mar`. `apr`, `may`, `jun`, `jul`, `aug`, `sep`, `oct`, `nov`, `dec` - as well as by number.
+
+
+The current year and month can both be specified with `*`.
+For example January of this year can be specified with
+
+    =cal * jan
+
+
+
 #### Controlling How Day Numbers Are Displayed With `=caldays`
 
 You can style days in the calendar with CSS using the `class` attribute. For example:
@@ -876,7 +886,9 @@ You can specify a range of days in the following manner:
 
 **Notes:**
 
-1. In a range specification there mustn't be spaces between the `-` and the numbers either side.
+1. In a range specification there can be spaces between the `-` and the numbers either side.
+1. In a range specification a `:` can be used instead of a dash.
+1. `=caldays` can have commas instead of spaces.
 1. A later `=caldays` line overrides a prior one in the sequence - within a `=cal` / `=endcal` bracket.
 
 #### Adding A Key To The Day Numbers' Styling With `=calkey`

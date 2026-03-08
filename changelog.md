@@ -3,11 +3,11 @@
 ### Releases
 
 
-### v1.1.3+ - 26 February, 20256
+### v1.1.4 - 8 March, 2026
 
+* **FIXED** `=cal` doesn't crash if an illegal month or year parameter is specified.
 * **ENHANCED** `=cal` now accepts `*` for current year and month.
 * **ENHANCED** `=cal` now accepts 3-letter abbreviations for month e.g. "nov".
-* **ENHANCED** `=cal` doesn't crash if an illegal month or year parameter is specified.
 * **ENHANCED** `=caldays` can have dashes round the minus sign for ranges
 * **ENHANCED** `=caldays` can have commas insted of spaces and colons instead of dashes
 
