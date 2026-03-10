@@ -23,8 +23,8 @@ from enum import Enum
 import calendar
 import tempfile
 
-mdpre_level = "1.1.4"
-mdpre_date = "8 March, 2026"
+mdpre_level = "1.1.4+"
+mdpre_date = "10 March, 2026"
 banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
 
 
@@ -203,7 +203,6 @@ class Output(object):
             columnCount = max(columnCount, len(row))
 
             rowCount += 1 
-
             CSV_lines.append(row)
 
         # Potentially flow the input CSV into a wider table
@@ -2155,6 +2154,9 @@ for line in input_file:
     elif (line.startswith("=endcsv")) & (in_csv is True):
         g_output.formatCSV(CSV_lines, CSV_colaligns, CSV_colwidths, CSV_rules, CSV_flowLines, CSV_flowGutterCells)
         in_csv = False
+        CSV_flowLines = 0
+        CSV_flowGutterCells = 0
+
         if wantVerbose is True:
             handle_verbose("<!--mdpre-endcsv:" + line + "-->")
 
