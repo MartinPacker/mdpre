@@ -189,6 +189,7 @@ class Output(object):
         self.write(f"{p_text}{self.NL}")
 
     def formatCSV(self, CSV_lines, colalign, colwidth, rules, flowLines, flowGutterCells):
+        # Create a CSV reader from the lines
         if csvDialect == "":
             CSV_reader = csv.reader(CSV_lines)
         else:
@@ -198,11 +199,14 @@ class Output(object):
         rowCount = 0
         columnCount = 0
 
+        # Create array of lines, working out maximum column count
+        # as well as row count
         CSV_lines = []
         for rowNumber, row in enumerate(CSV_reader):
             columnCount = max(columnCount, len(row))
 
-            rowCount += 1 
+            rowCount += 1
+            
             CSV_lines.append(row)
 
         # Potentially flow the input CSV into a wider table
@@ -215,6 +219,10 @@ class Output(object):
 
             # Create a list with gutter cells in
             gutterCells = [" "] * flowGutterCells
+            
+            # Create alignment and width arrays for gutters
+            gutterWidths = [1] * flowGutterCells
+            gutterAligns = ["c"] * flowGutterCells
 
 
             # Extend each pre-existing line to the maximum length,
@@ -223,9 +231,11 @@ class Output(object):
                 CSV_lines[lineNumber].extend([" "] * (columnCount - len(CSV_lines[lineNumber])))
                 CSV_lines[lineNumber].extend(gutterCells)
             
+            # The title line is the first line
             titleLine = CSV_lines[0]
 
             # Replicate the cells in the title row the right number of times
+            # Note: includes gutter cells, with one extra set
             titleLine *= flowings
                         
             # Operate on the data lines
@@ -248,7 +258,6 @@ class Output(object):
             for lineNumber, dataLine in enumerate(dataLines):
                 if len(dataLine) < (columnCount + flowGutterCells) * flowings:
                     dataLines[lineNumber].extend(padCells)
-                #dataLines[lineNumber].extend(gutterCells)
             
             # Adjust column count - due to flowing and gutters
             columnCount = (columnCount + flowGutterCells) * flowings - flowGutterCells
@@ -284,7 +293,13 @@ class Output(object):
             # Extend list by the replication factor
             colalign2.extend([alignment] * replication)
 
-        colalign = colalign2
+        colalign = colalign2.copy()
+
+        # Fix up colalign if =csvflow in effect
+        for fl in range(flowLines):
+            colalign.extend(gutterAligns)
+            colalign.extend(colalign2)
+
 
         # Extend colalign to cover all columns - now we know how many there are
         colalign.extend([colAlignExtender]* (columnCount - len(colalign)))
@@ -307,7 +322,13 @@ class Output(object):
             # Extend list by the replication factor
             colwidth2.extend([int(width)] * replication)
 
-        colwidth = colwidth2
+        colwidth = colwidth2.copy()
+
+        # Fix up colwidth if =csvflow in effect
+        for fl in range(flowLines):
+            colwidth.extend(gutterWidths)
+            colwidth.extend(colwidth2)
+
 
         # Extend colwidth to cover all columns - now we know how many there are
         colwidth.extend([int(colWidthExtender)] * (columnCount - len(colwidth)))
