@@ -17,10 +17,10 @@
 ### Releases
 
 
-### v1.1.4+ - 10 March, 2026
+### v1.1.5 - 12 March, 2026
 
-* **<span class="orange">FIXED</span>** `=csvflow` should be cancelled after the next `=endcsv`.
-* **<span class="orange">FIXED</span>** `=csvflow` should clone `=colalign` and `=colwidth` specifications.
+* **<span class="orange">FIXED</span>** [Issue 46](https://github.com/MartinPacker/mdpre/issues/46): `=csvflow` is cancelled after the next `=endcsv`.
+* **<span class="orange">FIXED</span>** [Issue 47](https://github.com/MartinPacker/mdpre/issues/47): `=csvflow` clones `=colalign` and `=colwidth` specifications when it creates extra sets of columns.
 
 ### v1.1.4 - 8 March, 2026
 

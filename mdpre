@@ -23,8 +23,8 @@ from enum import Enum
 import calendar
 import tempfile
 
-mdpre_level = "1.1.4+"
-mdpre_date = "10 March, 2026"
+mdpre_level = "1.1.5"
+mdpre_date = "12 March, 2026"
 banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
 
 

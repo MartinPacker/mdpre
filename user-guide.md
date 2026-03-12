@@ -116,7 +116,7 @@ This document describes the mdpre Markdown preprocessor.
 
 In this document we'll refer to it as "mdpre", pronounced "em dee pree".
 
-This document was converted to HTML at 14&colon;55 on 8 March&comma; 2026.
+This document was converted to HTML at 20&colon;57 on 12 March&comma; 2026.
 
 ### Table Of Contents
 
@@ -789,6 +789,11 @@ If you code "1" a single column "gutter" of cells with just a single space in wi
 prior to flowing.
 (The line-terminating gutter cells will be removed after flowing.)
 If you coded "2" then two gutter columns would be added - as appropriate.
+
+**Notes:**
+
+1. After the next `=csv` / `=endcsv` bracket CSV flowing will be reset - to not flow.
+1. When flowing causes columns to be added `=colalign` and `=colwidth` specifications will be appropriately propagated.
 
 ### Creating A Calendar Month Table With `=cal`
 

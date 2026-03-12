@@ -1350,7 +1350,7 @@ body .markdown-body
 <h1 id="markdown-preprocessor-user-guide">Markdown Preprocessor User Guide<a class="headerlink" href="#markdown-preprocessor-user-guide" title="Permanent link"></a></h1>
 <p>This document describes the mdpre Markdown preprocessor.</p>
 <p>In this document we&rsquo;ll refer to it as &ldquo;mdpre&rdquo;, pronounced &ldquo;em dee pree&rdquo;.</p>
-<p>This document was converted to HTML at 14&colon;55 on 8 March&comma; 2026.</p>
+<p>This document was converted to HTML at 20&colon;57 on 12 March&comma; 2026.</p>
 <h3 id="table-of-contents">Table Of Contents<a class="headerlink" href="#table-of-contents" title="Permanent link"></a></h3>
 <ul>
 <li><a href="#why-a-preprocessor">Why A Preprocessor?</a></li>
@@ -1903,6 +1903,11 @@ If you code &ldquo;1&rdquo; a single column &ldquo;gutter&rdquo; of cells with j
 prior to flowing.
 (The line-terminating gutter cells will be removed after flowing.)
 If you coded &ldquo;2&rdquo; then two gutter columns would be added - as appropriate.</p>
+<p><strong>Notes:</strong></p>
+<ol>
+<li>After the next <code>=csv</code> / <code>=endcsv</code> bracket CSV flowing will be reset - to not flow.</li>
+<li>When flowing causes columns to be added <code>=colalign</code> and <code>=colwidth</code> specifications will be appropriately propagated.</li>
+</ol>
 <h3 id="creating-a-calendar-month-table-with-cal">Creating A Calendar Month Table With <code>=cal</code><a class="headerlink" href="#creating-a-calendar-month-table-with-cal" title="Permanent link"></a></h3>
 <p>You can generate a Markdown table that shows all the days in a month. For example:</p>
 <table>
