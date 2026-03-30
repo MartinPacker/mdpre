@@ -23,10 +23,16 @@ from enum import Enum
 import calendar
 import tempfile
 
-mdpre_level = "1.1.5"
-mdpre_date = "12 March, 2026"
-banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
+try:
+    from Cheetah.Template import Template
 
+    have_cheetah = True
+except:
+    have_cheetah = False
+
+mdpre_level = "1.1.5+"
+mdpre_date = "28 March, 2026"
+banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
 
 def log(textToLog):
     logfileHandle.write(textToLog + "\n")
@@ -122,6 +128,9 @@ def setOrUpdateVariable(varName, varValue):
 			 # Add the variable as it's new
 			vars.append(var)
 
+def get_all_variables():
+    global vars
+    return vars
 class OutputType(Enum):
     """preparation for later usage. support e.g. other outputs like MMD or ADOC"""
 
@@ -694,6 +703,70 @@ def parse_calnote(noteString, cal_notes):
 
     return cal_notes
 
+def parse_templatedef(defstring):
+    global in_templatedef, templateName, templateFilename, templateDefinitions
+    if(m := templatedefRegex2.match(defstring)):
+        # Second group is a filename
+        templateName = m.group(1)
+        templateFilename = m.group(2)
+        
+        if templateName in templateDefinitions.keys():
+            log(f"Replacing definition of template {templateName}.")
+            
+            try:
+                with open(templateFilename, "r") as t:
+                    templateLines = t.readlines()
+                    templateDefinitions[templateName] = "".join(templateLines)
+                    
+            except IOError:
+                log(f"File {templateFilename} missing. Terminating.\n")
+
+                exit()
+
+        
+        in_templatedef = False
+
+    elif (m := templatedefRegex1.match(defstring)):
+        # No second group so start inline template definition
+        templateName = m.group(1)
+        templateFilename = ""
+        
+        if templateName in templateDefinitions.keys():
+            log(f"Replacing definition of template {templateName}.\n")
+
+        in_templatedef = True
+        
+        templateDefinitions[templateName] = ""
+
+    else:
+        print(templateDefinitions)
+        log("Syntax error in template definition. Ignoring\n")
+
+def parse_endtemplatedef(line):
+    global in_templatedef
+
+    in_templatedef = False
+
+def parse_usetemplate(usestring):
+    global in_templatedef, templateDefinitions, g_output
+    
+    templateName = usestring.strip()    
+    
+    if templateName in templateDefinitions.keys():
+        template = templateDefinitions[templateName]
+
+        variables = {}       
+        for v in get_all_variables():
+            varName, _, varValue = v
+            variables[varName] = varValue
+        
+        try:
+            filledInTemplate = Template(template, variables)
+            g_output.write(filledInTemplate)
+        except:
+            log(f"Error in filling in template {templateName}. Terminating\n")
+    else:
+        log(f"Template {templateName} not defined. Terminating.\n")
 
 # Handle =def - which might return more than one variable
 def parse_def(defString):
@@ -1689,6 +1762,16 @@ def handle_verbose(line):
     elif verboseType == "exec":
         log("Exec " + verboseArray[1][6:] + "\n")
 
+    elif verboseType == "template":
+        log("Template Definition " + verboseArray[1][10:] + "\n")
+
+    elif verboseType == "endtemplate":
+        log("End Template Definition\n")
+
+    elif verboseType == "usetemplate":
+        log("Template Use " + verboseArray[1][13:] + "\n")
+
+
     else:
         log("Unknown " + line + "\n")
 
@@ -1874,6 +1957,11 @@ for arg in range(1, arguments + 1):
         sys.argv[arg] = ""
 
 log("\n" + banner + "\n" + bannerUnderline + "\n")
+
+if have_cheetah:
+    log("Cheetah templating engine imported\n")
+else:
+    log("Cheetah templating engine not imported\n")
 
 # Second pass argument parsing - to pick up all the rest
 for arg in range(1, arguments + 1):
@@ -2094,6 +2182,10 @@ videoRegex = re.compile(videoRE)
 audioRE = "<audio (.*?)></audio>"
 audioRegex = re.compile(audioRE)
 
+templatedefRE1 = "^([^\\s]+)"
+templatedefRegex1 = re.compile(templatedefRE1)
+templatedefRE2 = "^([^\\s]+)\\s+(.+)\\s?"
+templatedefRegex2 = re.compile(templatedefRE2)
 
 # Prime list of referenced files
 includeStack = ["top-level-file"]
@@ -2117,6 +2209,10 @@ CSV_rules =  []
 in_csv = False
 in_cal = False
 
+in_templatedef = False
+templateDefinitions = {}
+templateName = ""
+templateFilename = ""
 
 for line in input_file:
     line = line.rstrip("\n")
@@ -2124,7 +2220,7 @@ for line in input_file:
         # For verbose mode writing to stderr
         handle_verbose(line)
 
-    elif line.startswith("#"):
+    elif (line.startswith("#")) & (in_templatedef is False):
         if wantVerbose is True:
             handle_verbose("<!--mdpre-heading:" + line + "-->")
         g_output.write(line)
@@ -2240,6 +2336,36 @@ for line in input_file:
 
     elif in_cal is True:
         cal_lines.append(line)
+
+    elif line.startswith("=template"):
+        if have_cheetah:
+            parse_templatedef(line[10:])
+
+        if wantVerbose is True:
+            handle_verbose("<!--mdpre-template:" + line + "-->")
+
+        else:
+            log("=template encountered nut Cheetah not installed. Ignoring.")
+
+    elif line.startswith("=endtemplate"):
+        if have_cheetah:
+            if in_templatedef:
+                parse_endtemplatedef(line[13:])
+                if wantVerbose is True:
+                    handle_verbose("<!--mdpre-endtemplate:" + line + "-->")
+            else:
+                log("=endtemplate encountered but no matching =template. Ignoring.")
+        else:
+            log("=endtemplate encountered nut Cheetah not installed. Ignoring.")
+
+    elif in_templatedef:
+        templateDefinitions[templateName] += line + "\n"
+
+    elif line.startswith("=usetemplate"):
+        parse_usetemplate(line[13:])
+
+        if wantVerbose is True:
+            handle_verbose("<!--mdpre-usetemplate:" + line + "-->")
 
     elif line.find("![") > -1:
         if (line[0:4] != "    ") & (line[0:1] != "\t"):
