@@ -31,7 +31,7 @@ except:
     have_cheetah = False
 
 mdpre_level = "1.1.5+"
-mdpre_date = "28 March, 2026"
+mdpre_date = "31 March, 2026"
 banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
 
 def log(textToLog):
@@ -713,16 +713,15 @@ def parse_templatedef(defstring):
         if templateName in templateDefinitions.keys():
             log(f"Replacing definition of template {templateName}.")
             
-            try:
-                with open(templateFilename, "r") as t:
-                    templateLines = t.readlines()
-                    templateDefinitions[templateName] = "".join(templateLines)
+        try:
+            with open(templateFilename, "r") as t:
+                templateLines = t.readlines()
+                templateDefinitions[templateName] = "".join(templateLines)
                     
-            except IOError:
-                log(f"File {templateFilename} missing. Terminating.\n")
+        except IOError:
+            log(f"File {templateFilename} missing. Terminating.\n")
 
-                exit()
-
+            exit()
         
         in_templatedef = False
 
@@ -739,7 +738,6 @@ def parse_templatedef(defstring):
         templateDefinitions[templateName] = ""
 
     else:
-        print(templateDefinitions)
         log("Syntax error in template definition. Ignoring\n")
 
 def parse_endtemplatedef(line):
@@ -753,6 +751,7 @@ def parse_usetemplate(usestring):
     templateName = usestring.strip()    
     
     if templateName in templateDefinitions.keys():
+        print(templateDefinitions.keys())
         template = templateDefinitions[templateName]
 
         variables = {}       
