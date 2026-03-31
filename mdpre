@@ -751,7 +751,6 @@ def parse_usetemplate(usestring):
     templateName = usestring.strip()    
     
     if templateName in templateDefinitions.keys():
-        print(templateDefinitions.keys())
         template = templateDefinitions[templateName]
 
         variables = {}       
@@ -2218,6 +2217,10 @@ for line in input_file:
     if line.startswith("<!--mdpre-"):
         # For verbose mode writing to stderr
         handle_verbose(line)
+
+    elif line.startswith("=."):
+        # Comment line
+        continue
 
     elif (line.startswith("#")) & (in_templatedef is False):
         if wantVerbose is True:

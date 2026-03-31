@@ -7,6 +7,10 @@
   color: #00FF00;
 }
 
+.red {
+  color: #FF0000;
+}
+
 .orange {
   color: #FF7F00;
 }
@@ -14,7 +18,12 @@
 
 # This Is The Change Log For mdpre Markdown Preprocessor
 
+**<span class="blue">NEW</span>** **<span class="green">ENHANCED</span>** **<span class="orange">FIXED</span>** **<span class="red">REMOVED</span>** 
 =toc 2 2 Releases
+
+### v1.1.5+ - 31 March, 2026
+* **<span class="blue">NEW</span>** Support (optional) Cheetah templates
+* **<span class="blue">NEW</span>** Support `=.` denoting a comment line
 
 ### v1.1.5 - 12 March, 2026
 
@@ -86,7 +95,7 @@
 
 ### v0.6.8 - 8  March, 2024
 
-* **<span class="orange">FIXED</span>** The only thing that should be stripped off a line in the main loop is the <span class="green">NEW</span>line
+* **<span class="orange">FIXED</span>** The only thing that should be stripped off a line in the main loop is the newline
 
 ### v0.6.7 - 17  December, 2023
 
@@ -143,12 +152,11 @@
 
 ### v0.4.3 - 10 March, 2019
 
-* **<span class="green">NEW</span>** Added some pre-defined variables
+* **<span class="blue">NEW</span>** Added some pre-defined variables
 
 ### v0.4.2 - 20 January, 2019
 
-* **<span class="green">NEW</span>** `-d` to define variables
-* **<span class="green">NEW</span>** `-c` to wrap everything with `=csv` and `=endcsv`
+* **<span class="blue">NEW</span>** `-c` to wrap everything with `=csv` and `=endcsv`
 
 ### v0.4.1 - 12 January, 2019
 
@@ -156,7 +164,7 @@
 
 ### v0.4 - 21 October, 2018
 
-* **<span class="green">NEW</span>** `=stop` stops reading in further text
+* **<span class="blue">NEW</span>** `=stop` stops reading in further text
 
 ### v0.3 - 1 April, 2018
 
@@ -165,21 +173,21 @@
 
 ### v0.2 - 26 March, 2018
 
-* **<span class="green">NEW</span>** [TextBundle](http://textbundle.org) support - both TextPack and TextBundle subformats.
+* **<span class="blue">NEW</span>** [TextBundle](http://textbundle.org) support - both TextPack and TextBundle subformats.
 
 ### v0.1 - 17 March, 2018
 
-* **<span class="green">NEW</span>** Backslash (`\`) at end of line joins the next line.
+* **<span class="blue">NEW</span>** Backslash (`\`) at end of line joins the next line.
 
-* **<span class="green">NEW</span>** You can specify an automatically-generated Table Of Contents.
+* **<span class="blue">NEW</span>** You can specify an automatically-generated Table Of Contents.
 
-* **<span class="green">NEW</span>** Startup banner and normal termination message.
+* **<span class="blue">NEW</span>** Startup banner and normal termination message.
 
-* **<span class="green">NEW</span>** `-h` Help parameter.
+* **<span class="blue">NEW</span>** `-h` Help parameter.
 
-* **<span class="green">NEW</span>** `-v` "Verbose Mode" parameter - which just documents files being embedded.
+* **<span class="blue">NEW</span>** `-v` "Verbose Mode" parameter - which just documents files being embedded.
 
 ### v0.0 - 12 March, 2018
 
-* **<span class="green">NEW</span>** Initial release
+* **<span class="blue">NEW</span>** Initial release
 
