@@ -543,25 +543,6 @@ class Output(object):
 
         return
 
-
-##########################
-# Class to control loops #
-##########################
-
-class LoopController:
-
-    def __init__(self, loopType, parent, loopVarName, loopVarValues, loopValue = "", children = []):
-        self.loopType = loopType
-        self.parent = parent
-        self.loopVarName = loopVarName
-        self.loopVarValues = loopVarValues
-        self.children = children
-        self.lineValue = loopValue
-        self.endForEncountered = False
-        self.currentIndex = -1
-        self.valueCount = len(loopVarValues)
-
-
 ####################
 # Helper Functions #
 ####################
@@ -1075,226 +1056,8 @@ def handle_undef(name):
 
     return ["<!--mdpre-undef:notfound:" + name + "-->"]
 
-def handle_for(forArguments):
-    global rootLoopController, currentLoopController
-    global vars
-
-    ####################
-    # Handle arguments #
-    ####################
-    forArgs=forArguments.split(" ")
-    
-    # Remove empty members because of multiple spaces
-    forArgs = [i for i in forArgs if i]
-    
-    # Remove optional "="
-    forArgs = [i for i in forArgs if i != "="]
-    
-    loopIsIn = False
-    
-    # Parse arguments
-    argCount = len(forArgs)
-
-    if argCount < 3:
-        log(f"Syntax error: {forArguments}\n")
-        log("Stopping.")
-        sys.exit()
-
-    elif forArgs[1].lower() == "in":
-        # for / in variant
-        loopVarname = forArgs[0]
-        
-        # Get remainder of statement after the variable and "in"
-        afterIn = forArguments.find(" in ") + 4
-        rest = forArguments[afterIn:]
-
-        # ~Use CSV reader to parse the line
-        loopValues = csv.reader(io.StringIO(rest), escapechar = "\\", skipinitialspace = True).__next__()
-
-        loopIsIn = True
-
-    elif argCount == 4:
-        # for / to - without by
-        loopVarname = forArgs[0]
-
-        loopFirst = int(forArgs[1])
-
-        if forArgs[2].lower() != "to":
-            log(f"Syntax error: {forArguments}\n")
-            log("Stopping.")
-            sys.exit()
-        
-        loopLast = int(forArgs[3])
-
-        loopBy = 1
-    else:
-        # for / to / by
-        loopVarname = forArgs[0]
-
-        loopFirst = int(forArgs[1])
-
-        if forArgs[2].lower() != "to":
-            log(f"Syntax error: {forArguments}\n")
-            log("Stopping.")
-            sys.exit()
-        
-        loopLast = int(forArgs[3])
-
-        if forArgs[4].lower() != "by":
-            log(f"Syntax error: {forArguments}\n")
-            log("Stopping.")
-            sys.exit()
-        
-
-        loopBy = int(forArgs[5])
-
-    # Only use range to make list if not "in" form
-    if loopIsIn is False:
-    # Make values into a list
-        loopLast = loopLast + loopBy
-        loopValues = [*range(loopFirst, loopLast, loopBy)]
-
-    ##############################
-    # Set up the loop controller #
-    ##############################
-
-    # Register this for loop
-    loopController = LoopController("for", None, loopVarname, loopValues,"", [])
-    if rootLoopController == None:
-        # Start the tree of loops
-        rootLoopController = loopController
-        currentLoopController = loopController
-    else:
-        if currentLoopController != None:
-            # Add loop controller to tree as a child at parent's position
-            currentLoopController.children.append(loopController)
-            loopController.parent = currentLoopController
-            currentLoopController = loopController
-    
-    # Set the loop variable to its initial value
-    setOrUpdateVariable(loopVarname, str(loopValues[0]))
-
-    return "<!--mdpre-for:" + forArguments + "-->"
-
-def _printLoopControllers(loopController, level):
-    print("    " * level + "--------------------")
-    print("    " * level + "Type: " + loopController.loopType)
-    print("    " * level + "Self: " + str(loopController))
-    print("    " * level + "Parent: " + str(loopController.parent))
-    print("    " * level + "End For: " + str(loopController.endForEncountered))
-    print("    " * level + "Variable: " + loopController.loopVarName)
-    for value in loopController.loopVarValues:
-        print("    " * level + str(value))
-    if loopController.loopType == "line":
-        print("    " * level + "Line value: " +loopController.lineValue)
-    elif loopController.loopType == "include":
-        print("    " * level + "Filename: " +loopController.lineValue[9:])
-    else:
-        print("    " * level + "Children:")
-        for child in loopController.children:
-            print("    " * level + str(child))
-    
-    print("    " * level + "--------------------")
-    print("\n")
-
-    for child in loopController.children:
-        _printLoopControllers(child, level + 1)
-    print("\n\n")
-    
-def printLoopControllers():
-    if rootLoopController is not None:
-        _printLoopControllers(rootLoopController, 0)
-    else:
-        print("No loop controllers")
-
-def interpretLoops(input_file2, loopController):
-    global vars
-    global rootLoopController, currentLoopController
-    #printLoopControllers()
-
-    # Loop over the loop variable's values
-    for loopVarValue in loopController.loopVarValues:
-        # Set the loop variable's current value
-        setOrUpdateVariable(loopController.loopVarName, str(loopVarValue))
-
-        # Add the children of this loop controller
-        for child in loopController.children:
-            if child.loopType == "line":
-                line = substitute_variables(child.lineValue)
-                input_file2.append(line)
-            elif child.loopType == "include":
-                line = substitute_variables(child.lineValue)
-                include_name = substitute_variables(line[9:].rstrip().lstrip())
-
-                # Check for recursive inclusion
-                if include_name in includeStack:
-                    log(
-                        f"File '{include_name}' recursively included. Stopping."
-                    )
-                    sys.exit()
-
-                if wantVerbose is True:
-                    input_file2.append(
-                        "<!--mdpre-embed-start:"
-                        + str(embedLevel)
-                        + ":"
-                        + include_name
-                        + "-->"
-                    )
-
-                # Not recursive so add include file name to stack
-                includeStack.append(include_name)
-
-                try:
-                    with open(include_name, "r") as f:
-                        stopIt, include_lines = parse_include(f.readlines())
-                except:
-                    log(f"File {include_name} missing. Terminating.\n")
-                    exit()
-
-                for line2 in include_lines:
-                    input_file2.append(line2)
-
-                if wantVerbose is True:
-                    input_file2.append(
-                        "<!--mdpre-embed-stop:"
-                        + str(embedLevel)
-                        + ":"
-                        + include_name
-                        + "-->"
-                    )
-
-                if stopIt is True:
-                    return [stopIt, input_file2, vars]
-            else:
-                input_file2 = interpretLoops(input_file2, child)
-    if loopController == rootLoopController:
-        rootLoopController = None
-        currentLoopController = None
-    return input_file2
-
-def handle_endfor(endforArguments, input_file2):
-    global rootLoopController, currentLoopController
-    global vars
-
-    loopController = currentLoopController
-
-    # Flag "end for" encountered
-    currentLoopController.endForEncountered = True
-
-    # Back to processing parent
-    currentLoopController = currentLoopController.parent
-    # printLoopControllers()
-    
-    # If all the way up to root loop controller has met "end for" interpret the loop set
-    if rootLoopController.endForEncountered:
-        input_file2 = interpretLoops(input_file2, rootLoopController)
-
-    return ["<!--mdpre-endfor:" + endforArguments + "-->", input_file2]
-    
 
 def parse_include(input_file):
-    global rootLoopController, currentLoopController
     global embedLevel
     global ifStack
     global vars
@@ -1315,7 +1078,7 @@ def parse_include(input_file):
             ifStackTop = True
         
         if ifStackTop is True:
-            if (line.startswith("=include ")) & (rootLoopController == None):
+            if line.startswith("=include "):
                 include_name = substitute_variables(line[9:].rstrip().lstrip())
 
                 # Check for recursive inclusion
@@ -1386,27 +1149,6 @@ def parse_include(input_file):
                             + redefined
                             + "-->"
                         )
-
-            elif line.startswith("=for ") is True:
-                verbosity = handle_for(line[5:-1].lstrip())
-                if wantVerbose is True:
-                    input_file2.append(verbosity)
-
-            elif line.startswith("=endfor") is True:
-                verbosity, input_file2 = handle_endfor(line[8:-1].lstrip(), input_file2)
-                if wantVerbose is True:
-                    input_file2.append(verbosity)
-
-            elif currentLoopController != None:
-                # There is an active loop
-                if line.startswith("=include "):
-                    # Add current line to loop lines - as an include
-                    lineController = LoopController("include", None, "", [], unsubstitutedLine, [])
-                    currentLoopController.children.append(lineController)
-                else:
-                    # Add current line to loop lines - as an ordinary line
-                    lineController = LoopController("line", None, "", [], unsubstitutedLine, [])
-                    currentLoopController.children.append(lineController)
 
             elif line.startswith("=inc ") is True:
                 parse_inc(line)
@@ -1908,9 +1650,6 @@ wantTextBundle = False
 wantTextPack = False
 
 textBundleFilename = ""
-
-rootLoopController = None
-currentLoopController = None
 
 parmVars = []
 
