@@ -22,7 +22,10 @@
 ### Releases
 
 
-### v1.1.5+ - 31 March, 2026
+### v1.1.5+ - 4 April, 2026
+
+* **<span class="blue">NEW</span>** Add `--help` command line switch - as an alternative to `-h`
+* **<span class="blue">NEW</span>** Add `--version` command line switch
 * **<span class="blue">NEW</span>** Support (optional) Cheetah templates
 * **<span class="blue">NEW</span>** Support `=.` denoting a comment line
 

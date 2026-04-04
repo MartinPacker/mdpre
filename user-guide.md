@@ -116,13 +116,14 @@ This document describes the mdpre Markdown preprocessor.
 
 In this document we'll refer to it as "mdpre", pronounced "em dee pree".
 
-This document was converted to HTML at 20&colon;57 on 12 March&comma; 2026.
+This document was converted to HTML at 14&colon;47 on 3 April&comma; 2026.
 
 ### Table Of Contents
 
 * [Why A Preprocessor?](#why-a-preprocessor)
 * [How Do You Use mdpre?](#how-do-you-use-mdpre)
 	* [Help](#help)
+	* [Printing The Version](#printing-the-version)
 	* [Verbose Mode](#verbose-mode)
 	* [Creating A Make File Fragment](#creating-a-make-file-fragment)
 	* [Defining Variables](#defining-variables)
@@ -130,7 +131,9 @@ This document was converted to HTML at 20&colon;57 on 12 March&comma; 2026.
 	* [Specifying Filenames On The Command Line](#specifying-filenames-on-the-command-line)
 	* [TextBundle And TextPack Support](#textbundle-and-textpack-support)
 	* [Processing Flow](#processing-flow)
+	* [Installing Cheetah 3 Template Support](#installing-cheetah-3-template-support)
 * [Language Elements](#language-elements)
+	* [Comments with `=.`](#comments-with)
 	* [Including files with `=include`](#including-files-with-include)
 	* [Defining Variables With `=def`](#defining-variables-with-def)
 		* [Substituting Variables In Text](#substituting-variables-in-text)
@@ -158,6 +161,11 @@ This document was converted to HTML at 20&colon;57 on 12 March&comma; 2026.
 	* [Concatenating Lines With `\`](#concatenating-lines-with)
 	* [Generating A Table Of Contents With `=toc`](#generating-a-table-of-contents-with-toc)
 	* [Terminating Input With `=stop`](#terminating-input-with-stop)
+	* [Using Cheetah 3 Templates](#using-cheetah-3-templates)
+		* [Defining Templates With `=template`](#defining-templates-with-template)
+			* [Defining A Template With Inline Text](#defining-a-template-with-inline-text)
+			* [Defining A Template With An External File](#defining-a-template-with-an-external-file)
+		* [Using A Template With `=usetemplate`](#using-a-template-with-usetemplate)
 * [Additional Information](#additional-information)
 	* [Built-In Variables](#builtin-variables)
 
@@ -208,6 +216,16 @@ Messages are written to stderr.
 You can get parameter help using the `-h` parameter:
 
 	mdpre -h
+
+An alternative to this is `--help`.
+
+### Printing The Version
+
+If the only parameter on the command line is `--version` the version string will be reported:
+
+    mdpre --version
+
+Whether Cheetah 3 is available to the run is also reported.
 
 ### Verbose Mode
 
@@ -305,9 +323,9 @@ In this case the whole `-d` parameter string is in quotes to preserve spaces in 
 
 ### Filenames
 
-You can use any names you like but an extension to denote that the input file is a preprocessable one is handy. In the above example .mdp was used. This seems like a sensible convention.
+You can use any names you like but an extension to denote that the input file is a preprocessable one is handy. In the above example `.mdp` was used. This seems like a sensible convention.
 
-Similarly, common file extensions for Markdown files are .md and .markdown.
+Similarly, common file extensions for Markdown files are `.md` and `.markdown`.
 
 ### Specifying Filenames On The Command Line
 
@@ -355,6 +373,18 @@ mdpre can process TextBundle files directly, and you can convert a TextPack file
 
 ![Processing Flow](processing-flow.png)
 
+### Installing Cheetah 3 Template Support
+
+You can optionally install the Python-based Cheetah 3 templating engine.
+This is a MIT-licensed open source package, just like mdpre.
+
+On most operating systems the following command will work:
+
+    pip3 install ct3
+
+On startup mdpre will indicate whether Cheetah 3 is available to it.
+If Cheetah 3 is not installed attempting to use mdpre features that require it will cause messages to be issued.
+
 ## Language Elements
 
 The input to mdpre generally consists of standard Markdown. However, it would be a very boring use of mdpre if that's all you wrote.
@@ -362,6 +392,14 @@ The input to mdpre generally consists of standard Markdown. However, it would be
 This section describes **additional** statements, which are the real reason for using mdpre in the first place.
 
 The spirit of some of these additional statements is similar to that of C compiler preprocessors. However the `#` character is already taken in Markdown so commands begin with `=` instead. **All statements begin at the first character on the line.**
+
+### Comments with `=.`
+
+You can include comments that are stripped out by mdpre.
+Any line beginning with `=.` will be considered to be a comment line.
+
+**Note:** Blank lines are considered significant and passed through.
+`=.` is the nearest thing to a blank line that is stripped out.
 
 ### Including files with `=include`
 
@@ -1011,6 +1049,91 @@ Here's a scenario: You copy some Markdown into a new file. Then you work on adap
 A line beginning `=stop` causes all further input lines to be ignored.
 
 As you work on your text you can, of course, move the `=stop` line down.
+
+### Using Cheetah 3 Templates
+
+You can - if Cheetah 3 is installed and made available to mdpre - use its templating capabilities.
+
+These templates can, for example:
+
+* Loop
+* Instantiate variables
+* Perform Python-like logic
+* Perform conditional processing
+* Include other template files
+
+Some of the above can be done by other means with mdpre but Cheetah 3 significantly extends the capabilities of mdpre.
+
+#### Defining Templates With `=template`
+
+There are two ways to define a template to mdpre:
+
+1. With the template text inline
+1. Referring to an external template file
+
+In both cases you give the template a name - so it can be referred to.
+
+You can redefine a template - and mdpre will warn you if you do.
+
+##### Defining A Template With Inline Text
+
+The template definition is sandwiched between a `=template` line and a `=endtemplate` line.
+For example:
+
+    =template t1
+    <html>
+      <title>$title</title>
+    </html>
+    =endtemplate
+
+Here the template is called `t1`.
+
+##### Defining A Template With An External File
+
+The template is defined with a single line - and there is no `=endtemplate` line.
+For example:
+
+    =template t1 hello.tmpl
+
+The template file (`hello.tmpl`) might contain the following lines, equivalent to the inline definition shown above:
+
+    <html>
+      <title>$title</title>
+    </html>
+
+
+#### Using A Template With `=usetemplate`
+
+In the following invocation template t1 is used:
+
+    =usetemplate t1
+
+You can use a template multiple times in a mdpre run.
+
+mdpre passes all its variables to Cheetah 3.
+These can be used in the template.
+Any not used are ignored.
+
+Consider the following example:
+
+    =def title Hello From Cheetah 3
+    =.
+    =template t1
+    <html>
+      <title>$title</title>
+    </html>
+    =endtemplate
+    =.
+    =usetemplate t1
+
+Here the variable `title` is defined and then used when the inline template is used.
+The result is:
+
+    <html>
+      <title>Hello From Cheetah 3</title>
+    </html>
+
+(The use of `=.` is to create empty comment lines that don't form part of the output.)
 
 ## Additional Information
 

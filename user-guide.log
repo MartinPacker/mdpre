@@ -1,6 +1,8 @@
 
-mdpre Markdown Preprocessor v1.1.5 (12 March, 2026)
+mdpre Markdown Preprocessor v1.1.5+ (3 April, 2026)
 ===================================================
+
+Cheetah templating engine imported
 
 - opened <stdout> for writing
 Def makefile = file-3
@@ -11,9 +13,9 @@ Def output = stdout
 
 Def input = stdin
 
-Def node = Mac-Studio-Max.local
+Def node = Mac.domain_not_set.invalid
 
-Def version = Darwin Kernel Version 25.4.0: Thu Mar  5 22:45:07 PST 2026; root:xnu-12377.101.14~19/RELEASE_ARM64_T6000
+Def version = Darwin Kernel Version 25.4.0: Thu Mar 19 19:30:44 PDT 2026; root:xnu-12377.101.15~1/RELEASE_ARM64_T6000
 
 Def architecture = 64bit Mach-O
 
@@ -29,21 +31,21 @@ Def python_implementation = CPython
 
 Def processor = arm
 
-Def mdpre_date = 12 March, 2026
+Def mdpre_date = 3 April, 2026
 
-Def mdpre_level = 1.1.5
+Def mdpre_level = 1.1.5+
 
 Def userid = martinpacker
 
-Def day = 12
+Def day = 3
 
-Def month = March
+Def month = April
 
 Def year = 2026
 
-Def time = 20&colon;57
+Def time = 14&colon;47
 
-Def date = 12 March&comma; 2026
+Def date = 3 April&comma; 2026
 
 Def TOC = Table Of Contents
 
@@ -57,6 +59,8 @@ Table Of Contents - spec '2 * Table Of Contents'
 .....  How Do You Use mdpre?
 
 ..... .....  Help
+
+..... .....  Printing The Version
 
 ..... .....  Verbose Mode
 
@@ -72,7 +76,11 @@ Table Of Contents - spec '2 * Table Of Contents'
 
 ..... .....  Processing Flow
 
+..... .....  Installing Cheetah 3 Template Support
+
 .....  Language Elements
+
+..... .....  Comments with `=.`
 
 ..... .....  Including files with `=include`
 
@@ -155,6 +163,16 @@ Calendar Stop
 ..... .....  Generating A Table Of Contents With `=toc`
 
 ..... .....  Terminating Input With `=stop`
+
+..... .....  Using Cheetah 3 Templates
+
+..... ..... .....  Defining Templates With `=template`
+
+..... ..... ..... .....  Defining A Template With Inline Text
+
+..... ..... ..... .....  Defining A Template With An External File
+
+..... ..... .....  Using A Template With `=usetemplate`
 
 .....  Additional Information
 

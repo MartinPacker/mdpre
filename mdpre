@@ -31,7 +31,7 @@ except:
     have_cheetah = False
 
 mdpre_level = "1.1.5+"
-mdpre_date = "31 March, 2026"
+mdpre_date = "4 April, 2026"
 banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
 
 def log(textToLog):
@@ -1935,6 +1935,19 @@ arguments = len(sys.argv) - 1
 
 lastArgument = ""
 
+# Check if only purpose of the run is to pick up the version
+if arguments > 0:
+    if sys.argv[1] == "--version":
+        log("\n" + banner + "\n")
+
+        if have_cheetah:
+            log("Cheetah templating engine imported\n")
+        else:
+            log("Cheetah templating engine not imported\n")
+
+        exit()
+
+
 # First pass argument parsing - just to pick up any log filename
 for arg in range(1, arguments + 1):
     argument = sys.argv[arg]
@@ -1969,7 +1982,7 @@ for arg in range(1, arguments + 1):
         # Parameters nullified by first pass argument parsing
         pass
 
-    elif argument == "-h":
+    elif (argument == "-h") | (argument == "--help"):
         # Print help
         log(
             "\n\nThe mdpre program is a Markdown preprocessor, making writing complex\nMarkdown documents easier.\n\n"
@@ -1980,8 +1993,12 @@ for arg in range(1, arguments + 1):
         log("which processes from inputfile to outputfile.\n\n")
 
         log(BOLD + "or:\n\n" + END)
-        log("mdpre -h\n\n")
+        log("mdpre -h     or mdpre --help\n\n")
         log("which generates this help.\n\n")
+
+        log(BOLD + "or:\n\n" + END)
+        log("mdpre --version\n\n")
+        log("which prints version information.\n\n")
 
         log(BOLD + "or:\n\n" + END)
         log("mdpre -v < inputfile > outputfile\n\n")
