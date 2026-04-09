@@ -31,7 +31,7 @@ except:
     have_cheetah = False
 
 mdpre_level = "1.1.5+"
-mdpre_date = "4 April, 2026"
+mdpre_date = "9 April, 2026"
 banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
 
 def log(textToLog):
@@ -348,6 +348,9 @@ class Output(object):
             rowNumber = rowNumber0 + 1
 
             row_text = "|"
+
+            spanClass = ""
+
             for col_index, col_text in enumerate(row):
                 # Human-understandable column number (1-indexed)
                 columnNumber = col_index + 1
@@ -355,7 +358,6 @@ class Output(object):
                 # Human-understandable variable containing original cell text
                 cellText = col_text
 
-                spanClass = ""
 
                 # For each cell first apply any rowspan class
                 if (col_index == 0) & (col_text.startswith("=rowspan ")):
@@ -2046,11 +2048,11 @@ for line in input_file:
         if wantVerbose is True:
             handle_verbose("<!--mdpre-colwidth:" + line + "-->")
 
-    elif line.startswith("=rowspan"):
+    elif line.startswith("=rowspan "):
         in_rowspan = True
         if wantVerbose is True:
             handle_verbose("<!--mdpre-rowspan:" + line + "-->")
-            rowspan = line.rstrip()
+        rowspan = line.rstrip()
 
     elif in_csv is True:
         if in_rowspan:
