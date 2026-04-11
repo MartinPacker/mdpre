@@ -22,7 +22,7 @@
 ### Releases
 
 
-### v1.1.5+ - 10 April, 2026
+### v1.2 - 11 April, 2026
 
 * **<span class="orange">FIXED</span>** [Issue 48](https://github.com/MartinPacker/mdpre/issues/48): `=rowspan` only colours first cell in the row
 * **<span class="blue">NEW</span>** Add `--help` command line switch - as an alternative to `-h` 

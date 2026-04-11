@@ -30,8 +30,8 @@ try:
 except:
     have_cheetah = False
 
-mdpre_level = "1.1.5+"
-mdpre_date = "9 April, 2026"
+mdpre_level = "1.2"
+mdpre_date = "11 April, 2026"
 banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
 
 def log(textToLog):
