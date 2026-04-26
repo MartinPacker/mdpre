@@ -22,6 +22,10 @@
 ### Releases
 
 
+### v1.2+ - 26 April, 2026
+
+* **<span class="green">ENHANCED</span>** [Issue 49](https://github.com/MartinPacker/mdpre/issues/49): `=csvflow` accepts `1/2`, `1/3`, and `1/4` for gutter cell "count. Causes other cells to be boosted widths by 2, 3, and 4 respectively. This allows a single narrow gutter cell with little effort.
+
 ### v1.2 - 11 April, 2026
 
 * **<span class="orange">FIXED</span>** [Issue 48](https://github.com/MartinPacker/mdpre/issues/48): `=rowspan` only colours first cell in the row

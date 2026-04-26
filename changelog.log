@@ -1,6 +1,6 @@
 
-mdpre Markdown Preprocessor v1.1.5+ (9 April, 2026)
-===================================================
+mdpre Markdown Preprocessor v1.2+ (26 April, 2026)
+==================================================
 
 Cheetah templating engine imported
 
@@ -15,7 +15,7 @@ Def input = stdin
 
 Def node = Mac.domain_not_set.invalid
 
-Def version = Darwin Kernel Version 25.5.0: Fri Mar 20 18:53:09 PDT 2026; root:xnu-12377.120.72.0.4~13/RELEASE_ARM64_T6000
+Def version = Darwin Kernel Version 25.5.0: Tue Apr 14 21:52:22 PDT 2026; root:xnu-12377.120.99.0.7~25/RELEASE_ARM64_T6000
 
 Def architecture = 64bit Mach-O
 
@@ -31,27 +31,29 @@ Def python_implementation = CPython
 
 Def processor = arm
 
-Def mdpre_date = 9 April, 2026
+Def mdpre_date = 26 April, 2026
 
-Def mdpre_level = 1.1.5+
+Def mdpre_level = 1.2+
 
 Def userid = martinpacker
 
-Def day = 11
+Def day = 26
 
 Def month = April
 
 Def year = 2026
 
-Def time = 14&colon;28
+Def time = 16&colon;05
 
-Def date = 11 April&comma; 2026
+Def date = 26 April&comma; 2026
 
 This Is The Change Log For mdpre Markdown Preprocessor
 
 Table Of Contents - spec '2 2 Releases'
 
 2 2 Releases
+..... .....  v1.2+ - 26 April, 2026
+
 ..... .....  v1.2 - 11 April, 2026
 
 ..... .....  v1.1.5 - 12 March, 2026
@@ -124,7 +126,7 @@ Table Of Contents - spec '2 2 Releases'
 
 ..... .....  v0.0 - 12 March, 2018
 
----------------------------------------------------
+--------------------------------------------------
 - Processing completed.
----------------------------------------------------
+--------------------------------------------------
 

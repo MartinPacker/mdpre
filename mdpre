@@ -30,8 +30,8 @@ try:
 except:
     have_cheetah = False
 
-mdpre_level = "1.2"
-mdpre_date = "11 April, 2026"
+mdpre_level = "1.2+"
+mdpre_date = "26 April, 2026"
 banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
 
 def log(textToLog):
@@ -77,6 +77,7 @@ g_wrapInCSV = False
 
 CSV_colaligns = []
 CSV_colwidths = []
+CSV_colspans = []
 CSV_flowLines = 0
 CSV_flowGutterCells = 0
 
@@ -161,11 +162,19 @@ def handle_CSVflow(spec):
     if len(specWords) == 1:
         flowGutterCells = 0
     else:
-        try:
-            flowGutterCells = int(specWords[-1])
-        except:
-            log(f"ERROR: =csvflow requires an integer for the second parameter. \"{specWords[-1]}\" specified")
-            goodSpec = False
+        gutterSpec = specWords[-1]
+        if gutterSpec == "1/2":
+            flowGutterCells = 0.5
+        elif gutterSpec == "1/3":
+            flowGutterCells = 0.33
+        elif gutterSpec == "1/4":
+            flowGutterCells = 0.25
+        else:
+            try:
+                flowGutterCells = int(gutterSpec)
+            except:
+                log(f"ERROR: =csvflow requires an integer for the second parameter. \"{specWords[-1]}\" specified")
+                goodSpec = False
 
     if goodSpec:
         return flowLines, flowGutterCells
@@ -197,7 +206,7 @@ class Output(object):
     def write_line(self, p_text):
         self.write(f"{p_text}{self.NL}")
 
-    def formatCSV(self, CSV_lines, colalign, colwidth, rules, flowLines, flowGutterCells):
+    def formatCSV(self, CSV_lines, colalign, colwidth, rules, flowLines, flowGutterCells, colspans):
         # Create a CSV reader from the lines
         if csvDialect == "":
             CSV_reader = csv.reader(CSV_lines)
@@ -225,6 +234,18 @@ class Output(object):
         
             # Calculate how many times the cells need to be replicated
             flowings = math.ceil(dataRowCount / flowLines)
+            
+            if flowGutterCells in [0.5, 0.25]:
+                # Only one gutter cell per and other cells made wider
+                nonGutterCellBoost = 1 / flowGutterCells
+                flowGutterCells = 1
+            if flowGutterCells == 0.33:
+                # Only one gutter cell per and other cells made wider
+                nonGutterCellBoost = 3
+                flowGutterCells = 1
+            else:
+                # Non gutter cells' widths don't need boosting
+                nonGutterCellBoost = 1
 
             # Create a list with gutter cells in
             gutterCells = [" "] * flowGutterCells
@@ -331,17 +352,27 @@ class Output(object):
             # Extend list by the replication factor
             colwidth2.extend([int(width)] * replication)
 
-        colwidth = colwidth2.copy()
+        colwidth = [int(cw * nonGutterCellBoost) for cw in colwidth2]
 
         # Fix up colwidth if =csvflow in effect
         for fl in range(flowLines):
             colwidth.extend(gutterWidths)
-            colwidth.extend(colwidth2)
+            colwidth.extend([int(cw * nonGutterCellBoost) for cw in colwidth2])
 
 
         # Extend colwidth to cover all columns - now we know how many there are
         colwidth.extend([int(colWidthExtender)] * (columnCount - len(colwidth)))
-           
+
+        # Unpack any colspan information
+        colspanNumbers = []
+        if colspans == []:
+            colspanName = None
+        else:
+            colspanName, colspanNumberStrings = colspans
+            for colspanNumberString in colspanNumberStrings:
+                colspanNumbers.append(int(colspanNumberString))
+        
+        print(colspanNumbers)
         # Now print the table
         for rowNumber0, row in enumerate(CSV_lines):
             # Human-understandable row number (1-indexed)
@@ -571,6 +602,17 @@ def parse_colwidth(colString, p_separator = r"\s+"):
 
     return colwidthInt
 
+def parse_colspan(colString, p_separator = r"\s+"):
+    cs = colString.rstrip().lstrip()
+    colspans = re.split(p_separator, cs)
+    colspanInt = []
+    for wordNumber, c in enumerate(colspans):
+        if wordNumber == 0:
+            spanname = c
+        else:
+            colspanInt.append(c)
+
+    return (spanname, colspanInt)
 
 def parse_calstart(calString, p_separator = r"\s+"):
     d = calString.rstrip().lstrip()
@@ -1438,6 +1480,9 @@ def handle_verbose(line):
     elif verboseType == "colalign":
         log("Column Alignment - spec '" + noPrefixSuffix[19:] + "'\n")
 
+    elif verboseType == "colspan":
+        log("Column span - spec '" + noPrefixSuffix[17:] + "'\n")
+    
     elif verboseType == "colwidth":
         log("Column Width - spec '" + noPrefixSuffix[19:] + "'\n")
     
@@ -1961,6 +2006,7 @@ minTocLevel, maxTocLevel, tableOfContents = extractTableOfContents(input_file)
 # Do any other processing, such as CSV to table
 CSV_colaligns = []
 CSV_colwidths = []
+CSV_colspans = []
 CSV_rules =  []
 in_csv = False
 in_cal = False
@@ -2029,10 +2075,11 @@ for line in input_file:
             handle_verbose("<!--mdpre-csv:" + line + "-->")
 
     elif (line.startswith("=endcsv")) & (in_csv is True):
-        g_output.formatCSV(CSV_lines, CSV_colaligns, CSV_colwidths, CSV_rules, CSV_flowLines, CSV_flowGutterCells)
+        g_output.formatCSV(CSV_lines, CSV_colaligns, CSV_colwidths, CSV_rules, CSV_flowLines, CSV_flowGutterCells, CSV_colspans)
         in_csv = False
         CSV_flowLines = 0
         CSV_flowGutterCells = 0
+        CSV_colspans =[]
 
         if wantVerbose is True:
             handle_verbose("<!--mdpre-endcsv:" + line + "-->")
@@ -2040,18 +2087,28 @@ for line in input_file:
 
     elif line.startswith("=colalign "):
         CSV_colaligns = parse_colalign(line[10:])
+
         if wantVerbose is True:
             handle_verbose("<!--mdpre-colalign:" + line + "-->")
 
     elif line.startswith("=colwidth "):
         CSV_colwidths = parse_colwidth(line[10:])
+
         if wantVerbose is True:
             handle_verbose("<!--mdpre-colwidth:" + line + "-->")
 
     elif line.startswith("=rowspan "):
         in_rowspan = True
+
         if wantVerbose is True:
             handle_verbose("<!--mdpre-rowspan:" + line + "-->")
+        rowspan = line.rstrip()
+
+    elif line.startswith("=colspan "):
+        CSV_colspans = parse_colspan(line[9:])
+
+        if wantVerbose is True:
+            handle_verbose("<!--mdpre-colspan:" + line + "-->")
         rowspan = line.rstrip()
 
     elif in_csv is True:
