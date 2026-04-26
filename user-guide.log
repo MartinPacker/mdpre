@@ -1,6 +1,6 @@
 
-mdpre Markdown Preprocessor v1.1.5+ (3 April, 2026)
-===================================================
+mdpre Markdown Preprocessor v1.2+ (26 April, 2026)
+==================================================
 
 Cheetah templating engine imported
 
@@ -15,7 +15,7 @@ Def input = stdin
 
 Def node = Mac.domain_not_set.invalid
 
-Def version = Darwin Kernel Version 25.4.0: Thu Mar 19 19:30:44 PDT 2026; root:xnu-12377.101.15~1/RELEASE_ARM64_T6000
+Def version = Darwin Kernel Version 25.5.0: Tue Apr 14 21:52:22 PDT 2026; root:xnu-12377.120.99.0.7~25/RELEASE_ARM64_T6000
 
 Def architecture = 64bit Mach-O
 
@@ -23,7 +23,7 @@ Def machine = arm64
 
 Def system = Darwin
 
-Def release = 25.4.0
+Def release = 25.5.0
 
 Def python_version = 3.14.3
 
@@ -31,21 +31,21 @@ Def python_implementation = CPython
 
 Def processor = arm
 
-Def mdpre_date = 3 April, 2026
+Def mdpre_date = 26 April, 2026
 
-Def mdpre_level = 1.1.5+
+Def mdpre_level = 1.2+
 
 Def userid = martinpacker
 
-Def day = 3
+Def day = 26
 
 Def month = April
 
 Def year = 2026
 
-Def time = 14&colon;47
+Def time = 17&colon;44
 
-Def date = 3 April&comma; 2026
+Def date = 26 April&comma; 2026
 
 Def TOC = Table Of Contents
 
@@ -184,13 +184,11 @@ Column Width - spec ' 2 4 1'
 
 CSV Start
 
-CSV Stop
-
-CSV Start
-
-CSV Stop
-
----------------------------------------------------
-- Processing completed.
----------------------------------------------------
-
+Traceback (most recent call last):
+  File "/Users/martinpacker/mdpre/mdpre", line 2078, in <module>
+    g_output.formatCSV(CSV_lines, CSV_colaligns, CSV_colwidths, CSV_rules, CSV_flowLines, CSV_flowGutterCells, CSV_colspans)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/martinpacker/mdpre/mdpre", line 355, in formatCSV
+    colwidth = [int(cw * nonGutterCellBoost) for cw in colwidth2]
+                         ^^^^^^^^^^^^^^^^^^
+UnboundLocalError: cannot access local variable 'nonGutterCellBoost' where it is not associated with a value

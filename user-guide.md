@@ -116,7 +116,7 @@ This document describes the mdpre Markdown preprocessor.
 
 In this document we'll refer to it as "mdpre", pronounced "em dee pree".
 
-This document was converted to HTML at 14&colon;47 on 3 April&comma; 2026.
+This document was converted to HTML at 17&colon;44 on 26 April&comma; 2026.
 
 ### Table Of Contents
 
@@ -593,6 +593,7 @@ Here is an example:
 
 The table consists of two lines and will render as
 
+[]
 |A|1|2|
 |:-|:-|:-|
 |B|20|30|
@@ -633,6 +634,7 @@ You can control the alignment with e.g.
 
 and the result would be
 
+[]
 |A|1|2|
 |:-|-:|-:|
 |B|20|30|
@@ -823,10 +825,14 @@ All rows will be squared up - so the overall effect is to create a rectangular t
 You could use `=csvflow` to square up a table where the number of rows **doesn't** exceed the `<dataRows>` value.
 
 The `<gutterColumns>` parameter is optional and defaults to "0".
-If you code "1" a single column "gutter" of cells with just a single space in will be added to the table
+It specifies the number of "gutter columns" between the flowings:
+
+* If you code `0` no gutter column is inserted between flowings.
+* If you code `1` a single column "gutter" of cells with just a single space in will be added to the table
 prior to flowing.
 (The line-terminating gutter cells will be removed after flowing.)
-If you coded "2" then two gutter columns would be added - as appropriate.
+* If you code `2`  two gutter columns will be added.
+* If you code `1/2`, `1/3`, or `1/4' you get a single narrow gutter column between flowings - if the renderer is md2pptx. 1/4 is narrower than 1/3, which is narrower than 1/2. (Other renderers will probably ignore this.)
 
 **Notes:**
 
@@ -1141,33 +1147,4 @@ The result is:
 ### Built-In Variables
 
 mdpre has the following built-in variables:
-
-|Variable|Description|Example Result|
-|:--|:----|:-|
-|date|Date when mdpre started running|`6 March&comma; 2019`|
-|time|Time when mdpre startred running|`21&colon;36`|
-|userid|Userid mdpre was run under|`martinpacker`|
-|mdpre_level|Level of mdpre|`0.4.4`|
-|mdpre_date|Date of mdpre|`9 March&colon; 2019`|
-|day|Day of month when mdpre started running|`3`|
-|month|Month when mdpre started running|`May`|
-|year|Year when mdpre started running|`2025`|
-|input|Name of input file&comma; or `stdin`|`test.mdp`|
-|output|Name of output file&comma; or `stdout`|`test.md`|
-|logfile|Name of log file&comma; or `stderr`|`test.log`|
-|makefile|Name of makefile fragment&comma; or `file-3`|`test.mak`|
-
-The following variables are from Python's `platform` module and are said to be available on all platforms.
-
-|Variable|Description|Example Result|
-|:--|:----|:-|
-|node|Machine node name|`bluemac.local`|
-|version|Operating system version|`Darwin Kernel Version 24.4.0: Fri Apr 11 18:33:47 PDT 2025; root:xnu-11417.101.15~117/RELEASE_ARM64_T6000`|
-|architecture|Machine architecture|`64bit`|
-|machine|Also machine architecture|`arm64`|
-|system|System type|`Darwin`|
-|release|Software release|`24.4.0`|
-|python_version|Python version|`3.12.3`|
-|python_implementation|Python implementation|`CPython`|
-|processor|Processor type|`arm`|
 

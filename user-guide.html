@@ -1357,7 +1357,7 @@ body .markdown-body
 <h1 id="markdown-preprocessor-user-guide">Markdown Preprocessor User Guide<a class="headerlink" href="#markdown-preprocessor-user-guide" title="Permanent link"></a></h1>
 <p>This document describes the mdpre Markdown preprocessor.</p>
 <p>In this document we&rsquo;ll refer to it as &ldquo;mdpre&rdquo;, pronounced &ldquo;em dee pree&rdquo;.</p>
-<p>This document was converted to HTML at 14&colon;47 on 3 April&comma; 2026.</p>
+<p>This document was converted to HTML at 17&colon;44 on 26 April&comma; 2026.</p>
 <h3 id="table-of-contents">Table Of Contents<a class="headerlink" href="#table-of-contents" title="Permanent link"></a></h3>
 <ul>
 <li><a href="#why-a-preprocessor">Why A Preprocessor?</a></li>
@@ -1749,22 +1749,10 @@ System is not Windows
 =endcsv
 </code></pre>
 <p>The table consists of two lines and will render as</p>
-<table>
-<thead>
-<tr>
-<th align="left">A</th>
-<th align="left">1</th>
-<th align="left">2</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="left">B</td>
-<td align="left">20</td>
-<td align="left">30</td>
-</tr>
-</tbody>
-</table>
+<p>[]
+|A|1|2|
+|:-|:-|:-|
+|B|20|30|</p>
 <p>(This manual uses this very function.)</p>
 <p>The actual Markdown for the table produced is:</p>
 <pre><code>|A|1|2|
@@ -1790,22 +1778,10 @@ If you specify a dialect that is not available mdpre will list the available dia
 <pre><code>=colalign l r r
 </code></pre>
 <p>and the result would be</p>
-<table>
-<thead>
-<tr>
-<th align="left">A</th>
-<th align="right">1</th>
-<th align="right">2</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="left">B</td>
-<td align="right">20</td>
-<td align="right">30</td>
-</tr>
-</tbody>
-</table>
+<p>[]
+|A|1|2|
+|:-|-:|-:|
+|B|20|30|</p>
 <p>(This manual uses this very function.)</p>
 <p>The actual Markdown for the table produced is:</p>
 <pre><code>|A|1|2|
@@ -1937,10 +1913,15 @@ The final 6 sets of cells in the third row will each contain blank cells.</p>
 <p>All rows will be squared up - so the overall effect is to create a rectangular table - with no cells missing.
 You could use <code>=csvflow</code> to square up a table where the number of rows <strong>doesn&rsquo;t</strong> exceed the <code>&lt;dataRows&gt;</code> value.</p>
 <p>The <code>&lt;gutterColumns&gt;</code> parameter is optional and defaults to &ldquo;0&rdquo;.
-If you code &ldquo;1&rdquo; a single column &ldquo;gutter&rdquo; of cells with just a single space in will be added to the table
+It specifies the number of &ldquo;gutter columns&rdquo; between the flowings:</p>
+<ul>
+<li>If you code <code>0</code> no gutter column is inserted between flowings.</li>
+<li>If you code <code>1</code> a single column &ldquo;gutter&rdquo; of cells with just a single space in will be added to the table
 prior to flowing.
-(The line-terminating gutter cells will be removed after flowing.)
-If you coded &ldquo;2&rdquo; then two gutter columns would be added - as appropriate.</p>
+(The line-terminating gutter cells will be removed after flowing.)</li>
+<li>If you code <code>2</code>  two gutter columns will be added.</li>
+<li>If you code <code>1/2</code>, <code>1/3</code>, or `1/4&rsquo; you get a single narrow gutter column between flowings - if the renderer is md2pptx. 1/4 is narrower than 1/3, which is narrower than 1/2. (Other renderers will probably ignore this.)</li>
+</ul>
 <p><strong>Notes:</strong></p>
 <ol>
 <li>After the next <code>=csv</code> / <code>=endcsv</code> bracket CSV flowing will be reset - to not flow.</li>
@@ -2297,132 +2278,4 @@ The result is:</p>
 <h2 id="additional-information">Additional Information<a class="headerlink" href="#additional-information" title="Permanent link"></a></h2>
 <p><a id="builtin-variables"></a></p>
 <h3 id="built-in-variables">Built-In Variables<a class="headerlink" href="#built-in-variables" title="Permanent link"></a></h3>
-<p>mdpre has the following built-in variables:</p>
-<table>
-<thead>
-<tr>
-<th align="left">Variable</th>
-<th align="left">Description</th>
-<th align="left">Example Result</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="left">date</td>
-<td align="left">Date when mdpre started running</td>
-<td align="left"><code>6 March&amp;comma; 2019</code></td>
-</tr>
-<tr>
-<td align="left">time</td>
-<td align="left">Time when mdpre startred running</td>
-<td align="left"><code>21&amp;colon;36</code></td>
-</tr>
-<tr>
-<td align="left">userid</td>
-<td align="left">Userid mdpre was run under</td>
-<td align="left"><code>martinpacker</code></td>
-</tr>
-<tr>
-<td align="left">mdpre_level</td>
-<td align="left">Level of mdpre</td>
-<td align="left"><code>0.4.4</code></td>
-</tr>
-<tr>
-<td align="left">mdpre_date</td>
-<td align="left">Date of mdpre</td>
-<td align="left"><code>9 March&amp;colon; 2019</code></td>
-</tr>
-<tr>
-<td align="left">day</td>
-<td align="left">Day of month when mdpre started running</td>
-<td align="left"><code>3</code></td>
-</tr>
-<tr>
-<td align="left">month</td>
-<td align="left">Month when mdpre started running</td>
-<td align="left"><code>May</code></td>
-</tr>
-<tr>
-<td align="left">year</td>
-<td align="left">Year when mdpre started running</td>
-<td align="left"><code>2025</code></td>
-</tr>
-<tr>
-<td align="left">input</td>
-<td align="left">Name of input file&comma; or <code>stdin</code></td>
-<td align="left"><code>test.mdp</code></td>
-</tr>
-<tr>
-<td align="left">output</td>
-<td align="left">Name of output file&comma; or <code>stdout</code></td>
-<td align="left"><code>test.md</code></td>
-</tr>
-<tr>
-<td align="left">logfile</td>
-<td align="left">Name of log file&comma; or <code>stderr</code></td>
-<td align="left"><code>test.log</code></td>
-</tr>
-<tr>
-<td align="left">makefile</td>
-<td align="left">Name of makefile fragment&comma; or <code>file-3</code></td>
-<td align="left"><code>test.mak</code></td>
-</tr>
-</tbody>
-</table>
-<p>The following variables are from Python&rsquo;s <code>platform</code> module and are said to be available on all platforms.</p>
-<table>
-<thead>
-<tr>
-<th align="left">Variable</th>
-<th align="left">Description</th>
-<th align="left">Example Result</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="left">node</td>
-<td align="left">Machine node name</td>
-<td align="left"><code>bluemac.local</code></td>
-</tr>
-<tr>
-<td align="left">version</td>
-<td align="left">Operating system version</td>
-<td align="left"><code>Darwin Kernel Version 24.4.0: Fri Apr 11 18:33:47 PDT 2025; root:xnu-11417.101.15~117/RELEASE_ARM64_T6000</code></td>
-</tr>
-<tr>
-<td align="left">architecture</td>
-<td align="left">Machine architecture</td>
-<td align="left"><code>64bit</code></td>
-</tr>
-<tr>
-<td align="left">machine</td>
-<td align="left">Also machine architecture</td>
-<td align="left"><code>arm64</code></td>
-</tr>
-<tr>
-<td align="left">system</td>
-<td align="left">System type</td>
-<td align="left"><code>Darwin</code></td>
-</tr>
-<tr>
-<td align="left">release</td>
-<td align="left">Software release</td>
-<td align="left"><code>24.4.0</code></td>
-</tr>
-<tr>
-<td align="left">python_version</td>
-<td align="left">Python version</td>
-<td align="left"><code>3.12.3</code></td>
-</tr>
-<tr>
-<td align="left">python_implementation</td>
-<td align="left">Python implementation</td>
-<td align="left"><code>CPython</code></td>
-</tr>
-<tr>
-<td align="left">processor</td>
-<td align="left">Processor type</td>
-<td align="left"><code>arm</code></td>
-</tr>
-</tbody>
-</table></article></body></html>
+<p>mdpre has the following built-in variables:</p></article></body></html>
