@@ -31,7 +31,7 @@ except:
     have_cheetah = False
 
 mdpre_level = "1.2+"
-mdpre_date = "26 April, 2026"
+mdpre_date = "28 April, 2026"
 banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
 
 def log(textToLog):
@@ -300,6 +300,8 @@ class Output(object):
             if flowGutterCells > 0:
                 for lineNumber, _ in enumerate(CSV_lines):
                     CSV_lines[lineNumber] = CSV_lines[lineNumber][:-flowGutterCells]
+        else:
+            nonGutterCellBoost = 1
 
         # Prime column width and alignment extenders
         colWidthExtender = 1
