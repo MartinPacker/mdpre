@@ -31,7 +31,7 @@ except:
     have_cheetah = False
 
 mdpre_level = "1.2+"
-mdpre_date = "28 April, 2026"
+mdpre_date = "30 April, 2026"
 banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
 
 def log(textToLog):
@@ -396,7 +396,7 @@ class Output(object):
                 if (col_index == 0) & (col_text.startswith("=rowspan ")):
                     rowspan2 = col_text.split("!!XYZZY!!")
                     spanClass = rowspan2[0][9:]
-                    col_text = rowspan2[1][1:-1]
+                    col_text = rowspan2[1] #[1:-1]
                 
                 # Apply any rules to the cell
                 for rule in rules:
@@ -2117,6 +2117,7 @@ for line in input_file:
         if in_rowspan:
             # Prepend line with rowspan
             CSV_lines.append(rowspan + "!!XYZZY!!" + line)
+
             in_rowspan = False
         else:
             # Don't prepend line with rowspan
