@@ -31,7 +31,7 @@ except:
     have_cheetah = False
 
 mdpre_level = "1.2+"
-mdpre_date = "30 April, 2026"
+mdpre_date = "1 May, 2026"
 banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
 
 def log(textToLog):
@@ -173,7 +173,7 @@ def handle_CSVflow(spec):
             try:
                 flowGutterCells = int(gutterSpec)
             except:
-                log(f"ERROR: =csvflow requires an integer for the second parameter. \"{specWords[-1]}\" specified")
+                log(f"ERROR: =csvflow requires an integer of special fractions for the second parameter. \"{specWords[-1]}\" specified")
                 goodSpec = False
 
     if goodSpec:
@@ -374,7 +374,6 @@ class Output(object):
             for colspanNumberString in colspanNumberStrings:
                 colspanNumbers.append(int(colspanNumberString))
         
-        print(colspanNumbers)
         # Now print the table
         for rowNumber0, row in enumerate(CSV_lines):
             # Human-understandable row number (1-indexed)

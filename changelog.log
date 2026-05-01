@@ -1,6 +1,6 @@
 
-mdpre Markdown Preprocessor v1.2+ (30 April, 2026)
-==================================================
+mdpre Markdown Preprocessor v1.2+ (1 May, 2026)
+===============================================
 
 Cheetah templating engine not imported
 
@@ -31,28 +31,28 @@ Def python_implementation = CPython
 
 Def processor = arm
 
-Def mdpre_date = 30 April, 2026
+Def mdpre_date = 1 May, 2026
 
 Def mdpre_level = 1.2+
 
 Def userid = martinpacker
 
-Def day = 30
+Def day = 1
 
-Def month = April
+Def month = May
 
 Def year = 2026
 
-Def time = 20&colon;45
+Def time = 09&colon;06
 
-Def date = 30 April&comma; 2026
+Def date = 1 May&comma; 2026
 
 This Is The Change Log For mdpre Markdown Preprocessor
 
 Table Of Contents - spec '2 2 Releases'
 
 2 2 Releases
-..... .....  v1.2+ - 30 April, 2026
+..... .....  v1.2+ - 1 May, 2026
 
 ..... .....  v1.2 - 11 April, 2026
 
@@ -126,7 +126,7 @@ Table Of Contents - spec '2 2 Releases'
 
 ..... .....  v0.0 - 12 March, 2018
 
---------------------------------------------------
+-----------------------------------------------
 - Processing completed.
---------------------------------------------------
+-----------------------------------------------
 
