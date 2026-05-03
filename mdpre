@@ -30,7 +30,7 @@ try:
 except:
     have_cheetah = False
 
-mdpre_level = "1.2.1"
+mdpre_level = "1.2.1+"
 mdpre_date = "3 May, 2026"
 banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
 
@@ -239,13 +239,16 @@ class Output(object):
                 # Only one gutter cell per and other cells made wider
                 nonGutterCellBoost = 1 / flowGutterCells
                 flowGutterCells = 1
-            if flowGutterCells == 0.33:
+
+            elif flowGutterCells == 0.33:
                 # Only one gutter cell per and other cells made wider
                 nonGutterCellBoost = 3
                 flowGutterCells = 1
+
             else:
                 # Non gutter cells' widths don't need boosting
                 nonGutterCellBoost = 1
+            
 
             # Create a list with gutter cells in
             gutterCells = [" "] * flowGutterCells
