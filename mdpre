@@ -31,7 +31,7 @@ except:
     have_cheetah = False
 
 mdpre_level = "1.2.1+"
-mdpre_date = "3 May, 2026"
+mdpre_date = "23 August, 2026"
 banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
 
 def log(textToLog):
@@ -376,6 +376,10 @@ class Output(object):
             colspanName, colspanNumberStrings = colspans
             for colspanNumberString in colspanNumberStrings:
                 colspanNumbers.append(int(colspanNumberString))
+
+        # Prime an array for syntax error detection
+        ruleSyntaxFlagged = [False for rule in rules]
+            
         
         # Now print the table
         for rowNumber0, row in enumerate(CSV_lines):
@@ -385,6 +389,13 @@ class Output(object):
             row_text = "|"
 
             spanClass = ""
+            
+            # Human-understandable array of cell values
+            # Note: First one user supplied is at index 1 (consistent with columnNumber)
+            allCellsText = [""]
+            allCellsText.extend(row)
+
+            rowSpanClass = ""
 
             for col_index, col_text in enumerate(row):
                 # Human-understandable column number (1-indexed)
@@ -397,22 +408,35 @@ class Output(object):
                 # For each cell first apply any rowspan class
                 if (col_index == 0) & (col_text.startswith("=rowspan ")):
                     rowspan2 = col_text.split("!!XYZZY!!")
-                    spanClass = rowspan2[0][9:]
+                    rowSpanClass = rowspan2[0][9:]
                     col_text = rowspan2[1] #[1:-1]
                 
                 # Apply any rules to the cell
-                for rule in rules:
+                for ruleNumber, rule in enumerate(rules):
                     # Following splits at white space of any kind and only returns 2 items
                     # (white space of any length)
                     (ruleClass, ruleCondition) = tuple(rule.split(None, 1))
 
+                    ruleCondition = ruleCondition.replace("&;", "&")
+
                     try:
-                        ruleMet =eval(ruleCondition)
+                        ruleMet = eval(ruleCondition)
+                    except SyntaxError:
+                        if ruleSyntaxFlagged[ruleNumber] is False:
+                          print(f"Syntax error in =csvrule: {ruleCondition}")
+                          ruleSyntaxFlagged[ruleNumber] = True
+                        ruleMet = False
                     except:
                         ruleMet = False
                     
                     if ruleMet:
                         spanClass = ruleClass
+
+                    elif rowSpanClass !="":
+                        spanClass = rowSpanClass
+
+                    else:
+                        spanClass = ""
                 
                 if spanClass == "":
                     cell_prefix = ""

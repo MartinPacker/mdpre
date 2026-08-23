@@ -670,7 +670,11 @@ For example `3x*` would make the unspecified columns have a width specifier of "
 
 **Note:** Many Markdown processors ignore width directives. The developer's other Markdown tool doesn't. :-)
 
-#### Applying A CSS Class To Whole Rows With `=rowspan`
+#### Applying Styling To Tables
+
+You can use simple or sophisticated rules to apply styles to individual table cells or whole rows with `=rowspan` and `=csvrule`.
+
+##### Applying A CSS Class To Whole Rows With `=rowspan`
 
 You can set the `<span>` element's `class` attribute for the text in each cell in the immediately following row using `=rowspan`. For example
 
@@ -684,7 +688,7 @@ Some basic examples of what you can do with CSS are in
 
 **Note:** This styling only applies to the immediately following row.
 
-#### Applying A CSS Class To Cells Based On Rules  With `=csvrule`
+##### Applying A CSS Class To Cells Based On Rules  With `=csvrule`
 
 You can set the `<span>` element's `class` attribute for each cell that meets some criteria.
 For example:
@@ -701,11 +705,12 @@ Only code `=csvrule` outside of a `=csv` / `=endcsv` bracket.
 Each rule will apply to subsequent tables.
 You can code multiple rules for the same class name, each with their own expression.
 
-Three variables you can use in the expression are:
+Four variables you can use in the expression are:
 
-* `cellText`
-* `columnNumber` - which is 1-indexed
-* `rowNumber` - which is 1-indexed
+* `cellText` - which is the current cell's text
+* `allCellsText` - which is an array of all the cells in the rows' text. The first cell has index 1.
+* `columnNumber` - which is the 1-indexed column number for the current cell
+* `rowNumber` - which is the 1-indexed number of the current row.
 
 Because mdpre imports the built-in `re` module you can use matching expressions for the text, such as:
 
@@ -725,14 +730,33 @@ So the following wouldn't work:
 
 Speaking of mathematics, mdpre also imports the built-in `math` module.
 
+You can colour an entire row based on the value in a particular cell.
+For example:
+
+    =csvrule red allCellsText[4] == "6"
+
+colours based on the value in the 4th cell.
+
+    
+You could refine that example so that only the first cell is coloured red if the condition is met:
+
+    =csvrule red (allCellsText[4] == "6") & (columnNumber == 1)
+
+You can use the `columnNumber` variable to colour an entire column.
+For example:
+
+    =csvrule green columnNumber == 3
+
 Some basic examples of what you can do with CSS are in
 [Some Useful CSS And Javascript Examples With `=rowspan` and `=csvrule`](#some-useful-css-and-javascript-examples-with-rowspan-and-csvrule).
 
-To delete all the rules, affecting future tables code
+If the expression you code contains a syntax error an error message will be produced the first time the error is encountered.
+
+To delete all the rules, affecting future tables, code
 
     =csvrule delete
 
-#### Some Useful CSS And Javascript Examples With `=rowspan` and `=csvrule`
+##### Some Useful CSS And Javascript Examples With `=rowspan` and `=csvrule`
 
 [`=rowspan`](#applying-a-css-class-to-whole-rows-with-rowspan) and [`=csvrule`](#applying-a-css-class-to-cells-based-on-rules-with-csvrule)
 assign `<span>` classes.
@@ -753,7 +777,7 @@ This CSS
 
 colours the text in a cell with the "red" class to red.
 
-##### Colouring The Cell's Background With CSS
+###### Colouring The Cell's Background With CSS
 
 This CSS
 
@@ -763,7 +787,7 @@ This CSS
 
 colours the background of a cell with the "grey" class to grey.
 
-##### Alerting Based On A Cell's Class With Javascript
+###### Alerting Based On A Cell's Class With Javascript
 
 This Javascript
 

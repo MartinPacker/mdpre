@@ -1,6 +1,6 @@
 
-mdpre Markdown Preprocessor v1.2+ (26 April, 2026)
-==================================================
+mdpre Markdown Preprocessor v1.2.1+ (23 August, 2026)
+=====================================================
 
 Cheetah templating engine imported
 
@@ -13,9 +13,9 @@ Def output = stdout
 
 Def input = stdin
 
-Def node = Mac.domain_not_set.invalid
+Def node = Mac-Studio-Max.local
 
-Def version = Darwin Kernel Version 25.5.0: Tue Apr 14 21:52:22 PDT 2026; root:xnu-12377.120.99.0.7~25/RELEASE_ARM64_T6000
+Def version = Darwin Kernel Version 27.0.0: Tue Aug 11 22:18:52 PDT 2026; root:xnu-13432.1.9~3/RELEASE_ARM64_T6000
 
 Def architecture = 64bit Mach-O
 
@@ -23,7 +23,7 @@ Def machine = arm64
 
 Def system = Darwin
 
-Def release = 25.5.0
+Def release = 27.0.0
 
 Def python_version = 3.14.3
 
@@ -31,21 +31,21 @@ Def python_implementation = CPython
 
 Def processor = arm
 
-Def mdpre_date = 26 April, 2026
+Def mdpre_date = 23 August, 2026
 
-Def mdpre_level = 1.2+
+Def mdpre_level = 1.2.1+
 
 Def userid = martinpacker
 
-Def day = 26
+Def day = 23
 
-Def month = April
+Def month = August
 
 Def year = 2026
 
-Def time = 17&colon;44
+Def time = 15&colon;48
 
-Def date = 26 April&comma; 2026
+Def date = 23 August&comma; 2026
 
 Def TOC = Table Of Contents
 
@@ -53,7 +53,7 @@ Markdown Preprocessor User Guide
 
 Table Of Contents - spec '2 * Table Of Contents'
 
-2 5 Table Of Contents
+2 6 Table Of Contents
 .....  Why A Preprocessor?
 
 .....  How Do You Use mdpre?
@@ -118,17 +118,19 @@ CSV Stop
 
 ..... ..... .....  Controlling Table Column Widths With `=colwidth`
 
-..... ..... .....  Applying A CSS Class To Whole Rows With `=rowspan`
+..... ..... .....  Applying Styling To Tables
 
-..... ..... .....  Applying A CSS Class To Cells Based On Rules  With `=csvrule`
+..... ..... ..... .....  Applying A CSS Class To Whole Rows With `=rowspan`
 
-..... ..... .....  Some Useful CSS And Javascript Examples With `=rowspan` and `=csvrule`
+..... ..... ..... .....  Applying A CSS Class To Cells Based On Rules  With `=csvrule`
+
+..... ..... ..... .....  Some Useful CSS And Javascript Examples With `=rowspan` and `=csvrule`
 
 ..... ..... ..... .....  Colouring The Cell's Text With CSS
 
-..... ..... ..... .....  Colouring The Cell's Background With CSS
+..... ..... ..... ..... .....  Colouring The Cell's Background With CSS
 
-..... ..... ..... .....  Alerting Based On A Cell's Class With Javascript
+..... ..... ..... ..... .....  Alerting Based On A Cell's Class With Javascript
 
 ..... ..... .....  Flowing A Table - To Shorten And Widen It - With `=csvflow`
 
@@ -184,11 +186,13 @@ Column Width - spec ' 2 4 1'
 
 CSV Start
 
-Traceback (most recent call last):
-  File "/Users/martinpacker/mdpre/mdpre", line 2078, in <module>
-    g_output.formatCSV(CSV_lines, CSV_colaligns, CSV_colwidths, CSV_rules, CSV_flowLines, CSV_flowGutterCells, CSV_colspans)
-    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/martinpacker/mdpre/mdpre", line 355, in formatCSV
-    colwidth = [int(cw * nonGutterCellBoost) for cw in colwidth2]
-                         ^^^^^^^^^^^^^^^^^^
-UnboundLocalError: cannot access local variable 'nonGutterCellBoost' where it is not associated with a value
+CSV Stop
+
+CSV Start
+
+CSV Stop
+
+-----------------------------------------------------
+- Processing completed.
+-----------------------------------------------------
+

@@ -1357,7 +1357,7 @@ body .markdown-body
 <h1 id="markdown-preprocessor-user-guide">Markdown Preprocessor User Guide<a class="headerlink" href="#markdown-preprocessor-user-guide" title="Permanent link"></a></h1>
 <p>This document describes the mdpre Markdown preprocessor.</p>
 <p>In this document we&rsquo;ll refer to it as &ldquo;mdpre&rdquo;, pronounced &ldquo;em dee pree&rdquo;.</p>
-<p>This document was converted to HTML at 17&colon;44 on 26 April&comma; 2026.</p>
+<p>This document was converted to HTML at 15&colon;48 on 23 August&comma; 2026.</p>
 <h3 id="table-of-contents">Table Of Contents<a class="headerlink" href="#table-of-contents" title="Permanent link"></a></h3>
 <ul>
 <li><a href="#why-a-preprocessor">Why A Preprocessor?</a></li>
@@ -1393,12 +1393,15 @@ body .markdown-body
 <li><a href="#converting-a-csv-file-to-a-markdown-table-with-csv-and-endcsv">Converting A CSV File To A Markdown Table With <code>=csv</code> And <code>=endcsv</code></a><ul>
 <li><a href="#controlling-table-alignment-with-colalign">Controlling Table Alignment With <code>=colalign</code></a></li>
 <li><a href="#controlling-table-column-widths-with-colwidth">Controlling Table Column Widths With <code>=colwidth</code></a></li>
+<li><a href="#applying-styling-to-tables">Applying Styling To Tables</a><ul>
 <li><a href="#applying-a-css-class-to-whole-rows-with-rowspan">Applying A CSS Class To Whole Rows With <code>=rowspan</code></a></li>
 <li><a href="#applying-a-css-class-to-cells-based-on-rules-with-csvrule">Applying A CSS Class To Cells Based On Rules  With <code>=csvrule</code></a></li>
-<li><a href="#some-useful-css-and-javascript-examples-with-rowspan-and-csvrule">Some Useful CSS And Javascript Examples With <code>=rowspan</code> and <code>=csvrule</code></a><ul>
-<li><a href="#colouring-the-cells-text-with-css">Colouring The Cell&rsquo;s Text With CSS</a></li>
+<li><a href="#some-useful-css-and-javascript-examples-with-rowspan-and-csvrule">Some Useful CSS And Javascript Examples With <code>=rowspan</code> and <code>=csvrule</code></a></li>
+<li><a href="#colouring-the-cells-text-with-css">Colouring The Cell&rsquo;s Text With CSS</a><ul>
 <li><a href="#colouring-the-cells-background-with-css">Colouring The Cell&rsquo;s Background With CSS</a></li>
 <li><a href="#alerting-based-on-a-cells-class-with-javascript">Alerting Based On A Cell&rsquo;s Class With Javascript</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a href="#flowing-a-table-to-shorten-and-widen-it-with-csvflow">Flowing A Table - To Shorten And Widen It - With <code>=csvflow</code></a></li>
@@ -1749,10 +1752,22 @@ System is not Windows
 =endcsv
 </code></pre>
 <p>The table consists of two lines and will render as</p>
-<p>[]
-|A|1|2|
-|:-|:-|:-|
-|B|20|30|</p>
+<table>
+<thead>
+<tr>
+<th align="left">A</th>
+<th align="left">1</th>
+<th align="left">2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">B</td>
+<td align="left">20</td>
+<td align="left">30</td>
+</tr>
+</tbody>
+</table>
 <p>(This manual uses this very function.)</p>
 <p>The actual Markdown for the table produced is:</p>
 <pre><code>|A|1|2|
@@ -1778,10 +1793,22 @@ If you specify a dialect that is not available mdpre will list the available dia
 <pre><code>=colalign l r r
 </code></pre>
 <p>and the result would be</p>
-<p>[]
-|A|1|2|
-|:-|-:|-:|
-|B|20|30|</p>
+<table>
+<thead>
+<tr>
+<th align="left">A</th>
+<th align="right">1</th>
+<th align="right">2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">B</td>
+<td align="right">20</td>
+<td align="right">30</td>
+</tr>
+</tbody>
+</table>
 <p>(This manual uses this very function.)</p>
 <p>The actual Markdown for the table produced is:</p>
 <pre><code>|A|1|2|
@@ -1826,7 +1853,9 @@ By default these will contain the value &ldquo;1&rdquo;.
 You can override this by making the last one have &ldquo;*&rdquo; as the replication factor.
 For example <code>3x*</code> would make the unspecified columns have a width specifier of &ldquo;3&rdquo;, as well as the last specified one.</p>
 <p><strong>Note:</strong> Many Markdown processors ignore width directives. The developer&rsquo;s other Markdown tool doesn&rsquo;t. :-)</p>
-<h4 id="applying-a-css-class-to-whole-rows-with-rowspan">Applying A CSS Class To Whole Rows With <code>=rowspan</code><a class="headerlink" href="#applying-a-css-class-to-whole-rows-with-rowspan" title="Permanent link"></a></h4>
+<h4 id="applying-styling-to-tables">Applying Styling To Tables<a class="headerlink" href="#applying-styling-to-tables" title="Permanent link"></a></h4>
+<p>You can use simple or sophisticated rules to apply styles to individual table cells or whole rows with <code>=rowspan</code> and <code>=csvrule</code>.</p>
+<h5 id="applying-a-css-class-to-whole-rows-with-rowspan">Applying A CSS Class To Whole Rows With <code>=rowspan</code><a class="headerlink" href="#applying-a-css-class-to-whole-rows-with-rowspan" title="Permanent link"></a></h5>
 <p>You can set the <code>&lt;span&gt;</code> element&rsquo;s <code>class</code> attribute for the text in each cell in the immediately following row using <code>=rowspan</code>. For example</p>
 <pre><code>=rowspan blue
 </code></pre>
@@ -1835,7 +1864,7 @@ For example <code>3x*</code> would make the unspecified columns have a width spe
 Some basic examples of what you can do with CSS are in
 <a href="#some-useful-css-and-javascript-examples-with-rowspan-and-csvrule">Some Useful CSS And Javascript Examples With <code>=rowspan</code> and <code>=csvrule</code></a>.</p>
 <p><strong>Note:</strong> This styling only applies to the immediately following row.</p>
-<h4 id="applying-a-css-class-to-cells-based-on-rules-with-csvrule">Applying A CSS Class To Cells Based On Rules  With <code>=csvrule</code><a class="headerlink" href="#applying-a-css-class-to-cells-based-on-rules-with-csvrule" title="Permanent link"></a></h4>
+<h5 id="applying-a-css-class-to-cells-based-on-rules-with-csvrule">Applying A CSS Class To Cells Based On Rules  With <code>=csvrule</code><a class="headerlink" href="#applying-a-css-class-to-cells-based-on-rules-with-csvrule" title="Permanent link"></a></h5>
 <p>You can set the <code>&lt;span&gt;</code> element&rsquo;s <code>class</code> attribute for each cell that meets some criteria.
 For example:</p>
 <pre><code>=csvrule red float(cellText) &gt;= 99
@@ -1847,11 +1876,12 @@ It should return a truthy value for the class to be applied.</p>
 <p>Only code <code>=csvrule</code> outside of a <code>=csv</code> / <code>=endcsv</code> bracket.
 Each rule will apply to subsequent tables.
 You can code multiple rules for the same class name, each with their own expression.</p>
-<p>Three variables you can use in the expression are:</p>
+<p>Four variables you can use in the expression are:</p>
 <ul>
-<li><code>cellText</code></li>
-<li><code>columnNumber</code> - which is 1-indexed</li>
-<li><code>rowNumber</code> - which is 1-indexed</li>
+<li><code>cellText</code> - which is the current cell&rsquo;s text</li>
+<li><code>allCellsText</code> - which is an array of all the cells in the rows&rsquo; text. The first cell has index 1.</li>
+<li><code>columnNumber</code> - which is the 1-indexed column number for the current cell</li>
+<li><code>rowNumber</code> - which is the 1-indexed number of the current row.</li>
 </ul>
 <p>Because mdpre imports the built-in <code>re</code> module you can use matching expressions for the text, such as:</p>
 <pre><code>=csvrule blue ((re.match(".+a", cellText)) and (columnNumber == 3))
@@ -1866,12 +1896,25 @@ So the following wouldn&rsquo;t work:</p>
 <pre><code>=csvrule red cellText &gt;= 99
 </code></pre>
 <p>Speaking of mathematics, mdpre also imports the built-in <code>math</code> module.</p>
+<p>You can colour an entire row based on the value in a particular cell.
+For example:</p>
+<pre><code>=csvrule red allCellsText[4] == "6"
+</code></pre>
+<p>colours based on the value in the 4th cell.</p>
+<p>You could refine that example so that only the first cell is coloured red if the condition is met:</p>
+<pre><code>=csvrule red (allCellsText[4] == "6") &amp;; (columnNumber == 1)
+</code></pre>
+<p>You can use the <code>columnNumber</code> variable to colour an entire column.
+For example:</p>
+<pre><code>=csvrule green columnNumber == 3
+</code></pre>
 <p>Some basic examples of what you can do with CSS are in
 <a href="#some-useful-css-and-javascript-examples-with-rowspan-and-csvrule">Some Useful CSS And Javascript Examples With <code>=rowspan</code> and <code>=csvrule</code></a>.</p>
-<p>To delete all the rules, affecting future tables code</p>
+<p>If the expression you code contains a syntax error an error message will be produced the first time the error is encountered.</p>
+<p>To delete all the rules, affecting future tables, code</p>
 <pre><code>=csvrule delete
 </code></pre>
-<h4 id="some-useful-css-and-javascript-examples-with-rowspan-and-csvrule">Some Useful CSS And Javascript Examples With <code>=rowspan</code> and <code>=csvrule</code><a class="headerlink" href="#some-useful-css-and-javascript-examples-with-rowspan-and-csvrule" title="Permanent link"></a></h4>
+<h5 id="some-useful-css-and-javascript-examples-with-rowspan-and-csvrule">Some Useful CSS And Javascript Examples With <code>=rowspan</code> and <code>=csvrule</code><a class="headerlink" href="#some-useful-css-and-javascript-examples-with-rowspan-and-csvrule" title="Permanent link"></a></h5>
 <p><a href="#applying-a-css-class-to-whole-rows-with-rowspan"><code>=rowspan</code></a> and <a href="#applying-a-css-class-to-cells-based-on-rules-with-csvrule"><code>=csvrule</code></a>
 assign <code>&lt;span&gt;</code> classes.</p>
 <p>mdpre passes CSS and other HTML elements through to the output file.
@@ -1885,14 +1928,14 @@ The full range of CSS (or indeed Javascript query) capabilities are available to
 }
 </code></pre>
 <p>colours the text in a cell with the &ldquo;red&rdquo; class to red.</p>
-<h5 id="colouring-the-cells-background-with-css">Colouring The Cell&rsquo;s Background With CSS<a class="headerlink" href="#colouring-the-cells-background-with-css" title="Permanent link"></a></h5>
+<h6 id="colouring-the-cells-background-with-css">Colouring The Cell&rsquo;s Background With CSS<a class="headerlink" href="#colouring-the-cells-background-with-css" title="Permanent link"></a></h6>
 <p>This CSS</p>
 <pre><code>td:has(.grey){
     background-color: #888888; 
 }
 </code></pre>
 <p>colours the background of a cell with the &ldquo;grey&rdquo; class to grey.</p>
-<h5 id="alerting-based-on-a-cells-class-with-javascript">Alerting Based On A Cell&rsquo;s Class With Javascript<a class="headerlink" href="#alerting-based-on-a-cells-class-with-javascript" title="Permanent link"></a></h5>
+<h6 id="alerting-based-on-a-cells-class-with-javascript">Alerting Based On A Cell&rsquo;s Class With Javascript<a class="headerlink" href="#alerting-based-on-a-cells-class-with-javascript" title="Permanent link"></a></h6>
 <p>This Javascript</p>
 <pre><code>blueElements = document.getElementsByClassName("blue")
 for(i = 0; i &lt; blueElements.length ; i++){
@@ -2278,4 +2321,132 @@ The result is:</p>
 <h2 id="additional-information">Additional Information<a class="headerlink" href="#additional-information" title="Permanent link"></a></h2>
 <p><a id="builtin-variables"></a></p>
 <h3 id="built-in-variables">Built-In Variables<a class="headerlink" href="#built-in-variables" title="Permanent link"></a></h3>
-<p>mdpre has the following built-in variables:</p></article></body></html>
+<p>mdpre has the following built-in variables:</p>
+<table>
+<thead>
+<tr>
+<th align="left">Variable</th>
+<th align="left">Description</th>
+<th align="left">Example Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">date</td>
+<td align="left">Date when mdpre started running</td>
+<td align="left"><code>6 March&amp;comma; 2019</code></td>
+</tr>
+<tr>
+<td align="left">time</td>
+<td align="left">Time when mdpre startred running</td>
+<td align="left"><code>21&amp;colon;36</code></td>
+</tr>
+<tr>
+<td align="left">userid</td>
+<td align="left">Userid mdpre was run under</td>
+<td align="left"><code>martinpacker</code></td>
+</tr>
+<tr>
+<td align="left">mdpre_level</td>
+<td align="left">Level of mdpre</td>
+<td align="left"><code>0.4.4</code></td>
+</tr>
+<tr>
+<td align="left">mdpre_date</td>
+<td align="left">Date of mdpre</td>
+<td align="left"><code>9 March&amp;colon; 2019</code></td>
+</tr>
+<tr>
+<td align="left">day</td>
+<td align="left">Day of month when mdpre started running</td>
+<td align="left"><code>3</code></td>
+</tr>
+<tr>
+<td align="left">month</td>
+<td align="left">Month when mdpre started running</td>
+<td align="left"><code>May</code></td>
+</tr>
+<tr>
+<td align="left">year</td>
+<td align="left">Year when mdpre started running</td>
+<td align="left"><code>2025</code></td>
+</tr>
+<tr>
+<td align="left">input</td>
+<td align="left">Name of input file&comma; or <code>stdin</code></td>
+<td align="left"><code>test.mdp</code></td>
+</tr>
+<tr>
+<td align="left">output</td>
+<td align="left">Name of output file&comma; or <code>stdout</code></td>
+<td align="left"><code>test.md</code></td>
+</tr>
+<tr>
+<td align="left">logfile</td>
+<td align="left">Name of log file&comma; or <code>stderr</code></td>
+<td align="left"><code>test.log</code></td>
+</tr>
+<tr>
+<td align="left">makefile</td>
+<td align="left">Name of makefile fragment&comma; or <code>file-3</code></td>
+<td align="left"><code>test.mak</code></td>
+</tr>
+</tbody>
+</table>
+<p>The following variables are from Python&rsquo;s <code>platform</code> module and are said to be available on all platforms.</p>
+<table>
+<thead>
+<tr>
+<th align="left">Variable</th>
+<th align="left">Description</th>
+<th align="left">Example Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">node</td>
+<td align="left">Machine node name</td>
+<td align="left"><code>bluemac.local</code></td>
+</tr>
+<tr>
+<td align="left">version</td>
+<td align="left">Operating system version</td>
+<td align="left"><code>Darwin Kernel Version 24.4.0: Fri Apr 11 18:33:47 PDT 2025; root:xnu-11417.101.15~117/RELEASE_ARM64_T6000</code></td>
+</tr>
+<tr>
+<td align="left">architecture</td>
+<td align="left">Machine architecture</td>
+<td align="left"><code>64bit</code></td>
+</tr>
+<tr>
+<td align="left">machine</td>
+<td align="left">Also machine architecture</td>
+<td align="left"><code>arm64</code></td>
+</tr>
+<tr>
+<td align="left">system</td>
+<td align="left">System type</td>
+<td align="left"><code>Darwin</code></td>
+</tr>
+<tr>
+<td align="left">release</td>
+<td align="left">Software release</td>
+<td align="left"><code>24.4.0</code></td>
+</tr>
+<tr>
+<td align="left">python_version</td>
+<td align="left">Python version</td>
+<td align="left"><code>3.12.3</code></td>
+</tr>
+<tr>
+<td align="left">python_implementation</td>
+<td align="left">Python implementation</td>
+<td align="left"><code>CPython</code></td>
+</tr>
+<tr>
+<td align="left">processor</td>
+<td align="left">Processor type</td>
+<td align="left"><code>arm</code></td>
+</tr>
+</tbody>
+</table></article></body></html>

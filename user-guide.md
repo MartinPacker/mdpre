@@ -116,7 +116,7 @@ This document describes the mdpre Markdown preprocessor.
 
 In this document we'll refer to it as "mdpre", pronounced "em dee pree".
 
-This document was converted to HTML at 17&colon;44 on 26 April&comma; 2026.
+This document was converted to HTML at 15&colon;48 on 23 August&comma; 2026.
 
 ### Table Of Contents
 
@@ -147,12 +147,13 @@ This document was converted to HTML at 17&colon;44 on 26 April&comma; 2026.
 	* [Converting A CSV File To A Markdown Table With `=csv` And `=endcsv`](#converting-a-csv-file-to-a-markdown-table-with-csv-and-endcsv)
 		* [Controlling Table Alignment With `=colalign`](#controlling-table-alignment-with-colalign)
 		* [Controlling Table Column Widths With `=colwidth`](#controlling-table-column-widths-with-colwidth)
-		* [Applying A CSS Class To Whole Rows With `=rowspan`](#applying-a-css-class-to-whole-rows-with-rowspan)
-		* [Applying A CSS Class To Cells Based On Rules  With `=csvrule`](#applying-a-css-class-to-cells-based-on-rules-with-csvrule)
-		* [Some Useful CSS And Javascript Examples With `=rowspan` and `=csvrule`](#some-useful-css-and-javascript-examples-with-rowspan-and-csvrule)
+		* [Applying Styling To Tables](#applying-styling-to-tables)
+			* [Applying A CSS Class To Whole Rows With `=rowspan`](#applying-a-css-class-to-whole-rows-with-rowspan)
+			* [Applying A CSS Class To Cells Based On Rules  With `=csvrule`](#applying-a-css-class-to-cells-based-on-rules-with-csvrule)
+			* [Some Useful CSS And Javascript Examples With `=rowspan` and `=csvrule`](#some-useful-css-and-javascript-examples-with-rowspan-and-csvrule)
 			* [Colouring The Cell's Text With CSS](#colouring-the-cells-text-with-css)
-			* [Colouring The Cell's Background With CSS](#colouring-the-cells-background-with-css)
-			* [Alerting Based On A Cell's Class With Javascript](#alerting-based-on-a-cells-class-with-javascript)
+				* [Colouring The Cell's Background With CSS](#colouring-the-cells-background-with-css)
+				* [Alerting Based On A Cell's Class With Javascript](#alerting-based-on-a-cells-class-with-javascript)
 		* [Flowing A Table - To Shorten And Widen It - With `=csvflow`](#flowing-a-table-to-shorten-and-widen-it-with-csvflow)
 	* [Creating A Calendar Month Table With `=cal`](#creating-a-calendar-month-table-with-cal)
 		* [Controlling How Day Numbers Are Displayed With `=caldays`](#controlling-how-day-numbers-are-displayed-with-caldays)
@@ -593,7 +594,6 @@ Here is an example:
 
 The table consists of two lines and will render as
 
-[]
 |A|1|2|
 |:-|:-|:-|
 |B|20|30|
@@ -634,7 +634,6 @@ You can control the alignment with e.g.
 
 and the result would be
 
-[]
 |A|1|2|
 |:-|-:|-:|
 |B|20|30|
@@ -702,7 +701,11 @@ For example `3x*` would make the unspecified columns have a width specifier of "
 
 **Note:** Many Markdown processors ignore width directives. The developer's other Markdown tool doesn't. :-)
 
-#### Applying A CSS Class To Whole Rows With `=rowspan`
+#### Applying Styling To Tables
+
+You can use simple or sophisticated rules to apply styles to individual table cells or whole rows with `=rowspan` and `=csvrule`.
+
+##### Applying A CSS Class To Whole Rows With `=rowspan`
 
 You can set the `<span>` element's `class` attribute for the text in each cell in the immediately following row using `=rowspan`. For example
 
@@ -716,7 +719,7 @@ Some basic examples of what you can do with CSS are in
 
 **Note:** This styling only applies to the immediately following row.
 
-#### Applying A CSS Class To Cells Based On Rules  With `=csvrule`
+##### Applying A CSS Class To Cells Based On Rules  With `=csvrule`
 
 You can set the `<span>` element's `class` attribute for each cell that meets some criteria.
 For example:
@@ -733,11 +736,12 @@ Only code `=csvrule` outside of a `=csv` / `=endcsv` bracket.
 Each rule will apply to subsequent tables.
 You can code multiple rules for the same class name, each with their own expression.
 
-Three variables you can use in the expression are:
+Four variables you can use in the expression are:
 
-* `cellText`
-* `columnNumber` - which is 1-indexed
-* `rowNumber` - which is 1-indexed
+* `cellText` - which is the current cell's text
+* `allCellsText` - which is an array of all the cells in the rows' text. The first cell has index 1.
+* `columnNumber` - which is the 1-indexed column number for the current cell
+* `rowNumber` - which is the 1-indexed number of the current row.
 
 Because mdpre imports the built-in `re` module you can use matching expressions for the text, such as:
 
@@ -757,14 +761,33 @@ So the following wouldn't work:
 
 Speaking of mathematics, mdpre also imports the built-in `math` module.
 
+You can colour an entire row based on the value in a particular cell.
+For example:
+
+    =csvrule red allCellsText[4] == "6"
+
+colours based on the value in the 4th cell.
+
+    
+You could refine that example so that only the first cell is coloured red if the condition is met:
+
+    =csvrule red (allCellsText[4] == "6") &; (columnNumber == 1)
+
+You can use the `columnNumber` variable to colour an entire column.
+For example:
+
+    =csvrule green columnNumber == 3
+
 Some basic examples of what you can do with CSS are in
 [Some Useful CSS And Javascript Examples With `=rowspan` and `=csvrule`](#some-useful-css-and-javascript-examples-with-rowspan-and-csvrule).
 
-To delete all the rules, affecting future tables code
+If the expression you code contains a syntax error an error message will be produced the first time the error is encountered.
+
+To delete all the rules, affecting future tables, code
 
     =csvrule delete
 
-#### Some Useful CSS And Javascript Examples With `=rowspan` and `=csvrule`
+##### Some Useful CSS And Javascript Examples With `=rowspan` and `=csvrule`
 
 [`=rowspan`](#applying-a-css-class-to-whole-rows-with-rowspan) and [`=csvrule`](#applying-a-css-class-to-cells-based-on-rules-with-csvrule)
 assign `<span>` classes.
@@ -785,7 +808,7 @@ This CSS
 
 colours the text in a cell with the "red" class to red.
 
-##### Colouring The Cell's Background With CSS
+###### Colouring The Cell's Background With CSS
 
 This CSS
 
@@ -795,7 +818,7 @@ This CSS
 
 colours the background of a cell with the "grey" class to grey.
 
-##### Alerting Based On A Cell's Class With Javascript
+###### Alerting Based On A Cell's Class With Javascript
 
 This Javascript
 
@@ -1147,4 +1170,33 @@ The result is:
 ### Built-In Variables
 
 mdpre has the following built-in variables:
+
+|Variable|Description|Example Result|
+|:--|:----|:-|
+|date|Date when mdpre started running|`6 March&comma; 2019`|
+|time|Time when mdpre startred running|`21&colon;36`|
+|userid|Userid mdpre was run under|`martinpacker`|
+|mdpre_level|Level of mdpre|`0.4.4`|
+|mdpre_date|Date of mdpre|`9 March&colon; 2019`|
+|day|Day of month when mdpre started running|`3`|
+|month|Month when mdpre started running|`May`|
+|year|Year when mdpre started running|`2025`|
+|input|Name of input file&comma; or `stdin`|`test.mdp`|
+|output|Name of output file&comma; or `stdout`|`test.md`|
+|logfile|Name of log file&comma; or `stderr`|`test.log`|
+|makefile|Name of makefile fragment&comma; or `file-3`|`test.mak`|
+
+The following variables are from Python's `platform` module and are said to be available on all platforms.
+
+|Variable|Description|Example Result|
+|:--|:----|:-|
+|node|Machine node name|`bluemac.local`|
+|version|Operating system version|`Darwin Kernel Version 24.4.0: Fri Apr 11 18:33:47 PDT 2025; root:xnu-11417.101.15~117/RELEASE_ARM64_T6000`|
+|architecture|Machine architecture|`64bit`|
+|machine|Also machine architecture|`arm64`|
+|system|System type|`Darwin`|
+|release|Software release|`24.4.0`|
+|python_version|Python version|`3.12.3`|
+|python_implementation|Python implementation|`CPython`|
+|processor|Processor type|`arm`|
 
