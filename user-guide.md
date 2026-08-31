@@ -116,7 +116,7 @@ This document describes the mdpre Markdown preprocessor.
 
 In this document we'll refer to it as "mdpre", pronounced "em dee pree".
 
-This document was converted to HTML at 15&colon;48 on 23 August&comma; 2026.
+This document was converted to HTML at 14&colon;15 on 31 August&comma; 2026.
 
 ### Table Of Contents
 

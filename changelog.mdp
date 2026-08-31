@@ -21,9 +21,9 @@
 **<span class="blue">NEW</span>** **<span class="green">ENHANCED</span>** **<span class="orange">FIXED</span>** **<span class="red">REMOVED</span>** 
 =toc 2 2 Releases
 
-### v1.2.1+ - 23 August, 2026
+### v1.2.2 - 31 August, 2026
 
-* **<span class="orange">FIXED</span>** [Issue 53](https://github.com/MartinPacker/mdpre/issues/53): If gutter cells is `1/2` or `1/4` it is set to `1`.
+* **<span class="orange">FIXED</span>** [Issue 53](https://github.com/MartinPacker/mdpre/issues/53): If gutter cell's value is specified as `1/2` or `1/4` it was set to `1`.
 * **<span class="green">ENHANCED</span>** Issues [43](https://github.com/MartinPacker/mdpre/issues/43) and [44](https://github.com/MartinPacker/mdpre/issues/44): `=csvrule` offers the `allCellsText` variable. \
 Documentation for `=csvrule` enhanced for the new use cases this unlocks.
 
