@@ -30,8 +30,8 @@ try:
 except:
     have_cheetah = False
 
-mdpre_level = "1.2.2"
-mdpre_date = "31 August, 2026"
+mdpre_level = "1.2.2+"
+mdpre_date = "20 September, 2026"
 banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
 
 def log(textToLog):
@@ -65,6 +65,64 @@ monthNames = [
     "December",
 ]
 
+class Tree:
+    def __init__(self, value, parent = None):
+        self.parent = parent
+        self.children = []
+        self.value = value
+        
+        if parent is not None:
+            parent.__addChild(self)
+    
+    def getChildren(self):
+        return self.children
+    
+    def getParent(self):
+        return self.parent
+    
+    def getValue(self):
+        return self.value
+    
+    def __addChild(self, newChild):
+        self.children.append(newChild)
+        
+    def walkValues(self, valuesSoFar):
+
+        for child in self.children:
+            valuesSoFar.append(child.value)
+            valuesSoFar = child.walkValues(valuesSoFar)
+
+        return valuesSoFar
+
+    def recursiveWrapValues(self, stringSoFar, level, prefix, suffix1, suffix2):
+
+        indent = "  " * level
+
+        stringSoFar += indent + prefix + self.value + suffix1
+
+        for child in self.children:
+            stringSoFar = child.recursiveWrapValues(stringSoFar, level + 1, prefix, suffix1, suffix2)
+            
+        stringSoFar += indent + suffix2
+        
+        return stringSoFar
+    
+    def __dump(self, stringSoFar = "", level = 0):
+        
+        if level == 0:
+            prefix = ""
+        else:
+            prefix = " " * (2 * (level - 1) ) + "->"
+        stringSoFar += prefix + self.value + "\n"
+
+        for child in self.children:
+            stringSoFar = child.__dump(stringSoFar, level + 1)
+
+        return stringSoFar
+        
+    def dump(self):
+        print(self.__dump("", 0))
+    
 
 def log_status(p_line):
     log("-" * len(banner))
@@ -1132,6 +1190,7 @@ def handle_undef(name):
 def parse_include(input_file):
     global embedLevel
     global ifStack
+    global currentNode
     global vars
     
     embedLevel += 1
@@ -1162,7 +1221,8 @@ def parse_include(input_file):
 
                 # Not recursive so add include file name to stack
                 includeStack.append(include_name)
-                dependencies.append(include_name)
+                
+                currentNode = Tree(include_name, currentNode)
 
                 if wantVerbose is True:
                     input_file2.append(
@@ -1174,11 +1234,12 @@ def parse_include(input_file):
                     )
 
                 try:
-                    with open(include_name, "r") as f:
-                        stopIt, include_lines = parse_include(f.readlines())
+                    f = open(include_name, "r")
                 except:
                     log(f"File {include_name} missing. Terminating.\n")
                     exit()
+
+                stopIt, include_lines = parse_include(f.readlines())
                 
                 for line2 in include_lines:
                     input_file2.append(line2)
@@ -1221,6 +1282,12 @@ def parse_include(input_file):
                             + redefined
                             + "-->"
                         )
+            elif line.find("![") > -1:
+                if (line[0:4] != "    ") & (line[0:1] != "\t"):
+                    # Match is not in a code block
+                    for resourceName in getResourceNames(line):
+                        newDependency = Tree(resourceName, currentNode)
+        
 
             elif line.startswith("=inc ") is True:
                 parse_inc(line)
@@ -1294,6 +1361,9 @@ def parse_include(input_file):
 
     # Pop this file from the stack
     includeStack.pop()
+    
+    if currentNode.value != "$target":
+        currentNode = currentNode.getParent()
 
     embedLevel -= 1
     
@@ -1995,8 +2065,9 @@ setupStandardVariables()
 
 ifStack = [True]
 
-# Prime list of dependencies
-dependencies = []
+# Prime tree of dependencies
+dependencies = Tree("$target")
+currentNode = dependencies
 
 # Regexes for matching graphics etc - to detect dependencies
 graphicRE = r"!\[(.*?)\]\((.+?)\)"
@@ -2214,10 +2285,6 @@ for line in input_file:
             handle_verbose("<!--mdpre-usetemplate:" + line + "-->")
 
     elif line.find("![") > -1:
-        if (line[0:4] != "    ") & (line[0:1] != "\t"):
-            # Match is not in a code block
-            dependencies += getResourceNames(line)
-        
         if(wantTextBundle is True):
             # Fix up graphics references and copy graphics to assets folder
             g_output.handle_adjustGraphics(line)
@@ -2254,10 +2321,16 @@ if wantTextPack is True:
 makefile = "makefragment=\n"
 makefile += "$(target).md: \\\n"
 makefile += "\t$(target).mdp \\\n"
-# 
-dependencyCount = len(dependencies)
 
-for dnum, d in enumerate(dependencies):
+flattenedDependencies = dependencies.walkValues([])
+
+uniqueFlattenedDependencies = []
+[uniqueFlattenedDependencies.append(x) for x in flattenedDependencies if x not in uniqueFlattenedDependencies]
+
+
+dependencyCount = len(uniqueFlattenedDependencies)
+
+for dnum, d in enumerate(uniqueFlattenedDependencies):
     makefileFragment = "\t" + d.replace(" ", "\\ ")
     makefile += makefileFragment
     if dnum < dependencyCount - 1:
@@ -2266,6 +2339,26 @@ for dnum, d in enumerate(dependencies):
         makefile += " \n\n"
 
 makefile += "\tmdpre -v < $(target).mdp > $(target).md 2>$(target).log $(makefragment)\n"
+
+
+
+# Write out dependency tree */
+makefile += "define DepTree\n"
+
+opml = "<?xml version=\"1.0\"?>\n"
+opml += "<opml version=\"1.0\">\n"
+opml += "<head>\n"
+opml += "</head>\n"
+opml += "<body>\n"
+
+opml = dependencies.recursiveWrapValues(opml, 0, "<outline text=\"", "\">\n", "</outline>\n")
+
+opml += "</body>\n"
+opml += "</opml>\n"
+
+makefile += opml
+
+makefile += "endef\n"
 
 if makefileFilename != "":
     # Write the make file fragment to the file specified
