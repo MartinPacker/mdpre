@@ -31,7 +31,7 @@ except:
     have_cheetah = False
 
 mdpre_level = "1.2.2+"
-mdpre_date = "20 September, 2026"
+mdpre_date = "21 September, 2026"
 banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
 
 def log(textToLog):
@@ -1287,6 +1287,7 @@ def parse_include(input_file):
                     # Match is not in a code block
                     for resourceName in getResourceNames(line):
                         newDependency = Tree(resourceName, currentNode)
+                input_file2.append(line)
         
 
             elif line.startswith("=inc ") is True:
