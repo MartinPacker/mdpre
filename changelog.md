@@ -22,6 +22,10 @@
 ### Releases
 
 
+### v1.2.2+ - 26 September, 2026
+
+* **<span class="blue">NEW</span>** [Issue 55](https://github.com/MartinPacker/mdpre/issues/55): `-r filename.opml` emits a resource tree as an OPML file.
+
 ### v1.2.2 - 31 August, 2026
 
 * **<span class="orange">FIXED</span>** [Issue 53](https://github.com/MartinPacker/mdpre/issues/53): If gutter cell's value is specified as `1/2` or `1/4` it was set to `1`.
