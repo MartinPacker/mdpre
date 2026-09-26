@@ -1357,7 +1357,7 @@ body .markdown-body
 <h1 id="markdown-preprocessor-user-guide">Markdown Preprocessor User Guide<a class="headerlink" href="#markdown-preprocessor-user-guide" title="Permanent link"></a></h1>
 <p>This document describes the mdpre Markdown preprocessor.</p>
 <p>In this document we&rsquo;ll refer to it as &ldquo;mdpre&rdquo;, pronounced &ldquo;em dee pree&rdquo;.</p>
-<p>This document was converted to HTML at 14&colon;15 on 31 August&comma; 2026.</p>
+<p>This document was converted to HTML at 17&colon;40 on 26 September&comma; 2026.</p>
 <h3 id="table-of-contents">Table Of Contents<a class="headerlink" href="#table-of-contents" title="Permanent link"></a></h3>
 <ul>
 <li><a href="#why-a-preprocessor">Why A Preprocessor?</a></li>
@@ -1366,6 +1366,7 @@ body .markdown-body
 <li><a href="#printing-the-version">Printing The Version</a></li>
 <li><a href="#verbose-mode">Verbose Mode</a></li>
 <li><a href="#creating-a-make-file-fragment">Creating A Make File Fragment</a></li>
+<li><a href="#creating-a-resource-dependency-tree-in-opml-format">Creating A Resource Dependency Tree In OPML Format</a></li>
 <li><a href="#defining-variables">Defining Variables</a></li>
 <li><a href="#filenames">Filenames</a></li>
 <li><a href="#specifying-filenames-on-the-command-line">Specifying Filenames On The Command Line</a></li>
@@ -1533,11 +1534,10 @@ $(target).md:
     mdpre -v &lt; $(target).mdp &gt; $(target).md 2&gt;$(target).log $(makefragment)
 </code></pre>
 <p>You could, for example, include the following lines in your main make file (possibly called &ldquo;makefile&rdquo;):</p>
-<div class="highlight"><pre>target=user-guide
+<div class="highlight"><pre><span></span><code>target=user-guide
 
 include fragment.mak
-</pre></div>
-
+</code></pre></div>
 <p>This would set the make variable <code>target</code> to the value &ldquo;user-guide&rdquo;.
 The result of this is that running make invokes mdpre against user-guide.mdp, creating as output user-guide.md and sending messages to user-guide.log.
 Verbose Mode is turned on - which is probably what you want with a log file as a destination for messages.</p>
@@ -1549,6 +1549,52 @@ Here is an example:</p>
 </code></pre>
 <p>The idea here is to allow you to specify a make file fragment is generated.
 The default is not to - as it is more likely you won&rsquo;t want to regenerate the make file fragment every time you run mdpre.</p>
+<p>You can use the <code>-m</code> and <a href="#creating-a-resource-dependency-tree-in-opml-format"><code>-r</code></a> command line options in the same mdpre run.</p>
+<h3 id="creating-a-resource-dependency-tree-in-opml-format">Creating A Resource Dependency Tree In OPML Format<a class="headerlink" href="#creating-a-resource-dependency-tree-in-opml-format" title="Permanent link"></a></h3>
+<p>OPML is a widely used XML-based format for describing trees.
+The &ldquo;O&rdquo; stands for &ldquo;Outline&rdquo; but it has more general applications.</p>
+<p>You can create an OMPL file that documents the dependencies mdpre infers.
+These are in two categories:</p>
+<ul>
+<li><code>=include</code> text files</li>
+<li>media files such as .PNG graphics</li>
+</ul>
+<p>Complex projects might have several levels of <code>=include</code> specifications.
+The OPML file mdpre creates respects the hierarchy.</p>
+<p>Here is an example OPML file:</p>
+<div class="highlight"><pre><span></span><code>&lt;?xml version="1.0"?&gt;
+&lt;opml version="1.0"&gt;
+&lt;head&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;outline text="$target"&gt;
+  &lt;outline text="Level1.mdp"&gt;
+    &lt;outline text="Level2.mdp"&gt;
+      &lt;outline text="test.png"&gt;
+      &lt;/outline&gt;
+    &lt;/outline&gt;
+    &lt;outline text="nonExistent.png"&gt;
+    &lt;/outline&gt;
+    &lt;outline text="Level2.mdp"&gt;
+      &lt;outline text="test.png"&gt;
+      &lt;/outline&gt;
+    &lt;/outline&gt;
+    &lt;outline text="nonExistent.png"&gt;
+    &lt;/outline&gt;
+  &lt;/outline&gt;
+  &lt;outline text="Level2.mdp"&gt;
+    &lt;outline text="test.png"&gt;
+    &lt;/outline&gt;
+  &lt;/outline&gt;
+&lt;/outline&gt;
+&lt;/body&gt;
+&lt;/opml&gt;
+</code></pre></div>
+<p>To create an OPML Resource Dependency file use the <code>-r</code> command line parameter.
+For example:</p>
+<pre><code>mdpre &lt; document.mdp &gt; document.md 2&gt; document.log -r document.opml
+</code></pre>
+<p>You can use the <code>-r</code> and <a href="#creating-a-make-file-fragment"><code>-m</code></a> command line options in the same mdpre run.</p>
 <h3 id="defining-variables">Defining Variables<a class="headerlink" href="#defining-variables" title="Permanent link"></a></h3>
 <p>You can define variables on the command line when you run mdpre. Use the <code>-d</code> switch. For example</p>
 <pre><code>mdpre -v -dfred -dbrian &lt; test.mdp &gt; test.md
@@ -1567,7 +1613,8 @@ The default is not to - as it is more likely you won&rsquo;t want to regenerate 
 <li><code>-i</code> specifies the top-level input filename</li>
 <li><code>-o</code> specifies the output filename</li>
 <li><code>-l</code> specifies the log output filename (especially useful with <code>-v</code>)</li>
-<li><code>-m</code> specifies the filename for a makefile fragment (containing dependencies)</li>
+<li><code>-m</code> specifies the filename for a <a href="#creating-a-make-file-fragment">make file fragment</a> (containing dependencies)</li>
+<li><code>-r</code> specifies the filename for an OPML file (containing <a href="#creating-a-resource-dependency-tree-in-opml-format">dependencies as a tree</a>)</li>
 </ul>
 <p>For example</p>
 <pre><code>mdpre -v -i user-guide.mdp -o user-guide.md -l user-guide.log -m user-guide.mak
@@ -1755,16 +1802,16 @@ System is not Windows
 <table>
 <thead>
 <tr>
-<th align="left">A</th>
-<th align="left">1</th>
-<th align="left">2</th>
+<th style="text-align: left;">A</th>
+<th style="text-align: left;">1</th>
+<th style="text-align: left;">2</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="left">B</td>
-<td align="left">20</td>
-<td align="left">30</td>
+<td style="text-align: left;">B</td>
+<td style="text-align: left;">20</td>
+<td style="text-align: left;">30</td>
 </tr>
 </tbody>
 </table>
@@ -1796,16 +1843,16 @@ If you specify a dialect that is not available mdpre will list the available dia
 <table>
 <thead>
 <tr>
-<th align="left">A</th>
-<th align="right">1</th>
-<th align="right">2</th>
+<th style="text-align: left;">A</th>
+<th style="text-align: right;">1</th>
+<th style="text-align: right;">2</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="left">B</td>
-<td align="right">20</td>
-<td align="right">30</td>
+<td style="text-align: left;">B</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">30</td>
 </tr>
 </tbody>
 </table>
@@ -1975,69 +2022,69 @@ prior to flowing.
 <table>
 <thead>
 <tr>
-<th align="center"></th>
-<th align="center"></th>
-<th align="center"></th>
-<th align="center">November 2021</th>
-<th align="center"></th>
-<th align="center"></th>
-<th align="center"></th>
+<th style="text-align: center;"></th>
+<th style="text-align: center;"></th>
+<th style="text-align: center;"></th>
+<th style="text-align: center;">November 2021</th>
+<th style="text-align: center;"></th>
+<th style="text-align: center;"></th>
+<th style="text-align: center;"></th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="center"><strong>Mo</strong></td>
-<td align="center"><strong>Tu</strong></td>
-<td align="center"><strong>We</strong></td>
-<td align="center"><strong>Th</strong></td>
-<td align="center"><strong>Fr</strong></td>
-<td align="center"><strong>Sa</strong></td>
-<td align="center"><strong>Su</strong></td>
+<td style="text-align: center;"><strong>Mo</strong></td>
+<td style="text-align: center;"><strong>Tu</strong></td>
+<td style="text-align: center;"><strong>We</strong></td>
+<td style="text-align: center;"><strong>Th</strong></td>
+<td style="text-align: center;"><strong>Fr</strong></td>
+<td style="text-align: center;"><strong>Sa</strong></td>
+<td style="text-align: center;"><strong>Su</strong></td>
 </tr>
 <tr>
-<td align="center"><br/></td>
-<td align="center"><br/></td>
-<td align="center">1<br/></td>
-<td align="center">2<br/></td>
-<td align="center">3<br/></td>
-<td align="center">4<br/></td>
-<td align="center">5<br/></td>
+<td style="text-align: center;"><br/></td>
+<td style="text-align: center;"><br/></td>
+<td style="text-align: center;">1<br/></td>
+<td style="text-align: center;">2<br/></td>
+<td style="text-align: center;">3<br/></td>
+<td style="text-align: center;">4<br/></td>
+<td style="text-align: center;">5<br/></td>
 </tr>
 <tr>
-<td align="center">6<br/></td>
-<td align="center">7<br/></td>
-<td align="center">8<br/></td>
-<td align="center">9<br/></td>
-<td align="center">10<br/></td>
-<td align="center">11<br/></td>
-<td align="center">12<br/></td>
+<td style="text-align: center;">6<br/></td>
+<td style="text-align: center;">7<br/></td>
+<td style="text-align: center;">8<br/></td>
+<td style="text-align: center;">9<br/></td>
+<td style="text-align: center;">10<br/></td>
+<td style="text-align: center;">11<br/></td>
+<td style="text-align: center;">12<br/></td>
 </tr>
 <tr>
-<td align="center">13<br/></td>
-<td align="center">14<br/></td>
-<td align="center">15<br/></td>
-<td align="center">16<br/></td>
-<td align="center">17<br/></td>
-<td align="center">18<br/></td>
-<td align="center">19<br/></td>
+<td style="text-align: center;">13<br/></td>
+<td style="text-align: center;">14<br/></td>
+<td style="text-align: center;">15<br/></td>
+<td style="text-align: center;">16<br/></td>
+<td style="text-align: center;">17<br/></td>
+<td style="text-align: center;">18<br/></td>
+<td style="text-align: center;">19<br/></td>
 </tr>
 <tr>
-<td align="center">20<br/></td>
-<td align="center">21<br/></td>
-<td align="center">22<br/></td>
-<td align="center">23<br/></td>
-<td align="center">24<br/></td>
-<td align="center">25<br/></td>
-<td align="center">26<br/></td>
+<td style="text-align: center;">20<br/></td>
+<td style="text-align: center;">21<br/></td>
+<td style="text-align: center;">22<br/></td>
+<td style="text-align: center;">23<br/></td>
+<td style="text-align: center;">24<br/></td>
+<td style="text-align: center;">25<br/></td>
+<td style="text-align: center;">26<br/></td>
 </tr>
 <tr>
-<td align="center">27<br/></td>
-<td align="center">28<br/></td>
-<td align="center">29<br/></td>
-<td align="center">30<br/></td>
-<td align="center">31<br/></td>
-<td align="center"></td>
-<td align="center"></td>
+<td style="text-align: center;">27<br/></td>
+<td style="text-align: center;">28<br/></td>
+<td style="text-align: center;">29<br/></td>
+<td style="text-align: center;">30<br/></td>
+<td style="text-align: center;">31<br/></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
 </tr>
 </tbody>
 </table>
@@ -2074,69 +2121,69 @@ prior to flowing.
 <table>
 <thead>
 <tr>
-<th align="center">December 2021</th>
-<th align="center"></th>
-<th align="center"></th>
-<th align="center"></th>
-<th align="center"></th>
-<th align="center"></th>
-<th align="center"></th>
+<th style="text-align: center;">December 2021</th>
+<th style="text-align: center;"></th>
+<th style="text-align: center;"></th>
+<th style="text-align: center;"></th>
+<th style="text-align: center;"></th>
+<th style="text-align: center;"></th>
+<th style="text-align: center;"></th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="center"><strong>Mo</strong></td>
-<td align="center"><strong>Tu</strong></td>
-<td align="center"><strong>We</strong></td>
-<td align="center"><strong>Th</strong></td>
-<td align="center"><strong>Fr</strong></td>
-<td align="center"><strong>Sa</strong></td>
-<td align="center"><strong>Su</strong></td>
+<td style="text-align: center;"><strong>Mo</strong></td>
+<td style="text-align: center;"><strong>Tu</strong></td>
+<td style="text-align: center;"><strong>We</strong></td>
+<td style="text-align: center;"><strong>Th</strong></td>
+<td style="text-align: center;"><strong>Fr</strong></td>
+<td style="text-align: center;"><strong>Sa</strong></td>
+<td style="text-align: center;"><strong>Su</strong></td>
 </tr>
 <tr>
-<td align="center">&nbsp;<br/><br/></td>
-<td align="center">&nbsp;<br/><br/></td>
-<td align="center">1<br/><br/></td>
-<td align="center">2<br/><br/></td>
-<td align="center">3<br/><br/></td>
-<td align="center">4<br/>X<br/></td>
-<td align="center">5<br/><br/></td>
+<td style="text-align: center;">&nbsp;<br/><br/></td>
+<td style="text-align: center;">&nbsp;<br/><br/></td>
+<td style="text-align: center;">1<br/><br/></td>
+<td style="text-align: center;">2<br/><br/></td>
+<td style="text-align: center;">3<br/><br/></td>
+<td style="text-align: center;">4<br/>X<br/></td>
+<td style="text-align: center;">5<br/><br/></td>
 </tr>
 <tr>
-<td align="center">6<br/><br/></td>
-<td align="center">7<br/><br/></td>
-<td align="center">8<br/><br/></td>
-<td align="center">9<br/><br/></td>
-<td align="center">10<br/><br/></td>
-<td align="center">11<br/><br/></td>
-<td align="center">12<br/><br/></td>
+<td style="text-align: center;">6<br/><br/></td>
+<td style="text-align: center;">7<br/><br/></td>
+<td style="text-align: center;">8<br/><br/></td>
+<td style="text-align: center;">9<br/><br/></td>
+<td style="text-align: center;">10<br/><br/></td>
+<td style="text-align: center;">11<br/><br/></td>
+<td style="text-align: center;">12<br/><br/></td>
 </tr>
 <tr>
-<td align="center">13<br/><br/></td>
-<td align="center"><span class='blue'>14</span><br/><br/></td>
-<td align="center"><span class='blue'>15</span><br/><br/></td>
-<td align="center"><span class='blue'>16</span><br/><br/></td>
-<td align="center"><span class='blue'>17</span><br/>A<br/></td>
-<td align="center"><span class='orange'>18</span><br/><span class="green">B</span><br/></td>
-<td align="center">19<br/><br/></td>
+<td style="text-align: center;">13<br/><br/></td>
+<td style="text-align: center;"><span class='blue'>14</span><br/><br/></td>
+<td style="text-align: center;"><span class='blue'>15</span><br/><br/></td>
+<td style="text-align: center;"><span class='blue'>16</span><br/><br/></td>
+<td style="text-align: center;"><span class='blue'>17</span><br/>A<br/></td>
+<td style="text-align: center;"><span class='orange'>18</span><br/><span class="green">B</span><br/></td>
+<td style="text-align: center;">19<br/><br/></td>
 </tr>
 <tr>
-<td align="center">20<br/><br/></td>
-<td align="center">21<br/><br/></td>
-<td align="center">22<br/><br/></td>
-<td align="center">23<br/><br/></td>
-<td align="center">24<br/><br/></td>
-<td align="center">25<br/><br/></td>
-<td align="center">26<br/><br/></td>
+<td style="text-align: center;">20<br/><br/></td>
+<td style="text-align: center;">21<br/><br/></td>
+<td style="text-align: center;">22<br/><br/></td>
+<td style="text-align: center;">23<br/><br/></td>
+<td style="text-align: center;">24<br/><br/></td>
+<td style="text-align: center;">25<br/><br/></td>
+<td style="text-align: center;">26<br/><br/></td>
 </tr>
 <tr>
-<td align="center">27<br/><br/></td>
-<td align="center">28<br/><br/></td>
-<td align="center">29<br/><br/></td>
-<td align="center">30<br/><br/></td>
-<td align="center">31<br/><br/></td>
-<td align="center">&nbsp;<br/><br/></td>
-<td align="center">&nbsp;<br/><br/></td>
+<td style="text-align: center;">27<br/><br/></td>
+<td style="text-align: center;">28<br/><br/></td>
+<td style="text-align: center;">29<br/><br/></td>
+<td style="text-align: center;">30<br/><br/></td>
+<td style="text-align: center;">31<br/><br/></td>
+<td style="text-align: center;">&nbsp;<br/><br/></td>
+<td style="text-align: center;">&nbsp;<br/><br/></td>
 </tr>
 </tbody>
 </table>
@@ -2163,9 +2210,8 @@ For example January of this year can be specified with</p>
 <p>In this case days 14, 15, 16, and 17 are styled with CSS class <code>blue</code>, whereas day 18 is styled with CSS class <code>orange</code>. You need to code the CSS for classes <code>blue</code> and <code>orange</code> for these specifications to be effective.</p>
 <p><code>=caldays</code> must be specified on its own line between the <code>=cal</code> and <code>=endcal</code> lines. You can specify as many <code>=caldays</code> lines as you like within this bracket.</p>
 <p>You can specify a range of days in the following manner:</p>
-<div class="highlight"><pre>=caldays blue 14-17 22-24 27
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>=caldays blue 14-17 22-24 27
+</code></pre></div>
 <p><strong>Notes:</strong></p>
 <ol>
 <li>In a range specification there can be spaces between the <code>-</code> and the numbers either side.</li>
@@ -2175,15 +2221,13 @@ For example January of this year can be specified with</p>
 </ol>
 <h4 id="adding-a-key-to-the-day-numbers-styling-with-calkey">Adding A Key To The Day Numbers&rsquo; Styling With <code>=calkey</code><a class="headerlink" href="#adding-a-key-to-the-day-numbers-styling-with-calkey" title="Permanent link"></a></h4>
 <p>You can add bullets below the table to explain what each style means. For example:</p>
-<div class="highlight"><pre>=calkey blue We have data for **somehow**
+<div class="highlight"><pre><span></span><code>=calkey blue We have data for **somehow**
 =calkey orange Is focus day
-</pre></div>
-
+</code></pre></div>
 <p>causes the following Markdown / HTML to be generated:</p>
-<div class="highlight"><pre>* &lt;span class=&#39;blue&#39;&gt;&amp;nbsp;&lt;/span&gt;We have data for **somehow**
-* &lt;span class=&#39;orange&#39;&gt;&amp;nbsp;&lt;/span&gt;Is focus day
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>* &lt;span class='blue'&gt;&amp;nbsp;&lt;/span&gt;We have data for **somehow**
+* &lt;span class='orange'&gt;&amp;nbsp;&lt;/span&gt;Is focus day
+</code></pre></div>
 <p>As with <code>=caldays</code>, you need to code the CSS for classes <code>blue</code> and <code>orange</code> for these specifications to be effective.</p>
 <p><code>=calkey</code> must be specified on its own line between the <code>=cal</code> and <code>=endcal</code> lines. You can specify as many <code>=calkey</code> lines as you like within this bracket.</p>
 <p><strong>Notes:</strong> </p>
@@ -2195,19 +2239,17 @@ For example January of this year can be specified with</p>
 </ol>
 <h4 id="adding-information-to-a-cell-with-calnote">Adding Information To A Cell With <code>=calnote</code><a class="headerlink" href="#adding-information-to-a-cell-with-calnote" title="Permanent link"></a></h4>
 <p>You can add annotations to individual calendar dates with <code>=calnote</code>. For example:</p>
-<div class="highlight"><pre>=calnote 17 A
-=calnote 18 &lt;span class=&quot;green&quot;&gt;B&lt;/span&gt;
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>=calnote 17 A
+=calnote 18 &lt;span class="green"&gt;B&lt;/span&gt;
+</code></pre></div>
 <ol>
 <li><code>=calnote 17 A</code> adds the text &ldquo;A&rdquo; to the cell for 17th of the month.</li>
 <li><code>=calnote 18 &lt;span class="green"&gt;B&lt;/span&gt;</code> adds the text &ldquo;B&rdquo; in (presumably) green to the cell for the 18th of the month.</li>
 </ol>
 <p><code>=calnote</code> must be specified on its own line between the <code>=cal</code> and <code>=endcal</code> lines. You can specify as many <code>=calnote</code> lines as you like within this bracket.</p>
 <p>You can specify a range of days in the following manner:</p>
-<div class="highlight"><pre>=calnote 14-17 RMF
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>=calnote 14-17 RMF
+</code></pre></div>
 <p><strong>Notes:</strong></p>
 <ol>
 <li>In the examples given the text is short. It probably looks worse if the text is long.</li>
@@ -2325,71 +2367,71 @@ The result is:</p>
 <table>
 <thead>
 <tr>
-<th align="left">Variable</th>
-<th align="left">Description</th>
-<th align="left">Example Result</th>
+<th style="text-align: left;">Variable</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: left;">Example Result</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="left">date</td>
-<td align="left">Date when mdpre started running</td>
-<td align="left"><code>6 March&amp;comma; 2019</code></td>
+<td style="text-align: left;">date</td>
+<td style="text-align: left;">Date when mdpre started running</td>
+<td style="text-align: left;"><code>6 March&amp;comma; 2019</code></td>
 </tr>
 <tr>
-<td align="left">time</td>
-<td align="left">Time when mdpre startred running</td>
-<td align="left"><code>21&amp;colon;36</code></td>
+<td style="text-align: left;">time</td>
+<td style="text-align: left;">Time when mdpre startred running</td>
+<td style="text-align: left;"><code>21&amp;colon;36</code></td>
 </tr>
 <tr>
-<td align="left">userid</td>
-<td align="left">Userid mdpre was run under</td>
-<td align="left"><code>martinpacker</code></td>
+<td style="text-align: left;">userid</td>
+<td style="text-align: left;">Userid mdpre was run under</td>
+<td style="text-align: left;"><code>martinpacker</code></td>
 </tr>
 <tr>
-<td align="left">mdpre_level</td>
-<td align="left">Level of mdpre</td>
-<td align="left"><code>0.4.4</code></td>
+<td style="text-align: left;">mdpre_level</td>
+<td style="text-align: left;">Level of mdpre</td>
+<td style="text-align: left;"><code>0.4.4</code></td>
 </tr>
 <tr>
-<td align="left">mdpre_date</td>
-<td align="left">Date of mdpre</td>
-<td align="left"><code>9 March&amp;colon; 2019</code></td>
+<td style="text-align: left;">mdpre_date</td>
+<td style="text-align: left;">Date of mdpre</td>
+<td style="text-align: left;"><code>9 March&amp;colon; 2019</code></td>
 </tr>
 <tr>
-<td align="left">day</td>
-<td align="left">Day of month when mdpre started running</td>
-<td align="left"><code>3</code></td>
+<td style="text-align: left;">day</td>
+<td style="text-align: left;">Day of month when mdpre started running</td>
+<td style="text-align: left;"><code>3</code></td>
 </tr>
 <tr>
-<td align="left">month</td>
-<td align="left">Month when mdpre started running</td>
-<td align="left"><code>May</code></td>
+<td style="text-align: left;">month</td>
+<td style="text-align: left;">Month when mdpre started running</td>
+<td style="text-align: left;"><code>May</code></td>
 </tr>
 <tr>
-<td align="left">year</td>
-<td align="left">Year when mdpre started running</td>
-<td align="left"><code>2025</code></td>
+<td style="text-align: left;">year</td>
+<td style="text-align: left;">Year when mdpre started running</td>
+<td style="text-align: left;"><code>2025</code></td>
 </tr>
 <tr>
-<td align="left">input</td>
-<td align="left">Name of input file&comma; or <code>stdin</code></td>
-<td align="left"><code>test.mdp</code></td>
+<td style="text-align: left;">input</td>
+<td style="text-align: left;">Name of input file&comma; or <code>stdin</code></td>
+<td style="text-align: left;"><code>test.mdp</code></td>
 </tr>
 <tr>
-<td align="left">output</td>
-<td align="left">Name of output file&comma; or <code>stdout</code></td>
-<td align="left"><code>test.md</code></td>
+<td style="text-align: left;">output</td>
+<td style="text-align: left;">Name of output file&comma; or <code>stdout</code></td>
+<td style="text-align: left;"><code>test.md</code></td>
 </tr>
 <tr>
-<td align="left">logfile</td>
-<td align="left">Name of log file&comma; or <code>stderr</code></td>
-<td align="left"><code>test.log</code></td>
+<td style="text-align: left;">logfile</td>
+<td style="text-align: left;">Name of log file&comma; or <code>stderr</code></td>
+<td style="text-align: left;"><code>test.log</code></td>
 </tr>
 <tr>
-<td align="left">makefile</td>
-<td align="left">Name of makefile fragment&comma; or <code>file-3</code></td>
-<td align="left"><code>test.mak</code></td>
+<td style="text-align: left;">makefile</td>
+<td style="text-align: left;">Name of makefile fragment&comma; or <code>file-3</code></td>
+<td style="text-align: left;"><code>test.mak</code></td>
 </tr>
 </tbody>
 </table>
@@ -2397,56 +2439,56 @@ The result is:</p>
 <table>
 <thead>
 <tr>
-<th align="left">Variable</th>
-<th align="left">Description</th>
-<th align="left">Example Result</th>
+<th style="text-align: left;">Variable</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: left;">Example Result</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td align="left">node</td>
-<td align="left">Machine node name</td>
-<td align="left"><code>bluemac.local</code></td>
+<td style="text-align: left;">node</td>
+<td style="text-align: left;">Machine node name</td>
+<td style="text-align: left;"><code>bluemac.local</code></td>
 </tr>
 <tr>
-<td align="left">version</td>
-<td align="left">Operating system version</td>
-<td align="left"><code>Darwin Kernel Version 24.4.0: Fri Apr 11 18:33:47 PDT 2025; root:xnu-11417.101.15~117/RELEASE_ARM64_T6000</code></td>
+<td style="text-align: left;">version</td>
+<td style="text-align: left;">Operating system version</td>
+<td style="text-align: left;"><code>Darwin Kernel Version 24.4.0: Fri Apr 11 18:33:47 PDT 2025; root:xnu-11417.101.15~117/RELEASE_ARM64_T6000</code></td>
 </tr>
 <tr>
-<td align="left">architecture</td>
-<td align="left">Machine architecture</td>
-<td align="left"><code>64bit</code></td>
+<td style="text-align: left;">architecture</td>
+<td style="text-align: left;">Machine architecture</td>
+<td style="text-align: left;"><code>64bit</code></td>
 </tr>
 <tr>
-<td align="left">machine</td>
-<td align="left">Also machine architecture</td>
-<td align="left"><code>arm64</code></td>
+<td style="text-align: left;">machine</td>
+<td style="text-align: left;">Also machine architecture</td>
+<td style="text-align: left;"><code>arm64</code></td>
 </tr>
 <tr>
-<td align="left">system</td>
-<td align="left">System type</td>
-<td align="left"><code>Darwin</code></td>
+<td style="text-align: left;">system</td>
+<td style="text-align: left;">System type</td>
+<td style="text-align: left;"><code>Darwin</code></td>
 </tr>
 <tr>
-<td align="left">release</td>
-<td align="left">Software release</td>
-<td align="left"><code>24.4.0</code></td>
+<td style="text-align: left;">release</td>
+<td style="text-align: left;">Software release</td>
+<td style="text-align: left;"><code>24.4.0</code></td>
 </tr>
 <tr>
-<td align="left">python_version</td>
-<td align="left">Python version</td>
-<td align="left"><code>3.12.3</code></td>
+<td style="text-align: left;">python_version</td>
+<td style="text-align: left;">Python version</td>
+<td style="text-align: left;"><code>3.12.3</code></td>
 </tr>
 <tr>
-<td align="left">python_implementation</td>
-<td align="left">Python implementation</td>
-<td align="left"><code>CPython</code></td>
+<td style="text-align: left;">python_implementation</td>
+<td style="text-align: left;">Python implementation</td>
+<td style="text-align: left;"><code>CPython</code></td>
 </tr>
 <tr>
-<td align="left">processor</td>
-<td align="left">Processor type</td>
-<td align="left"><code>arm</code></td>
+<td style="text-align: left;">processor</td>
+<td style="text-align: left;">Processor type</td>
+<td style="text-align: left;"><code>arm</code></td>
 </tr>
 </tbody>
 </table></article></body></html>

@@ -116,7 +116,7 @@ This document describes the mdpre Markdown preprocessor.
 
 In this document we'll refer to it as "mdpre", pronounced "em dee pree".
 
-This document was converted to HTML at 14&colon;15 on 31 August&comma; 2026.
+This document was converted to HTML at 17&colon;40 on 26 September&comma; 2026.
 
 ### Table Of Contents
 
@@ -126,6 +126,7 @@ This document was converted to HTML at 14&colon;15 on 31 August&comma; 2026.
 	* [Printing The Version](#printing-the-version)
 	* [Verbose Mode](#verbose-mode)
 	* [Creating A Make File Fragment](#creating-a-make-file-fragment)
+	* [Creating A Resource Dependency Tree In OPML Format](#creating-a-resource-dependency-tree-in-opml-format)
 	* [Defining Variables](#defining-variables)
 	* [Filenames](#filenames)
 	* [Specifying Filenames On The Command Line](#specifying-filenames-on-the-command-line)
@@ -308,6 +309,61 @@ Here is an example:
 The idea here is to allow you to specify a make file fragment is generated.
 The default is not to - as it is more likely you won't want to regenerate the make file fragment every time you run mdpre.
 
+You can use the `-m` and [`-r`](#creating-a-resource-dependency-tree-in-opml-format) command line options in the same mdpre run.
+
+### Creating A Resource Dependency Tree In OPML Format
+
+OPML is a widely used XML-based format for describing trees.
+The "O" stands for "Outline" but it has more general applications.
+
+You can create an OMPL file that documents the dependencies mdpre infers.
+These are in two categories:
+
+* `=include` text files
+* media files such as .PNG graphics
+
+Complex projects might have several levels of `=include` specifications.
+The OPML file mdpre creates respects the hierarchy.
+
+Here is an example OPML file:
+
+```
+<?xml version="1.0"?>
+<opml version="1.0">
+<head>
+</head>
+<body>
+<outline text="$target">
+  <outline text="Level1.mdp">
+    <outline text="Level2.mdp">
+      <outline text="test.png">
+      </outline>
+    </outline>
+    <outline text="nonExistent.png">
+    </outline>
+    <outline text="Level2.mdp">
+      <outline text="test.png">
+      </outline>
+    </outline>
+    <outline text="nonExistent.png">
+    </outline>
+  </outline>
+  <outline text="Level2.mdp">
+    <outline text="test.png">
+    </outline>
+  </outline>
+</outline>
+</body>
+</opml>
+```
+
+To create an OPML Resource Dependency file use the `-r` command line parameter.
+For example:
+
+	mdpre < document.mdp > document.md 2> document.log -r document.opml
+
+You can use the `-r` and [`-m`](#creating-a-make-file-fragment) command line options in the same mdpre run.
+
 ### Defining Variables
 
 You can define variables on the command line when you run mdpre. Use the `-d` switch. For example
@@ -335,7 +391,8 @@ As well as using stdin, stdout, stderr, and file handle 3 you can specify filena
 * `-i` specifies the top-level input filename
 * `-o` specifies the output filename
 * `-l` specifies the log output filename (especially useful with `-v`)
-* `-m` specifies the filename for a makefile fragment (containing dependencies)
+* `-m` specifies the filename for a [make file fragment](#creating-a-make-file-fragment) (containing dependencies)
+* `-r` specifies the filename for an OPML file (containing [dependencies as a tree](#creating-a-resource-dependency-tree-in-opml-format))
 
 For example
 

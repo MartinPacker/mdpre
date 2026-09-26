@@ -1,6 +1,6 @@
 
-mdpre Markdown Preprocessor v1.2.1+ (23 August, 2026)
-=====================================================
+mdpre Markdown Preprocessor v1.2.2+ (26 September, 2026)
+========================================================
 
 Cheetah templating engine imported
 
@@ -13,9 +13,9 @@ Def output = stdout
 
 Def input = stdin
 
-Def node = Mac-Studio-Max.local
+Def node = Mac.domain_not_set.invalid
 
-Def version = Darwin Kernel Version 27.0.0: Tue Aug 11 22:18:52 PDT 2026; root:xnu-13432.1.9~3/RELEASE_ARM64_T6000
+Def version = Darwin Kernel Version 27.2.0: Sun Sep 13 20:01:35 PDT 2026; root:xnu-13432.40.162~92/RELEASE_ARM64_T6000
 
 Def architecture = 64bit Mach-O
 
@@ -23,7 +23,7 @@ Def machine = arm64
 
 Def system = Darwin
 
-Def release = 27.0.0
+Def release = 27.2.0
 
 Def python_version = 3.14.3
 
@@ -31,21 +31,21 @@ Def python_implementation = CPython
 
 Def processor = arm
 
-Def mdpre_date = 23 August, 2026
+Def mdpre_date = 26 September, 2026
 
-Def mdpre_level = 1.2.1+
+Def mdpre_level = 1.2.2+
 
 Def userid = martinpacker
 
-Def day = 31
+Def day = 26
 
-Def month = August
+Def month = September
 
 Def year = 2026
 
-Def time = 14&colon;15
+Def time = 17&colon;40
 
-Def date = 31 August&comma; 2026
+Def date = 26 September&comma; 2026
 
 Def TOC = Table Of Contents
 
@@ -65,6 +65,8 @@ Table Of Contents - spec '2 * Table Of Contents'
 ..... .....  Verbose Mode
 
 ..... .....  Creating A Make File Fragment
+
+..... .....  Creating A Resource Dependency Tree In OPML Format
 
 ..... .....  Defining Variables
 
@@ -192,7 +194,7 @@ CSV Start
 
 CSV Stop
 
------------------------------------------------------
+--------------------------------------------------------
 - Processing completed.
------------------------------------------------------
+--------------------------------------------------------
 
