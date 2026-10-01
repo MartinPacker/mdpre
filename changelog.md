@@ -22,7 +22,7 @@
 ### Releases
 
 
-### v1.2.2+ - 26 September, 2026
+### v1.3 - 1 October, 2026
 
 * **<span class="blue">NEW</span>** [Issue 55](https://github.com/MartinPacker/mdpre/issues/55): `-r filename.opml` emits a resource tree as an OPML file.
 
