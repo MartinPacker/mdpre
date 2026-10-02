@@ -30,8 +30,8 @@ try:
 except:
     have_cheetah = False
 
-mdpre_level = "1.3"
-mdpre_date = "1 October, 2026"
+mdpre_level = "1.3+"
+mdpre_date = "2 October, 2026"
 banner = "mdpre Markdown Preprocessor v" + mdpre_level + " (" + mdpre_date + ")"
 
 def log(textToLog):
@@ -1371,13 +1371,39 @@ def parse_include(input_file):
     return [False, input_file2]
 
 
-def replace_varname(varName):
+def replace_varname(varExpression):
     global vars
+
     for var in vars:
-        if (var[0] == varName) & (var[1] == "T"):
-            # A match so return the value
+        if (var[0] == varExpression) & (var[1] == "T"):
+            # A direct match so return the value
             return var[2]
-    return "&" + varName + ";"
+        elif (varExpression.startswith(var[0] + "[")) & (varExpression.endswith("]")) & (var[1] == "T"):
+            # An indexed match so return the word at the appropriate index
+            
+            # Obtain the index and convert from 1-based to 0-based
+                openBracketPos = varExpression.index("[") + 1
+                indexString = varExpression[openBracketPos:-1]
+                
+                try:
+                    indexValue = int(indexString) - 1
+                except:
+                    log(f"Non-integer subscript: {indexString} in &{varExpression};")
+                    
+                    return "&" + varExpression + ";"
+
+                words = re.findall(r'\w+', var[2])
+                
+                try:
+                    varValue = words[indexValue]
+                    
+                    return varValue
+                except:
+                    log(f"Invalid integer subscript: {indexString} in &{varExpression};")
+                    
+                    return "&" + varExpression + ";"
+                
+    return "&" + varExpression + ";"
 
 
 def substitute_variables(input_line):
